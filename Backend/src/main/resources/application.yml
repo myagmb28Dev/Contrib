@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: contribution-backend
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/contribution}
+    username: ${POSTGRES_USER:contribution}
+    password: ${POSTGRES_PASSWORD:contribution}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
