@@ -1,6 +1,7 @@
-import { RoutePlaceholder } from "@/components/route-placeholder";
+import { AnalysesClient } from "@/components/analyses-client";
+import { AppNav } from "@/components/app-nav";
 
 export default function AnalysesPage() {
-  return <RoutePlaceholder title="Analyses" description="분석 작업 상태와 결과 목록이 들어갈 자리야." />;
+  return <main className="shell"><p className="eyebrow">Contribution Attestation</p><AppNav />
+    <div className="card stack"><h1>Analyses</h1><AnalysesClient /></div></main>;
 }
-

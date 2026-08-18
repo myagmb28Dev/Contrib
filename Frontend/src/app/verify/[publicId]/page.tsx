@@ -1,6 +1,7 @@
-import { RoutePlaceholder } from "@/components/route-placeholder";
+import { VerificationClient } from "@/components/verification-client";
 
-export default function VerifyPage() {
-  return <RoutePlaceholder title="Public Verification" description="로그인 없이 Payload Hash와 On-chain Hash를 비교하는 화면이야." />;
+export default async function VerifyPage({ params }: { params: Promise<{ publicId: string }> }) {
+  const { publicId } = await params;
+  return <main className="shell"><p className="eyebrow">Public Verification</p><div className="card stack">
+    <h1>Certificate Verification</h1><VerificationClient publicId={publicId} /></div></main>;
 }
-

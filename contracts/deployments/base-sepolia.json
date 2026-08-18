@@ -1,0 +1,7 @@
+{
+  "network": "base-sepolia",
+  "chainId": 84532,
+  "contract": "ContributionAttestation",
+  "address": "0xEb1C46cd85512b27c5ac5Aa001fcaa9A91B187d1",
+  "deployer": "0x8754be6567A93785A94dc4d6ccf1CB312D2f0854"
+}

@@ -679,13 +679,13 @@ GET /api/public/certificates/{publicId}/verification
 
 ### Phase 1: Backend 기반과 인증
 
-- [ ] Spring Boot 프로젝트 생성
-- [ ] PostgreSQL 연결
-- [ ] Migration 구성
-- [ ] 공통 예외 응답 구성
-- [ ] GitHub OAuth 구현
-- [ ] User와 GitHubAccount 저장
-- [ ] 로그인·로그아웃·현재 사용자 조회
+- [x] Spring Boot 프로젝트 생성
+- [x] PostgreSQL 연결
+- [x] Migration 구성
+- [x] 공통 예외 응답 구성
+- [x] GitHub OAuth 구현
+- [x] User와 GitHubAccount 저장
+- [x] 로그인·로그아웃·현재 사용자 조회
 
 완료 기준:
 
@@ -693,15 +693,15 @@ GET /api/public/certificates/{publicId}/verification
 
 ### Phase 2: GitHub 데이터 수집
 
-- [ ] Repository 목록 조회
-- [ ] Repository 저장
-- [ ] Commit 수집
-- [ ] Pull Request 수집
-- [ ] Review 수집
-- [ ] Pagination 처리
-- [ ] Rate Limit 처리
-- [ ] RepositorySnapshot 저장
-- [ ] 중복 수집 방지
+- [x] Repository 목록 조회
+- [x] Repository 저장
+- [x] Commit 수집
+- [x] Pull Request 수집
+- [x] Review 수집
+- [x] Pagination 처리
+- [x] Rate Limit 처리
+- [x] RepositorySnapshot 저장
+- [x] 중복 수집 방지
 
 완료 기준:
 
@@ -709,13 +709,13 @@ GET /api/public/certificates/{publicId}/verification
 
 ### Phase 3: Contribution Analysis
 
-- [ ] ActivityEvent 정규화
-- [ ] 원시 metrics 계산
-- [ ] Score v1 계산
-- [ ] Score version 저장
-- [ ] Analysis 결과 저장
-- [ ] 분석 작업 재시도
-- [ ] Dashboard 구현
+- [x] ActivityEvent 정규화
+- [x] 원시 metrics 계산
+- [x] Score v1 계산
+- [x] Score version 저장
+- [x] Analysis 결과 저장
+- [x] 분석 작업 재시도
+- [x] Dashboard 구현
 
 완료 기준:
 
@@ -723,14 +723,14 @@ GET /api/public/certificates/{publicId}/verification
 
 ### Phase 4: Certificate와 공개 검증
 
-- [ ] Certificate Payload 생성
-- [ ] Canonical JSON 구현
-- [ ] Hash 생성
-- [ ] Certificate Preview 구현
-- [ ] Certificate 발급 상태 관리
-- [ ] 공개 Certificate 페이지
-- [ ] Payload 다운로드
-- [ ] Hash 재계산 검증
+- [x] Certificate Payload 생성
+- [x] Canonical JSON 구현
+- [x] Hash 생성
+- [x] Certificate Preview 구현
+- [x] Certificate 발급 상태 관리
+- [x] 공개 Certificate 페이지
+- [x] Payload 다운로드
+- [x] Hash 재계산 검증
 
 완료 기준:
 
@@ -738,15 +738,15 @@ GET /api/public/certificates/{publicId}/verification
 
 ### Phase 5: Blockchain과 Wallet
 
-- [ ] Foundry 프로젝트 생성
-- [ ] Smart Contract 작성
-- [ ] Contract Unit Test
-- [ ] Base Sepolia 배포
-- [ ] Wallet 연결
-- [ ] 발급 트랜잭션 요청
-- [ ] Receipt 확인
-- [ ] Transaction 정보 저장
-- [ ] On-chain Hash 검증
+- [x] Foundry 프로젝트 생성
+- [x] Smart Contract 작성
+- [x] Contract Unit Test
+- [x] Base Sepolia 배포
+- [x] Wallet 연결
+- [x] 발급 트랜잭션 요청
+- [x] Receipt 확인
+- [x] Transaction 정보 저장
+- [x] On-chain Hash 검증
 
 완료 기준:
 
@@ -754,13 +754,13 @@ GET /api/public/certificates/{publicId}/verification
 
 ### Phase 6: AI Summary
 
-- [ ] Snapshot 기반 AI 입력 구조 생성
-- [ ] Prompt 버전 관리
-- [ ] Structured Output 검증
-- [ ] Summary 생성
-- [ ] Technical Area 생성
-- [ ] 결과 재생성
-- [ ] AI 실패 시 Fallback
+- [x] Snapshot 기반 AI 입력 구조 생성
+- [x] Prompt 버전 관리
+- [x] Structured Output 검증
+- [x] Summary 생성
+- [x] Technical Area 생성
+- [x] 결과 재생성
+- [x] AI 실패 시 Fallback
 
 완료 기준:
 
@@ -849,4 +849,3 @@ GET /api/public/certificates/{publicId}/verification
 10. 로그인하지 않은 사용자가 Certificate를 검증한다.
 11. Payload Hash와 On-chain Hash가 일치한다.
 12. Certificate를 폐기하면 검증 결과가 REVOKED로 바뀐다.
-

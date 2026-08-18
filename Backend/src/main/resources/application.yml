@@ -1,6 +1,10 @@
 spring:
   application:
     name: contribution-backend
+  config:
+    import:
+      - optional:file:../.env[.properties]
+      - optional:file:../.env.local[.properties]
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/contribution}
     username: ${POSTGRES_USER:contribution}
@@ -11,13 +15,47 @@ spring:
       ddl-auto: none
   flyway:
     enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID:github-client-id-not-configured}
+            client-secret: ${GITHUB_CLIENT_SECRET:github-client-secret-not-configured}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/api/auth/github/callback/{registrationId}"
+            scope:
+              - read:user
+              - user:email
+        provider:
+          github:
+            user-name-attribute: id
 
 server:
   port: ${SERVER_PORT:8080}
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: ${SESSION_COOKIE_SECURE:false}
+        same-site: lax
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}
+  github:
+    refresh-token-ttl: ${GITHUB_REFRESH_TOKEN_TTL:PT4416H}
+  security:
+    token-encryption-key: ${TOKEN_ENCRYPTION_KEY}
+  blockchain:
+    chain-id: ${BLOCKCHAIN_CHAIN_ID:84532}
+    network: ${BLOCKCHAIN_NETWORK:base-sepolia}
+    contract-address: ${ATTESTATION_CONTRACT_ADDRESS:}
+    rpc-url: ${BASE_SEPOLIA_RPC_URL:https://base-sepolia-rpc.publicnode.com}
+  ai:
+    provider: ${AI_PROVIDER:rule-based}
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
-

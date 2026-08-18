@@ -1,6 +1,7 @@
-import { RoutePlaceholder } from "@/components/route-placeholder";
+import { CertificateDetailClient } from "@/components/certificate-detail-client";
 
-export default function CertificatePage() {
-  return <RoutePlaceholder title="Certificate" description="Payload, Hash, Blockchain 상태와 공개 URL이 들어갈 자리야." />;
+export default async function CertificatePage({ params }: { params: Promise<{ certificateId: string }> }) {
+  const { certificateId } = await params;
+  return <main className="shell"><p className="eyebrow">Certificate</p><div className="card stack">
+    <h1>Certificate</h1><CertificateDetailClient certificateId={certificateId} /></div></main>;
 }
-

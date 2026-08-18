@@ -1,6 +1,7 @@
-import { RoutePlaceholder } from "@/components/route-placeholder";
+import { AnalysisDetailClient } from "@/components/analysis-detail-client";
 
-export default function AnalysisPage() {
-  return <RoutePlaceholder title="Analysis Result" description="Snapshot, metrics, Score, AI 요약 결과가 들어갈 자리야." />;
+export default async function AnalysisPage({ params }: { params: Promise<{ analysisId: string }> }) {
+  const { analysisId } = await params;
+  return <main className="shell"><p className="eyebrow">Analysis</p><div className="card stack">
+    <h1>Analysis Result</h1><AnalysisDetailClient analysisId={analysisId} /></div></main>;
 }
-

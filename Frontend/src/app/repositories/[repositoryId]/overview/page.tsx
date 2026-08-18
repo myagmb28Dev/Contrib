@@ -1,6 +1,7 @@
-import { RoutePlaceholder } from "@/components/route-placeholder";
+import { RepositoryOverviewClient } from "@/components/repository-overview-client";
 
-export default function RepositoryOverviewPage() {
-  return <RoutePlaceholder title="Repository Overview" description="Repository 메타데이터와 최근 분석이 들어갈 자리야." />;
+export default async function RepositoryOverviewPage({ params }: { params: Promise<{ repositoryId: string }> }) {
+  const { repositoryId } = await params;
+  return <main className="shell"><p className="eyebrow">Repository</p><div className="card stack">
+    <h1>Repository Overview</h1><RepositoryOverviewClient repositoryId={repositoryId} /></div></main>;
 }
-

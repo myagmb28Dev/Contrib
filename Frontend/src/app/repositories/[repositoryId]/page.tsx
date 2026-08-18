@@ -1,6 +1,6 @@
-import { RoutePlaceholder } from "@/components/route-placeholder";
+import { redirect } from "next/navigation";
 
-export default function RepositoryPage() {
-  return <RoutePlaceholder title="Repository" description="선택한 Repository의 분석 진입 화면이 들어갈 자리야." />;
+export default async function RepositoryPage({ params }: { params: Promise<{ repositoryId: string }> }) {
+  const { repositoryId } = await params;
+  redirect(`/repositories/${repositoryId}/overview`);
 }
-
