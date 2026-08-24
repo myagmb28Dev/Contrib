@@ -10,9 +10,7 @@ export default function HomePage() {
       </p>
       <nav className="nav" aria-label="주요 메뉴">
         <Link href="/login">GitHub로 시작하기</Link>
-        <Link href="/verify/demo">공개 검증 예시</Link>
       </nav>
     </main>
   );
 }
-
