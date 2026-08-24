@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BlockchainService {
 
     private static final String ISSUE_EVENT = "CertificateIssued(bytes32,bytes32,address,address)";
+    private static final String REVOKE_EVENT = "CertificateRevoked(bytes32,address,uint64)";
 
     private final BlockchainProperties properties;
     private final CertificateRepository certificateRepository;
@@ -67,8 +68,19 @@ public class BlockchainService {
         String issuer = payloadFactory.normalizeAddress(issuerWalletAddress);
         var existing = attestationRepository.findByCertificateId(certificateId);
         if (existing.isPresent()) {
+            if (!existing.get().getTransactionHash().equalsIgnoreCase(txHash)
+                    && existing.get().getStatus()
+                    == com.example.project.blockchain.domain.AttestationStatus.FAILED) {
+                certificate.setIssuerWalletAddress(issuer);
+            } else if (!issuer.equalsIgnoreCase(certificate.getIssuerWalletAddress())) {
+                throw new IllegalArgumentException("Transaction issuer does not match the certificate issuer");
+            }
             if (!existing.get().getTransactionHash().equalsIgnoreCase(txHash)) {
-                throw new IllegalArgumentException("Certificate already has another transaction");
+                if (existing.get().getStatus()
+                        != com.example.project.blockchain.domain.AttestationStatus.FAILED) {
+                    throw new IllegalArgumentException("Certificate already has another transaction");
+                }
+                existing.get().resubmit(txHash);
             }
             refresh(existing.get());
             return AttestationResponse.from(existing.get());
@@ -90,7 +102,73 @@ public class BlockchainService {
             throw new ResourceNotFoundException("Blockchain transaction not found");
         }
         refresh(attestation);
+        refreshRevocation(attestation);
         return AttestationResponse.from(attestation);
+    }
+
+    @Transactional
+    public AttestationResponse getForCertificate(UUID userId, UUID certificateId) {
+        ownedCertificate(userId, certificateId);
+        BlockchainAttestation attestation = attestationRepository.findByCertificateId(certificateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Blockchain attestation not found"));
+        refresh(attestation);
+        refreshRevocation(attestation);
+        return AttestationResponse.from(attestation);
+    }
+
+    @Transactional(readOnly = true)
+    public AttestationIntentResponse revocationIntent(UUID userId, UUID certificateId) {
+        Certificate certificate = ownedCertificate(userId, certificateId);
+        ensureConfigured();
+        BlockchainAttestation attestation = attestationRepository.findByCertificateId(certificateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Blockchain attestation not found"));
+        if (attestation.getStatus() != com.example.project.blockchain.domain.AttestationStatus.CONFIRMED) {
+            throw new IllegalStateException("Certificate must be confirmed on-chain before revocation");
+        }
+        if (certificate.getStatus() == com.example.project.certificate.domain.CertificateStatus.REVOKED) {
+            throw new IllegalStateException("Certificate is already revoked");
+        }
+        return new AttestationIntentResponse(certificate.getId(), properties.getChainId(), properties.getNetwork(),
+                properties.getContractAddress().toLowerCase(Locale.ROOT), "revoke",
+                List.of(attestation.getOnchainCertificateId()), attestation.getOnchainCertificateId(),
+                certificate.getCertificateHash());
+    }
+
+    @Transactional
+    public AttestationResponse submitRevocation(UUID userId, UUID certificateId, String transactionHash,
+            String issuerWalletAddress, String reason) {
+        Certificate certificate = ownedCertificate(userId, certificateId);
+        BlockchainAttestation attestation = attestationRepository.findByCertificateId(certificateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Blockchain attestation not found"));
+        if (attestation.getStatus() != com.example.project.blockchain.domain.AttestationStatus.CONFIRMED) {
+            throw new IllegalStateException("Certificate must be confirmed on-chain before revocation");
+        }
+        String issuer = payloadFactory.normalizeAddress(issuerWalletAddress);
+        if (!issuer.equalsIgnoreCase(certificate.getIssuerWalletAddress())) {
+            throw new IllegalArgumentException("Only the original issuer wallet can revoke the certificate");
+        }
+        String txHash = requireHash(transactionHash, "Revocation transaction hash");
+        if (attestation.getRevocationTransactionHash() != null
+                && !attestation.getRevocationTransactionHash().equalsIgnoreCase(txHash)) {
+            if (attestation.getRevocationStatus()
+                    != com.example.project.blockchain.domain.AttestationStatus.FAILED) {
+                throw new IllegalArgumentException("Certificate already has another revocation transaction");
+            }
+            attestation.submitRevocation(txHash, reason);
+        }
+        if (attestation.getRevocationTransactionHash() == null) {
+            attestation.submitRevocation(txHash, reason);
+        }
+        refreshRevocation(attestation);
+        return AttestationResponse.from(attestation);
+    }
+
+    @Transactional
+    public void refreshPending(UUID attestationId) {
+        attestationRepository.findById(attestationId).ifPresent(attestation -> {
+            refresh(attestation);
+            refreshRevocation(attestation);
+        });
     }
 
     public boolean refresh(BlockchainAttestation attestation) {
@@ -108,6 +186,31 @@ public class BlockchainService {
                 return false;
             }
             attestation.confirm(receipt.blockNumber());
+            return true;
+        } catch (BlockchainRpcException exception) {
+            return false;
+        }
+    }
+
+    public boolean refreshRevocation(BlockchainAttestation attestation) {
+        if (attestation.getRevocationStatus() == null) {
+            return false;
+        }
+        if (attestation.getRevocationStatus() != com.example.project.blockchain.domain.AttestationStatus.PENDING) {
+            return attestation.getRevocationStatus()
+                    == com.example.project.blockchain.domain.AttestationStatus.CONFIRMED;
+        }
+        try {
+            TransactionReceiptData receipt = rpcClient.getTransactionReceipt(attestation.getRevocationTransactionHash());
+            if (receipt == null) {
+                return false;
+            }
+            if (!receipt.successful() || !receipt.contractAddress().equalsIgnoreCase(attestation.getContractAddress())
+                    || !hasExpectedRevokeLog(receipt, attestation)) {
+                attestation.failRevocation();
+                return false;
+            }
+            attestation.confirmRevocation(receipt.blockNumber());
             return true;
         } catch (BlockchainRpcException exception) {
             return false;
@@ -139,7 +242,30 @@ public class BlockchainService {
         return false;
     }
 
+    private boolean hasExpectedRevokeLog(TransactionReceiptData receipt, BlockchainAttestation attestation) {
+        if (!receipt.logs().isArray()) {
+            return false;
+        }
+        String eventTopic = hasher.hashUtf8(REVOKE_EVENT);
+        for (var log : receipt.logs()) {
+            var topics = log.path("topics");
+            if (!log.path("address").asText().equalsIgnoreCase(attestation.getContractAddress())
+                    || topics.size() != 3
+                    || !topics.get(0).asText().equalsIgnoreCase(eventTopic)
+                    || !topics.get(1).asText().equalsIgnoreCase(attestation.getOnchainCertificateId())
+                    || !topicAddress(topics.get(2).asText()).equalsIgnoreCase(
+                            attestation.getCertificate().getIssuerWalletAddress())) {
+                continue;
+            }
+            return log.path("data").asText().matches("0x[0-9a-fA-F]{64}");
+        }
+        return false;
+    }
+
     private String topicAddress(String topic) {
+        if (topic == null || !topic.matches("0x[0-9a-fA-F]{64}")) {
+            return "";
+        }
         return "0x" + topic.substring(topic.length() - 40);
     }
 

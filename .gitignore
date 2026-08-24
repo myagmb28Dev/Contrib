@@ -26,6 +26,8 @@ Frontend/node_modules/
 Frontend/.next/
 Frontend/out/
 Frontend/coverage/
+Frontend/test-results/
+Frontend/playwright-report/
 Frontend/next-env.d.ts
 Frontend/*.tsbuildinfo
 Frontend/npm-debug.log*
@@ -42,4 +44,5 @@ contracts/.gas-snapshot
 
 # Local infrastructure data
 postgres-data/
+backups/
 *.log

@@ -6,6 +6,7 @@ import com.example.project.auth.service.GitHubPrincipal;
 import com.example.project.blockchain.dto.AttestationIntentResponse;
 import com.example.project.blockchain.dto.AttestationResponse;
 import com.example.project.blockchain.dto.SubmitTransactionRequest;
+import com.example.project.blockchain.dto.SubmitRevocationRequest;
 import com.example.project.blockchain.service.BlockchainService;
 
 import jakarta.validation.Valid;
@@ -39,6 +40,25 @@ public class BlockchainController {
             @PathVariable UUID certificateId, @Valid @RequestBody SubmitTransactionRequest request) {
         return blockchainService.submit(principal.getUserId(), certificateId,
                 request.transactionHash(), request.issuerWalletAddress());
+    }
+
+    @GetMapping("/certificates/{certificateId}/attestation")
+    public AttestationResponse getForCertificate(@AuthenticationPrincipal GitHubPrincipal principal,
+            @PathVariable UUID certificateId) {
+        return blockchainService.getForCertificate(principal.getUserId(), certificateId);
+    }
+
+    @PostMapping("/certificates/{certificateId}/revocation-intent")
+    public AttestationIntentResponse revocationIntent(@AuthenticationPrincipal GitHubPrincipal principal,
+            @PathVariable UUID certificateId) {
+        return blockchainService.revocationIntent(principal.getUserId(), certificateId);
+    }
+
+    @PostMapping("/certificates/{certificateId}/revocation-transactions")
+    public AttestationResponse submitRevocation(@AuthenticationPrincipal GitHubPrincipal principal,
+            @PathVariable UUID certificateId, @Valid @RequestBody SubmitRevocationRequest request) {
+        return blockchainService.submitRevocation(principal.getUserId(), certificateId,
+                request.transactionHash(), request.issuerWalletAddress(), request.reason());
     }
 
     @GetMapping("/blockchain/transactions/{transactionHash}")

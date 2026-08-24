@@ -1,8 +1,10 @@
 package com.example.project.common.security;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.example.project.auth.service.GitHubOAuth2UserService;
+import com.example.project.common.config.RequestCorrelationFilter;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,22 +28,37 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final OAuth2AuthorizedClientService authorizedClientService;
     private final String frontendUrl;
+    private final List<String> allowedOrigins;
+    private final boolean secureCookie;
+    private final String sameSiteCookie;
 
     public SecurityConfig(
             GitHubOAuth2UserService gitHubOAuth2UserService,
             RestAuthenticationEntryPoint authenticationEntryPoint,
             OAuth2AuthorizedClientService authorizedClientService,
-            @Value("${app.frontend-url}") String frontendUrl) {
+            @Value("${app.frontend-url}") String frontendUrl,
+            @Value("${app.cors.allowed-origins:${app.frontend-url}}") String allowedOrigins,
+            @Value("${server.servlet.session.cookie.secure:false}") boolean secureCookie,
+            @Value("${server.servlet.session.cookie.same-site:lax}") String sameSiteCookie) {
         this.gitHubOAuth2UserService = gitHubOAuth2UserService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.authorizedClientService = authorizedClientService;
         this.frontendUrl = frontendUrl;
+        this.allowedOrigins = Arrays.stream(StringUtils.commaDelimitedListToStringArray(allowedOrigins))
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .toList();
+        this.secureCookie = secureCookie;
+        this.sameSiteCookie = sameSiteCookie;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrfTokenRepository.setCookiePath("/");
+        csrfTokenRepository.setCookieCustomizer(cookie -> cookie
+                .secure(secureCookie)
+                .sameSite(sameSiteCookie));
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -53,6 +71,10 @@ public class SecurityConfig {
                                 "/error",
                                 "/api/health",
                                 "/actuator/health",
+                                "/actuator/health/**",
+                                "/actuator/prometheus",
+                                "/livez",
+                                "/readyz",
                                 "/oauth2/authorization/**",
                                 "/api/auth/github",
                                 "/api/auth/github/callback/**",
@@ -88,9 +110,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontendUrl));
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Content-Type", "Accept", "X-XSRF-TOKEN"));
+        configuration.setExposedHeaders(List.of(RequestCorrelationFilter.HEADER_NAME));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 

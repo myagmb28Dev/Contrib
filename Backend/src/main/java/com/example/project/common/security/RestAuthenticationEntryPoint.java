@@ -2,6 +2,7 @@ package com.example.project.common.security;
 
 import java.io.IOException;
 
+import com.example.project.common.config.RequestCorrelationFilter;
 import com.example.project.common.response.ApiErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -9,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -35,6 +37,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 HttpStatus.UNAUTHORIZED.value(),
                 "AUTHENTICATION_REQUIRED",
                 "Authentication is required",
-                request.getRequestURI()));
+                request.getRequestURI(),
+                MDC.get(RequestCorrelationFilter.MDC_KEY)));
     }
 }

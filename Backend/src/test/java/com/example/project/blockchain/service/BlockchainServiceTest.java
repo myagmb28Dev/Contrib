@@ -3,6 +3,7 @@ package com.example.project.blockchain.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 import com.example.project.blockchain.client.EthereumJsonRpcClient;
 import com.example.project.blockchain.config.BlockchainProperties;
@@ -32,6 +33,7 @@ class BlockchainServiceTest {
     private final EthereumKeccak256 hasher = new EthereumKeccak256();
     private BlockchainService service;
     private BlockchainAttestation attestation;
+    private Certificate certificate;
 
     @BeforeEach
     void setUp() {
@@ -44,7 +46,7 @@ class BlockchainServiceTest {
                 mock(BlockchainAttestationRepository.class), mock(CertificatePayloadFactory.class),
                 hasher, rpcClient);
 
-        Certificate certificate = mock(Certificate.class);
+        certificate = mock(Certificate.class);
         when(certificate.getCertificateHash()).thenReturn(CERTIFICATE_HASH);
         when(certificate.getIssuerWalletAddress()).thenReturn(ISSUER);
         when(certificate.getSubjectWalletAddress()).thenReturn(SUBJECT);
@@ -70,6 +72,18 @@ class BlockchainServiceTest {
         assertThat(attestation.getStatus()).isEqualTo(AttestationStatus.FAILED);
     }
 
+    @Test
+    void confirmsRevocationReceiptAndRevokesCertificate() throws Exception {
+        String revocationHash = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+        attestation.submitRevocation(revocationHash, "Superseded certificate");
+        when(rpcClient.getTransactionReceipt(revocationHash)).thenReturn(revocationReceipt(revocationHash));
+
+        assertThat(service.refreshRevocation(attestation)).isTrue();
+        assertThat(attestation.getRevocationStatus()).isEqualTo(AttestationStatus.CONFIRMED);
+        assertThat(attestation.getRevocationBlockNumber()).isEqualTo(43L);
+        verify(certificate).revoke("Superseded certificate");
+    }
+
     private TransactionReceiptData receipt(String emittedHash) throws Exception {
         String eventTopic = hasher.hashUtf8("CertificateIssued(bytes32,bytes32,address,address)");
         String issuerTopic = "0x" + "0".repeat(24) + ISSUER.substring(2);
@@ -82,6 +96,20 @@ class BlockchainServiceTest {
                 }]
                 """.formatted(CONTRACT, eventTopic, ONCHAIN_ID, issuerTopic, subjectTopic, emittedHash);
         return new TransactionReceiptData(TX_HASH, CONTRACT, true, 42L,
+                new ObjectMapper().readTree(logs));
+    }
+
+    private TransactionReceiptData revocationReceipt(String transactionHash) throws Exception {
+        String eventTopic = hasher.hashUtf8("CertificateRevoked(bytes32,address,uint64)");
+        String issuerTopic = "0x" + "0".repeat(24) + ISSUER.substring(2);
+        String logs = """
+                [{
+                  "address":"%s",
+                  "topics":["%s","%s","%s"],
+                  "data":"0x%s"
+                }]
+                """.formatted(CONTRACT, eventTopic, ONCHAIN_ID, issuerTopic, "0".repeat(63) + "1");
+        return new TransactionReceiptData(transactionHash, CONTRACT, true, 43L,
                 new ObjectMapper().readTree(logs));
     }
 }
