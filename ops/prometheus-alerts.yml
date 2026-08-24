@@ -1,0 +1,42 @@
+groups:
+  - name: contrib-backend
+    rules:
+      - alert: ContribBackendDown
+        expr: up{job="contrib-backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Contrib backend is unavailable
+      - alert: ContribBackendHighErrorRate
+        expr: |
+          sum(rate(http_server_requests_seconds_count{job="contrib-backend",status=~"5.."}[5m]))
+          /
+          clamp_min(sum(rate(http_server_requests_seconds_count{job="contrib-backend"}[5m])), 0.001)
+          > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Contrib backend 5xx rate is above 5 percent
+      - alert: ContribBackendHighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_server_requests_seconds_bucket{job="contrib-backend"}[5m])))
+          > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Contrib backend p95 latency is above 2 seconds
+      - alert: ContribDatabasePoolSaturated
+        expr: |
+          hikaricp_connections_active{job="contrib-backend"}
+          /
+          clamp_min(hikaricp_connections_max{job="contrib-backend"}, 1)
+          > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Contrib database pool is above 90 percent utilization

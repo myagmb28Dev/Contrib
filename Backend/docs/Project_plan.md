@@ -700,6 +700,7 @@ GET /api/public/certificates/{publicId}/verification
 - [x] Review 수집
 - [x] Pagination 처리
 - [x] Rate Limit 처리
+- [x] Rate Limit 자동 대기와 지수 백오프 재시도
 - [x] RepositorySnapshot 저장
 - [x] 중복 수집 방지
 
@@ -715,6 +716,7 @@ GET /api/public/certificates/{publicId}/verification
 - [x] Score version 저장
 - [x] Analysis 결과 저장
 - [x] 분석 작업 재시도
+- [x] DB Lease 기반 작업 복구와 재시작 후 재개
 - [x] Dashboard 구현
 
 완료 기준:
@@ -747,6 +749,9 @@ GET /api/public/certificates/{publicId}/verification
 - [x] Receipt 확인
 - [x] Transaction 정보 저장
 - [x] On-chain Hash 검증
+- [x] Receipt 백그라운드 조정과 UI 폴링
+- [x] On-chain Certificate 폐기
+- [x] GitHub 연결부터 공개 검증·폐기까지 자동 E2E 테스트
 
 완료 기준:
 
@@ -773,11 +778,12 @@ GET /api/public/certificates/{publicId}/verification
 - [ ] PostgreSQL 운영 환경 구성
 - [ ] HTTPS
 - [ ] Production OAuth 설정
-- [ ] Secret 관리
-- [ ] Backup
-- [ ] Structured Logging
-- [ ] Monitoring
-- [ ] Error Tracking
+- [x] Container 배포 Artifact와 운영 환경 검증
+- [x] Secret 관리 절차와 필수값 검증
+- [x] Backup·검증·보존 스크립트
+- [x] ECS JSON Structured Logging
+- [x] Health Probe, Prometheus Metrics, Alert 규칙
+- [x] Request ID 기반 Error Tracking
 
 완료 기준:
 

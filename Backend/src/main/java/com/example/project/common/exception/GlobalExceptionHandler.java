@@ -1,19 +1,25 @@
 package com.example.project.common.exception;
 
+import com.example.project.common.config.RequestCorrelationFilter;
 import com.example.project.common.response.ApiErrorResponse;
+import com.example.project.github.client.GitHubApiException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import com.example.project.github.client.GitHubApiException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(
@@ -57,12 +63,37 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.NOT_FOUND, "NOT_FOUND", exception.getMessage(), request);
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleNoResource(
+            NoResourceFoundException exception, HttpServletRequest request) {
+        return error(HttpStatus.NOT_FOUND, "NOT_FOUND", "Resource not found", request);
+    }
+
     @ExceptionHandler(GitHubApiException.class)
     public ResponseEntity<ApiErrorResponse> handleGitHubApi(
             GitHubApiException exception, HttpServletRequest request) {
         HttpStatus status = exception.getStatusCode() == 429 || exception.getStatusCode() == 403
                 ? HttpStatus.TOO_MANY_REQUESTS : HttpStatus.BAD_GATEWAY;
         return error(status, "GITHUB_API_FAILED", exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorResponse> handleUnexpected(
+            Exception exception,
+            HttpServletRequest request) {
+        String requestId = requestId();
+        LOGGER.atError()
+                .addKeyValue("errorCode", "UNEXPECTED_ERROR")
+                .addKeyValue("requestId", requestId)
+                .addKeyValue("requestPath", request.getRequestURI())
+                .setCause(exception)
+                .log("Unhandled request failure");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiErrorResponse.of(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "UNEXPECTED_ERROR",
+                "Unexpected server error",
+                request.getRequestURI(),
+                requestId));
     }
 
     private ResponseEntity<ApiErrorResponse> error(
@@ -74,6 +105,12 @@ public class GlobalExceptionHandler {
                 status.value(),
                 code,
                 message,
-                request.getRequestURI()));
+                request.getRequestURI(),
+                requestId()));
+    }
+
+    private String requestId() {
+        String requestId = MDC.get(RequestCorrelationFilter.MDC_KEY);
+        return requestId == null ? "unavailable" : requestId;
     }
 }

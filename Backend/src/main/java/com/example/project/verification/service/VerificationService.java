@@ -6,6 +6,7 @@ import com.example.project.blockchain.client.BlockchainRpcException;
 import com.example.project.blockchain.client.EthereumJsonRpcClient;
 import com.example.project.blockchain.domain.AttestationStatus;
 import com.example.project.blockchain.repository.BlockchainAttestationRepository;
+import com.example.project.blockchain.service.BlockchainService;
 import com.example.project.certificate.domain.Certificate;
 import com.example.project.certificate.domain.CertificateStatus;
 import com.example.project.certificate.hashing.EthereumKeccak256;
@@ -23,17 +24,18 @@ public class VerificationService {
     private final BlockchainAttestationRepository attestationRepository;
     private final EthereumKeccak256 hasher;
     private final EthereumJsonRpcClient rpcClient;
+    private final BlockchainService blockchainService;
 
     public VerificationService(CertificateRepository certificateRepository,
             BlockchainAttestationRepository attestationRepository, EthereumKeccak256 hasher,
-            EthereumJsonRpcClient rpcClient) {
+            EthereumJsonRpcClient rpcClient, BlockchainService blockchainService) {
         this.certificateRepository = certificateRepository;
         this.attestationRepository = attestationRepository;
         this.hasher = hasher;
         this.rpcClient = rpcClient;
+        this.blockchainService = blockchainService;
     }
 
-    @Transactional(readOnly = true)
     public VerificationResponse verify(UUID publicId) {
         var optional = certificateRepository.findByPublicId(publicId);
         if (optional.isEmpty()) {
@@ -46,6 +48,8 @@ public class VerificationService {
                     calculated, null, "Payload hash does not match");
         }
         var attestation = attestationRepository.findByCertificateId(certificate.getId());
+        attestation.ifPresent(value -> blockchainService.refreshPending(value.getId()));
+        attestation = attestationRepository.findByCertificateId(certificate.getId());
         String txHash = attestation.map(value -> value.getTransactionHash()).orElse(null);
         if (certificate.getStatus() == CertificateStatus.REVOKED) {
             return response(publicId, VerificationStatus.REVOKED, certificate.getCertificateHash(),

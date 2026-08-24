@@ -60,6 +60,15 @@ public class AnalysisJob extends BaseTimeEntity {
     @Column(name = "completed_at")
     private Instant completedAt;
 
+    @Column(name = "attempt_count", nullable = false)
+    private int attemptCount;
+
+    @Column(name = "next_attempt_at")
+    private Instant nextAttemptAt;
+
+    @Column(name = "lease_expires_at")
+    private Instant leaseExpiresAt;
+
     protected AnalysisJob() {
     }
 
@@ -73,6 +82,8 @@ public class AnalysisJob extends BaseTimeEntity {
         this.collectorVersion = collectorVersion;
         this.status = AnalysisJobStatus.PENDING;
         this.progress = 0;
+        this.attemptCount = 0;
+        this.nextAttemptAt = Instant.now();
     }
 
     public static AnalysisJob create(User user, GitHubRepository repository, Instant periodStart,
@@ -83,15 +94,36 @@ public class AnalysisJob extends BaseTimeEntity {
         return new AnalysisJob(UUID.randomUUID(), user, repository, periodStart, periodEnd, collectorVersion);
     }
 
-    public void startCollection() { status = AnalysisJobStatus.COLLECTING; progress = 10; startedAt = Instant.now(); }
-    public void startAnalysis() { status = AnalysisJobStatus.ANALYZING; progress = 60; }
-    public void startAiProcessing() { status = AnalysisJobStatus.AI_PROCESSING; progress = 85; }
-    public void complete() { status = AnalysisJobStatus.COMPLETED; progress = 100; completedAt = Instant.now(); }
+    public void startCollection(Instant leaseExpiresAt) {
+        status = AnalysisJobStatus.COLLECTING;
+        progress = 10;
+        startedAt = startedAt == null ? Instant.now() : startedAt;
+        this.leaseExpiresAt = leaseExpiresAt;
+    }
+    public void startAnalysis(Instant leaseExpiresAt) {
+        status = AnalysisJobStatus.ANALYZING;
+        progress = 60;
+        this.leaseExpiresAt = leaseExpiresAt;
+    }
+    public void startAiProcessing(Instant leaseExpiresAt) {
+        status = AnalysisJobStatus.AI_PROCESSING;
+        progress = 85;
+        this.leaseExpiresAt = leaseExpiresAt;
+    }
+    public void complete() {
+        status = AnalysisJobStatus.COMPLETED;
+        progress = 100;
+        completedAt = Instant.now();
+        leaseExpiresAt = null;
+        nextAttemptAt = null;
+    }
     public void fail(String code, String message) {
         status = AnalysisJobStatus.FAILED;
         errorCode = code;
         errorMessage = message == null ? null : message.substring(0, Math.min(message.length(), 2000));
         completedAt = Instant.now();
+        leaseExpiresAt = null;
+        nextAttemptAt = null;
     }
     public void retry() {
         if (status != AnalysisJobStatus.FAILED) {
@@ -103,6 +135,8 @@ public class AnalysisJob extends BaseTimeEntity {
         errorMessage = null;
         startedAt = null;
         completedAt = null;
+        leaseExpiresAt = null;
+        nextAttemptAt = Instant.now();
     }
 
     public UUID getId() { return id; }
@@ -117,4 +151,7 @@ public class AnalysisJob extends BaseTimeEntity {
     public String getErrorMessage() { return errorMessage; }
     public Instant getStartedAt() { return startedAt; }
     public Instant getCompletedAt() { return completedAt; }
+    public int getAttemptCount() { return attemptCount; }
+    public Instant getNextAttemptAt() { return nextAttemptAt; }
+    public Instant getLeaseExpiresAt() { return leaseExpiresAt; }
 }

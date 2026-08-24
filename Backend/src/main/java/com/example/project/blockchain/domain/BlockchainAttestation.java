@@ -55,6 +55,25 @@ public class BlockchainAttestation extends BaseTimeEntity {
     @Column(name = "confirmed_at")
     private Instant confirmedAt;
 
+    @Column(name = "revocation_transaction_hash", unique = true, length = 66)
+    private String revocationTransactionHash;
+
+    @Column(name = "revocation_block_number")
+    private Long revocationBlockNumber;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "revocation_status")
+    private AttestationStatus revocationStatus;
+
+    @Column(name = "revocation_reason", columnDefinition = "TEXT")
+    private String revocationReason;
+
+    @Column(name = "revocation_submitted_at")
+    private Instant revocationSubmittedAt;
+
+    @Column(name = "revocation_confirmed_at")
+    private Instant revocationConfirmedAt;
+
     protected BlockchainAttestation() {
     }
 
@@ -81,6 +100,32 @@ public class BlockchainAttestation extends BaseTimeEntity {
 
     public void fail() { this.status = AttestationStatus.FAILED; }
 
+    public void resubmit(String transactionHash) {
+        this.transactionHash = transactionHash;
+        this.blockNumber = null;
+        this.status = AttestationStatus.PENDING;
+        this.submittedAt = Instant.now();
+        this.confirmedAt = null;
+    }
+
+    public void submitRevocation(String transactionHash, String reason) {
+        this.revocationTransactionHash = transactionHash;
+        this.revocationReason = reason;
+        this.revocationStatus = AttestationStatus.PENDING;
+        this.revocationSubmittedAt = Instant.now();
+        this.revocationBlockNumber = null;
+        this.revocationConfirmedAt = null;
+    }
+
+    public void confirmRevocation(long blockNumber) {
+        this.revocationBlockNumber = blockNumber;
+        this.revocationStatus = AttestationStatus.CONFIRMED;
+        this.revocationConfirmedAt = Instant.now();
+        this.certificate.revoke(revocationReason);
+    }
+
+    public void failRevocation() { this.revocationStatus = AttestationStatus.FAILED; }
+
     public UUID getId() { return id; }
     public Certificate getCertificate() { return certificate; }
     public long getChainId() { return chainId; }
@@ -92,4 +137,10 @@ public class BlockchainAttestation extends BaseTimeEntity {
     public AttestationStatus getStatus() { return status; }
     public Instant getSubmittedAt() { return submittedAt; }
     public Instant getConfirmedAt() { return confirmedAt; }
+    public String getRevocationTransactionHash() { return revocationTransactionHash; }
+    public Long getRevocationBlockNumber() { return revocationBlockNumber; }
+    public AttestationStatus getRevocationStatus() { return revocationStatus; }
+    public String getRevocationReason() { return revocationReason; }
+    public Instant getRevocationSubmittedAt() { return revocationSubmittedAt; }
+    public Instant getRevocationConfirmedAt() { return revocationConfirmedAt; }
 }
