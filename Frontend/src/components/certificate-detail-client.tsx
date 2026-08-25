@@ -52,14 +52,14 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
           setCertificate(await getCertificate(certificateId));
         }
       } catch (reason) {
-        setError(reason instanceof Error ? reason.message : "트랜잭션 상태를 확인하지 못했어.");
+        setError(reason instanceof Error ? reason.message : "트랜잭션 상태를 확인하지 못했습니다.");
       }
     }, 1500);
     return () => window.clearInterval(timer);
   }, [attestation, certificateId]);
 
   async function connectWallet(intent: AttestationIntent) {
-    if (!window.ethereum) throw new Error("브라우저 지갑을 찾지 못했어.");
+    if (!window.ethereum) throw new Error("브라우저 지갑을 찾을 수 없습니다.");
     const wallet = createWalletClient({ transport: custom(window.ethereum) });
     const [account] = await wallet.requestAddresses();
     const chainId = `0x${intent.chainId.toString(16)}`;
@@ -86,12 +86,12 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       const hash = await wallet.writeContract({ account, chain: null, address: intent.contractAddress, abi: attestationAbi,
         functionName: "issue", args: intent.arguments as [`0x${string}`, `0x${string}`, `0x${string}`] });
       setAttestation(await submitAttestation(certificateId, hash, account));
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "온체인 발급에 실패했어."); }
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "온체인 발급에 실패했습니다."); }
     finally { setWorking(false); }
   }
 
   async function revoke() {
-    if (!revocationReason.trim()) { setError("폐기 사유를 입력해줘."); return; }
+    if (!revocationReason.trim()) { setError("폐기 사유를 입력해 주세요."); return; }
     setWorking(true); setError("");
     try {
       const intent = await getRevocationIntent(certificateId);
@@ -99,11 +99,11 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       const hash = await wallet.writeContract({ account, chain: null, address: intent.contractAddress,
         abi: attestationAbi, functionName: "revoke", args: [intent.arguments[0]] });
       setAttestation(await submitRevocation(certificateId, hash, account, revocationReason.trim()));
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "온체인 폐기에 실패했어."); }
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "온체인 폐기에 실패했습니다."); }
     finally { setWorking(false); }
   }
 
-  if (!certificate) return <p className={error ? "error-message" : "muted"}>{error || "인증서를 불러오는 중..."}</p>;
+  if (!certificate) return <p className={error ? "error-message" : "muted"}>{error || "인증서를 불러오는 중입니다..."}</p>;
   return <div className="stack full-width">
     <dl className="identity-list">
       <div><dt>상태</dt><dd>{certificate.status}</dd></div>

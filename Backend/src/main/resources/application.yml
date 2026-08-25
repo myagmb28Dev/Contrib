@@ -67,6 +67,12 @@ app:
     job-lease: ${ANALYSIS_JOB_LEASE:PT5M}
   ai:
     provider: ${AI_PROVIDER:rule-based}
+    openrouter:
+      api-key: ${OPENROUTER_API_KEY:}
+      base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api/v1}
+      model: "${OPENROUTER_MODEL:nvidia/nemotron-3-super-120b-a12b:free}"
+      site-url: ${OPENROUTER_SITE_URL:${FRONTEND_URL:http://localhost:3000}}
+      app-name: ${OPENROUTER_APP_NAME:Contrib}
 
 management:
   endpoints:

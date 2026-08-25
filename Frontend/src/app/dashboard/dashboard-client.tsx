@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
   ApiRequestError,
+  apiBaseUrl,
   type CurrentUser,
   getCurrentUser,
   logout,
@@ -39,7 +39,7 @@ export function DashboardClient() {
 
         setState({
           status: "error",
-          message: error instanceof Error ? error.message : "알 수 없는 오류가 발생했어.",
+          message: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.",
         });
       });
 
@@ -51,28 +51,28 @@ export function DashboardClient() {
 
     try {
       await logout();
-      router.replace("/login");
+      router.replace("/");
       router.refresh();
     } catch (error) {
       setState({
         status: "error",
-        message: error instanceof Error ? error.message : "로그아웃 중 오류가 발생했어.",
+        message: error instanceof Error ? error.message : "로그아웃 중 오류가 발생했습니다.",
       });
       setIsLoggingOut(false);
     }
   }
 
   if (state.status === "loading") {
-    return <p className="muted">로그인 정보를 확인하고 있어...</p>;
+    return <p className="muted">로그인 정보를 확인하는 중입니다...</p>;
   }
 
   if (state.status === "unauthenticated") {
     return (
       <div className="stack">
-        <p className="muted">로그인 세션이 없거나 만료됐어.</p>
-        <Link className="button primary" href="/login">
-          로그인 화면으로 이동
-        </Link>
+        <p className="muted">로그인 세션이 없거나 만료되었습니다.</p>
+        <a className="button primary" href={`${apiBaseUrl}/api/auth/github`}>
+          GitHub 로그인
+        </a>
       </div>
     );
   }

@@ -13,10 +13,10 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
   useEffect(() => { getAnalysis(analysisId).then(setAnalysis).catch((reason: Error) => setError(reason.message)); }, [analysisId]);
   async function issue() {
     try { setCertificateId((await createCertificate(analysisId, wallet || null)).id); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "인증서를 만들지 못했어."); }
+    catch (reason) { setError(reason instanceof Error ? reason.message : "인증서를 생성하지 못했습니다."); }
   }
   if (error && !analysis) return <p className="error-message">{error}</p>;
-  if (!analysis) return <p className="muted">분석 결과를 불러오는 중...</p>;
+  if (!analysis) return <p className="muted">분석 결과를 불러오는 중입니다...</p>;
   return (
     <div className="stack full-width">
       <div className="score">{analysis.score}<span>/ 100</span></div>

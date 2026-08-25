@@ -15,6 +15,6 @@ export function AnalysesClient() {
       <strong>{analysis.score}점 · {analysis.scoreVersion}</strong>
       <span>{new Date(analysis.periodStart).toLocaleDateString()} ~ {new Date(analysis.periodEnd).toLocaleDateString()}</span>
     </Link>)}
-    {!error && items.length === 0 && <p className="muted">아직 완료된 분석이 없어.</p>}
+    {!error && items.length === 0 && <p className="muted">아직 완료된 분석이 없습니다.</p>}
   </div>;
 }

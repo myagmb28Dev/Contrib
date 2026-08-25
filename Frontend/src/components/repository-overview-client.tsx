@@ -17,7 +17,7 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
   }, [repositoryId]);
 
   if (error) return <p className="error-message">{error}</p>;
-  if (!repository) return <p className="muted">저장소를 불러오는 중...</p>;
+  if (!repository) return <p className="muted">저장소를 불러오는 중입니다...</p>;
   return (
     <div className="stack full-width">
       <dl className="identity-list">

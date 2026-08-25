@@ -43,6 +43,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
         "spring.jpa.hibernate.ddl-auto=create-drop",
         "app.security.token-encryption-key=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
         "app.analysis.dispatch-enabled=false",
+        "app.ai.provider=rule-based",
         "app.blockchain.receipt-poll-enabled=false",
         "app.blockchain.contract-address=0x1111111111111111111111111111111111111111",
         "app.blockchain.rpc-url=http://localhost:8545"

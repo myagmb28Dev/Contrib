@@ -9,7 +9,7 @@ export default function DashboardPage() {
       <div className="card stack">
         <div>
           <h1>내 계정</h1>
-          <p className="muted">GitHub OAuth로 연결된 현재 사용자 정보야.</p>
+          <p className="muted">GitHub OAuth로 연결된 현재 사용자 정보입니다.</p>
         </div>
         <DashboardClient />
       </div>
