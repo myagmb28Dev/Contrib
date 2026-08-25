@@ -35,9 +35,21 @@ public class AnalysisJobWorker {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void process(AnalysisJobCreatedEvent event) {
-        UUID jobId = event.jobId();
+        processJob(event.jobId());
+    }
+
+    @Async
+    public void process(UUID jobId) {
+        processJob(jobId);
+    }
+
+    private void processJob(UUID jobId) {
         try {
-            AnalysisJob job = transactions.startCollection(jobId);
+            var claimed = transactions.claim(jobId);
+            if (claimed.isEmpty()) {
+                return;
+            }
+            AnalysisJob job = claimed.get();
             GitHubAccount account = accountRepository.findByUserId(job.getUser().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("GitHub account not found"));
             CollectedSnapshot collected = collector.collect(job, account.getGithubUserId());

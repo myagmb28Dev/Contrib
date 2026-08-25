@@ -49,6 +49,10 @@ jobs:
         run: npm run typecheck
       - name: Build
         run: npm run build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run browser E2E
+        run: npm run test:e2e
 
   contracts:
     name: Contract tests
@@ -65,3 +69,26 @@ jobs:
         run: forge build
       - name: Test contracts
         run: forge test
+
+  deployment-artifacts:
+    name: Deployment artifact checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Parse operations scripts
+        shell: pwsh
+        run: |
+          $allErrors = @()
+          foreach ($path in @("scripts/validate-production-env.ps1", "scripts/backup-postgres.ps1")) {
+            $tokens = $null
+            $parseErrors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              "$PWD/$path", [ref]$tokens, [ref]$parseErrors)
+            $allErrors += $parseErrors
+          }
+          if ($allErrors.Count -gt 0) { throw ($allErrors | Out-String) }
+      - name: Build Backend container
+        run: docker build --tag contrib-backend:ci Backend
+      - name: Build Frontend container
+        run: docker build --build-arg NEXT_PUBLIC_API_BASE_URL=https://api.example.com --tag contrib-frontend:ci Frontend

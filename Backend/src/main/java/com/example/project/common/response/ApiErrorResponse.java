@@ -7,9 +7,10 @@ public record ApiErrorResponse(
         int status,
         String code,
         String message,
-        String path) {
+        String path,
+        String requestId) {
 
-    public static ApiErrorResponse of(int status, String code, String message, String path) {
-        return new ApiErrorResponse(Instant.now(), status, code, message, path);
+    public static ApiErrorResponse of(int status, String code, String message, String path, String requestId) {
+        return new ApiErrorResponse(Instant.now(), status, code, message, path, requestId);
     }
 }

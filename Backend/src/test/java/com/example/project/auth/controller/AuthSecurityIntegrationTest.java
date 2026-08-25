@@ -22,6 +22,9 @@ import org.springframework.test.web.servlet.MockMvc;
         "spring.datasource.driver-class-name=org.h2.Driver",
         "spring.flyway.enabled=false",
         "spring.jpa.hibernate.ddl-auto=create-drop",
+        "management.endpoints.web.exposure.include=health,info,prometheus",
+        "management.prometheus.metrics.export.enabled=true",
+        "app.monitoring.token=test-monitoring-token",
         "app.security.token-encryption-key=" + AuthSecurityIntegrationTest.TEST_KEY
 })
 @AutoConfigureMockMvc
@@ -43,7 +46,23 @@ class AuthSecurityIntegrationTest {
     void rejectsCurrentUserRequestWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
                 .andExpect(status().isUnauthorized())
+                .andExpect(header().exists("X-Request-ID"))
+                .andExpect(jsonPath("$.requestId").isNotEmpty())
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+    }
+
+    @Test
+    void protectsPrometheusMetricsWithMonitoringToken() throws Exception {
+        mockMvc.perform(get("/actuator").with(oauth2Login()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._links.prometheus.href").exists());
+
+        mockMvc.perform(get("/actuator/prometheus"))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/actuator/prometheus")
+                        .header("X-Monitoring-Token", "test-monitoring-token"))
+                .andExpect(status().isOk());
     }
 
     @Test

@@ -76,8 +76,8 @@ export type AttestationIntent = {
   chainId: number;
   network: string;
   contractAddress: `0x${string}`;
-  functionName: "issue";
-  arguments: [`0x${string}`, `0x${string}`, `0x${string}`];
+  functionName: "issue" | "revoke";
+  arguments: `0x${string}`[];
   onchainCertificateId: `0x${string}`;
   certificateHash: `0x${string}`;
 };
@@ -86,6 +86,14 @@ export type Attestation = {
   transactionHash: `0x${string}`;
   blockNumber: number | null;
   status: string;
+  submittedAt: string;
+  confirmedAt: string | null;
+  revocationTransactionHash: `0x${string}` | null;
+  revocationBlockNumber: number | null;
+  revocationStatus: string | null;
+  revocationReason: string | null;
+  revocationSubmittedAt: string | null;
+  revocationConfirmedAt: string | null;
 };
 
 export type Verification = {
@@ -187,6 +195,26 @@ export async function submitAttestation(
   return apiJson(`/api/certificates/${id}/transactions`, {
     method: "POST",
     body: JSON.stringify({ transactionHash, issuerWalletAddress }),
+  });
+}
+
+export async function getCertificateAttestation(id: string): Promise<Attestation> {
+  return apiJson(`/api/certificates/${id}/attestation`);
+}
+
+export async function getRevocationIntent(id: string): Promise<AttestationIntent> {
+  return apiJson(`/api/certificates/${id}/revocation-intent`, { method: "POST" });
+}
+
+export async function submitRevocation(
+  id: string,
+  transactionHash: string,
+  issuerWalletAddress: string,
+  reason: string,
+): Promise<Attestation> {
+  return apiJson(`/api/certificates/${id}/revocation-transactions`, {
+    method: "POST",
+    body: JSON.stringify({ transactionHash, issuerWalletAddress, reason }),
   });
 }
 

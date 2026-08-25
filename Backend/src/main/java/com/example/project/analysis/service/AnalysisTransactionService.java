@@ -1,6 +1,9 @@
 package com.example.project.analysis.service;
 
 import java.util.List;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.example.project.analysis.ai.AiSummaryInput;
@@ -22,6 +25,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,26 +38,33 @@ public class AnalysisTransactionService {
     private final ContributionAnalysisRepository analysisRepository;
     private final ContributionScoreCalculator scoreCalculator;
     private final ObjectMapper objectMapper;
+    private final Duration leaseDuration;
 
     public AnalysisTransactionService(AnalysisJobRepository jobRepository,
             RepositorySnapshotRepository snapshotRepository, ActivityEventRepository eventRepository,
             ContributionAnalysisRepository analysisRepository, ContributionScoreCalculator scoreCalculator,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            @Value("${app.analysis.job-lease:PT5M}") Duration leaseDuration) {
         this.jobRepository = jobRepository;
         this.snapshotRepository = snapshotRepository;
         this.eventRepository = eventRepository;
         this.analysisRepository = analysisRepository;
         this.scoreCalculator = scoreCalculator;
         this.objectMapper = objectMapper;
+        this.leaseDuration = leaseDuration;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public AnalysisJob startCollection(UUID jobId) {
+    public Optional<AnalysisJob> claim(UUID jobId) {
+        Instant now = Instant.now();
+        if (jobRepository.claim(jobId, now, now.plus(leaseDuration)) != 1) {
+            return Optional.empty();
+        }
+        clearArtifacts(jobId);
         AnalysisJob job = detailedJob(jobId);
         job.getUser().getId();
         job.getRepository().getName();
-        job.startCollection();
-        return job;
+        return Optional.of(job);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -69,7 +80,7 @@ public class AnalysisTransactionService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CalculatedAnalysis calculate(UUID jobId, UUID snapshotId) {
         AnalysisJob job = detailedJob(jobId);
-        job.startAnalysis();
+        job.startAnalysis(leaseUntil());
         RepositorySnapshot snapshot = snapshotRepository.findById(snapshotId)
                 .orElseThrow(() -> new ResourceNotFoundException("Snapshot not found"));
         List<ActivityEvent> events = eventRepository.findAllBySnapshotIdOrderByOccurredAtAscExternalIdAsc(snapshotId);
@@ -85,7 +96,7 @@ public class AnalysisTransactionService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void applyAiAndComplete(UUID jobId, UUID analysisId, AiSummaryResult result) {
         AnalysisJob job = detailedJob(jobId);
-        job.startAiProcessing();
+        job.startAiProcessing(leaseUntil());
         ContributionAnalysis analysis = analysisRepository.findById(analysisId)
                 .orElseThrow(() -> new ResourceNotFoundException("Analysis not found"));
         analysis.applyAiSummary(result.summary(), result.model(), result.promptVersion(), json(result.technicalAreas()));
@@ -96,6 +107,18 @@ public class AnalysisTransactionService {
     public void fail(UUID jobId, Throwable throwable) {
         jobRepository.findById(jobId).ifPresent(job -> job.fail(
                 throwable.getClass().getSimpleName(), throwable.getMessage()));
+    }
+
+    private Instant leaseUntil() {
+        return Instant.now().plus(leaseDuration);
+    }
+
+    private void clearArtifacts(UUID jobId) {
+        snapshotRepository.findByAnalysisJobId(jobId).ifPresent(snapshot -> {
+            analysisRepository.findBySnapshotId(snapshot.getId()).ifPresent(analysisRepository::delete);
+            eventRepository.deleteAllBySnapshotId(snapshot.getId());
+            snapshotRepository.delete(snapshot);
+        });
     }
 
     private AnalysisJob detailedJob(UUID jobId) {
