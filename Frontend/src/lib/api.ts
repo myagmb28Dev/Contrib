@@ -104,7 +104,7 @@ export async function getCurrentUser(signal?: AbortSignal): Promise<CurrentUser>
   });
 
   if (!response.ok) {
-    throw new ApiRequestError(response.status, "현재 사용자 정보를 불러오지 못했어.");
+    throw new ApiRequestError(response.status, "현재 사용자 정보를 불러오지 못했습니다.");
   }
 
   return response.json() as Promise<CurrentUser>;
@@ -114,7 +114,7 @@ export async function logout(): Promise<void> {
   const response = await apiFetch("/api/auth/logout", { method: "POST" });
 
   if (!response.ok) {
-    throw new ApiRequestError(response.status, "로그아웃하지 못했어.");
+    throw new ApiRequestError(response.status, "로그아웃하지 못했습니다.");
   }
 }
 
@@ -202,7 +202,7 @@ async function apiJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await apiFetch(path, init);
   if (!response.ok) {
     const error = (await response.json().catch(() => null)) as { message?: string } | null;
-    throw new ApiRequestError(response.status, error?.message ?? "API 요청에 실패했어.");
+    throw new ApiRequestError(response.status, error?.message ?? "API 요청에 실패했습니다.");
   }
   return response.json() as Promise<T>;
 }
@@ -222,7 +222,7 @@ async function apiFetch(path: string, init: RequestInit = {}): Promise<Response>
 async function getCsrfToken(): Promise<CsrfToken> {
   const response = await fetch(`${apiBaseUrl}/api/auth/csrf`, { credentials: "include" });
   if (!response.ok) {
-    throw new ApiRequestError(response.status, "CSRF 토큰을 발급받지 못했어.");
+    throw new ApiRequestError(response.status, "CSRF 토큰을 발급받지 못했습니다.");
   }
   return response.json() as Promise<CsrfToken>;
 }

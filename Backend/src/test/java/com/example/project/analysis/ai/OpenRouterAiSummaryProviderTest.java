@@ -61,7 +61,7 @@ class OpenRouterAiSummaryProviderTest {
         assertThat(result.summary()).contains("구현과 협업");
         assertThat(result.technicalAreas()).containsExactly("Java", "협업");
         assertThat(result.model()).isEqualTo("nvidia/nemotron-3-super-120b-a12b:free");
-        assertThat(result.promptVersion()).isEqualTo("openrouter-nemotron-v1");
+        assertThat(result.promptVersion()).isEqualTo("openrouter-nemotron-v2");
         server.verify();
     }
 

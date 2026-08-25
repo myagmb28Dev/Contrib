@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClient;
 @Component
 public class OpenRouterAiSummaryProvider implements AiSummaryProvider {
 
-    static final String PROMPT_VERSION = "openrouter-nemotron-v1";
+    static final String PROMPT_VERSION = "openrouter-nemotron-v2";
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
@@ -84,9 +84,9 @@ public class OpenRouterAiSummaryProvider implements AiSummaryProvider {
         ArrayNode messages = body.putArray("messages");
         messages.addObject()
                 .put("role", "system")
-                .put("content", "너는 GitHub 기여 지표를 사실 그대로 요약하는 분석기야. "
-                        + "과장하거나 입력에 없는 활동을 추측하지 말고, summary는 자연스러운 한국어 2~3문장으로 작성해. "
-                        + "technicalAreas는 입력 언어와 지표로 확인 가능한 영역만 짧은 문자열로 최대 6개 반환해.");
+                .put("content", "GitHub 기여 지표를 사실에 근거하여 요약합니다. "
+                        + "과장하거나 입력에 없는 활동을 추측하지 말고, summary는 정중한 서술형 한국어 문체로 2~3문장을 작성합니다. "
+                        + "technicalAreas는 입력 언어와 지표로 확인 가능한 영역만 짧은 문자열로 최대 6개 반환합니다.");
         messages.addObject()
                 .put("role", "user")
                 .put("content", objectMapper.valueToTree(input).toString());

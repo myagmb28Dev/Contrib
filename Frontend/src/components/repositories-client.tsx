@@ -7,7 +7,7 @@ import { getRepositories, syncRepositories, type Repository } from "@/lib/api";
 
 export function RepositoriesClient() {
   const [items, setItems] = useState<Repository[]>([]);
-  const [message, setMessage] = useState("불러오는 중...");
+  const [message, setMessage] = useState("불러오는 중입니다...");
   const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export function RepositoriesClient() {
       setItems(await syncRepositories());
       setMessage("");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "동기화하지 못했어.");
+      setMessage(error instanceof Error ? error.message : "동기화하지 못했습니다.");
     } finally {
       setSyncing(false);
     }

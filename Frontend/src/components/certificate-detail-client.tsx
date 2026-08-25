@@ -22,7 +22,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
   useEffect(() => { getCertificate(certificateId).then(setCertificate).catch((reason: Error) => setError(reason.message)); }, [certificateId]);
 
   async function publish() {
-    if (!window.ethereum) { setError("브라우저 지갑을 찾지 못했어."); return; }
+    if (!window.ethereum) { setError("브라우저 지갑을 찾을 수 없습니다."); return; }
     setWorking(true); setError("");
     try {
       const intent = await getAttestationIntent(certificateId);
@@ -44,11 +44,11 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       const hash = await wallet.writeContract({ account, chain: null, address: intent.contractAddress, abi: attestationAbi,
         functionName: "issue", args: intent.arguments });
       setAttestation(await submitAttestation(certificateId, hash, account));
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "온체인 발급에 실패했어."); }
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "온체인 발급에 실패했습니다."); }
     finally { setWorking(false); }
   }
 
-  if (!certificate) return <p className={error ? "error-message" : "muted"}>{error || "인증서를 불러오는 중..."}</p>;
+  if (!certificate) return <p className={error ? "error-message" : "muted"}>{error || "인증서를 불러오는 중입니다..."}</p>;
   return <div className="stack full-width">
     <dl className="identity-list">
       <div><dt>상태</dt><dd>{certificate.status}</dd></div>

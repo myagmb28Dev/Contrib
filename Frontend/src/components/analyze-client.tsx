@@ -37,7 +37,7 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
         const analyses = await getRepositoryAnalyses(repositoryId);
         setAnalysisId(analyses.find((analysis) => analysis.jobId === created.id)?.id ?? null);
       }
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "분석을 시작하지 못했어."); }
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "분석을 시작하지 못했습니다."); }
   }
 
   return (

@@ -13,6 +13,6 @@ export function CertificatesClient() {
     {items.map((certificate) => <Link className="list-card" key={certificate.id} href={`/certificates/${certificate.id}`}>
       <strong>{certificate.status}</strong><span className="monospace">{certificate.hash}</span>
     </Link>)}
-    {!error && items.length === 0 && <p className="muted">아직 발급한 인증서가 없어.</p>}
+    {!error && items.length === 0 && <p className="muted">아직 발급한 인증서가 없습니다.</p>}
   </div>;
 }
