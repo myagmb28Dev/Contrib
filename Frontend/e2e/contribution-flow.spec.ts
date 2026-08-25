@@ -88,8 +88,8 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     return json({ message: `Unhandled ${method} ${path}` }, 500);
   });
 
-  await page.goto("/login");
-  await expect(page.getByRole("link", { name: "GitHub로 계속하기" })).toHaveAttribute("href", "http://backend.test/api/auth/github");
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "GitHub로 시작하기" })).toHaveAttribute("href", "http://backend.test/api/auth/github");
 
   await page.goto("/dashboard");
   await expect(page.getByText("@octocat")).toBeVisible();
