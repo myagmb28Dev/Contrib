@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClient;
 @Component
 public class OpenRouterAiSummaryProvider implements AiSummaryProvider {
 
-    static final String PROMPT_VERSION = "openrouter-nemotron-v2";
+    static final String PROMPT_VERSION = "openrouter-gemini-v1";
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;

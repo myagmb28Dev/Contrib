@@ -1,18 +1,20 @@
+﻿import { AppHeader } from "@/components/app-header";
 import { DashboardClient } from "./dashboard-client";
-import { AppNav } from "@/components/app-nav";
 
 export default function DashboardPage() {
   return (
-    <main className="shell narrow-shell">
-      <p className="eyebrow">Contribution Attestation</p>
-      <AppNav />
-      <div className="card stack">
-        <div>
-          <h1>내 계정</h1>
-          <p className="muted">GitHub OAuth로 연결된 현재 사용자 정보입니다.</p>
+    <>
+      <AppHeader />
+      <main className="shell">
+        <div className="page-header">
+          <div>
+            <p className="eyebrow">CONTRIBUTION ATTESTATION</p>
+            <h1>내 계정 대시보드</h1>
+            <p className="muted">GitHub 기여도 분석과 온체인 인증서 발급 현황을 한눈에 관리합니다.</p>
+          </div>
         </div>
         <DashboardClient />
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

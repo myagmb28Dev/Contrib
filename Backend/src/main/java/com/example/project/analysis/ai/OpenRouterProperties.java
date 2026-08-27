@@ -9,7 +9,7 @@ public class OpenRouterProperties {
 
     private String apiKey = "";
     private String baseUrl = "https://openrouter.ai/api/v1";
-    private String model = "nvidia/nemotron-3-super-120b-a12b:free";
+    private String model = "google/gemini-2.0-flash-001";
     private String siteUrl = "";
     private String appName = "Contrib";
 
