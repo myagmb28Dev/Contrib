@@ -32,22 +32,32 @@ export function SyncRepositoriesModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    setLoading(true);
-    setError("");
-    setSelectedIds(alreadySyncedRepoIds);
+    let ignore = false;
 
     getAvailableGitHubRepositories()
       .then((repos) => {
-        setAvailableRepos(repos);
+        if (!ignore) {
+          setAvailableRepos(repos);
+          setSelectedIds(alreadySyncedRepoIds);
+          setError("");
+        }
       })
       .catch((err: unknown) => {
-        setError(
-          err instanceof ApiRequestError
-            ? err.message
-            : "GitHub 저장소 목록을 불러오지 못했습니다."
-        );
+        if (!ignore) {
+          setError(
+            err instanceof ApiRequestError
+              ? err.message
+              : "GitHub 저장소 목록을 불러오지 못했습니다."
+          );
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, [isOpen, alreadySyncedRepoIds]);
 
   if (!isOpen) return null;

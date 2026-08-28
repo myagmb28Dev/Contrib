@@ -297,9 +297,9 @@ export default function HomePage() {
         <PublicVerificationForm />
 
         <footer className="landing-footer">
-          <a className="brand footer-brand" href="/">
+          <Link className="brand footer-brand" href="/">
             <span className="brand-text">Contrib</span>
-          </a>
+          </Link>
           <p>GitHub 활동 기반의 검증 가능한 Contribution Certificate</p>
         </footer>
       </div>

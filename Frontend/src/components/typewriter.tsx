@@ -9,33 +9,48 @@ interface TypewriterTextProps {
 }
 
 export function TypewriterText({ text, speed = 35, className }: TypewriterTextProps) {
-  const [displayed, setDisplayed] = useState("");
-  const [index, setIndex] = useState(0);
   const [replayKey, setReplayKey] = useState(0);
 
-  useEffect(() => {
-    setDisplayed("");
-    setIndex(0);
-  }, [text, replayKey]);
+  return (
+    <TypewriterCore
+      key={`${replayKey}-${text}`}
+      text={text}
+      speed={speed}
+      className={className}
+      onReplay={() => setReplayKey((k) => k + 1)}
+    />
+  );
+}
+
+function TypewriterCore({
+  text,
+  speed,
+  className,
+  onReplay,
+}: {
+  text: string;
+  speed: number;
+  className?: string;
+  onReplay: () => void;
+}) {
+  const [displayed, setDisplayed] = useState("");
 
   useEffect(() => {
-    if (index < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayed((prev) => prev + text.charAt(index));
-        setIndex((prev) => prev + 1);
-      }, speed);
-      return () => clearTimeout(timer);
-    }
-  }, [index, text, speed, replayKey]);
-
-  function handleReplay() {
-    setReplayKey((prev) => prev + 1);
-  }
+    let current = 0;
+    const interval = setInterval(() => {
+      current++;
+      setDisplayed(text.slice(0, current));
+      if (current >= text.length) {
+        clearInterval(interval);
+      }
+    }, speed);
+    return () => clearInterval(interval);
+  }, [text, speed]);
 
   return (
     <span
       className={`typewriter-interactive ${className ?? ""}`}
-      onClick={handleReplay}
+      onClick={onReplay}
     >
       {displayed}
       <span className="typing-cursor" aria-hidden="true" />
