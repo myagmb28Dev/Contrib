@@ -33,6 +33,7 @@ export type Repository = {
   language: string | null;
   archived: boolean;
   lastSyncedAt: string;
+  createdAt?: string;
 };
 
 export type AnalysisJob = {
