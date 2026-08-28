@@ -83,6 +83,11 @@ export function CertificatesClient() {
                     </strong>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+                    {cert.payload?.score !== undefined && (
+                      <span className="score-pill" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--primary)", background: "var(--primary-light)", padding: "3px 8px", borderRadius: "9999px" }}>
+                        {String(cert.payload.score)}점
+                      </span>
+                    )}
                     <span className={`verified-badge ${statusInfo.className}`}>
                       {statusInfo.label}
                     </span>
@@ -101,21 +106,6 @@ export function CertificatesClient() {
                       title="공개 검증 ID 복사"
                     >
                       {copiedId === `pub-${cert.id}` ? "복사됨" : "ID 복사"}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="cert-hash-section" style={{ marginTop: "6px" }}>
-                  <span className="cert-label">온체인 해시 (Keccak-256 Hash)</span>
-                  <div className="hash-copy-row">
-                    <code className="monospace">{cert.hash}</code>
-                    <button
-                      type="button"
-                      className="copy-btn"
-                      onClick={() => copyHash(cert.hash, cert.id)}
-                      title="해시 복사"
-                    >
-                      {copiedId === cert.id ? "복사됨" : "해시 복사"}
                     </button>
                   </div>
                 </div>
