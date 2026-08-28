@@ -26,14 +26,34 @@ function GitHubMark() {
 export default function HomePage() {
   const { user, loading } = useAuth();
   const [copiedType, setCopiedType] = useState<"id" | "link" | null>(null);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
-  function copyDummyId() {
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: -(y * 12), y: x * 12 });
+  }
+
+  function handleMouseLeave() {
+    setTilt({ x: 0, y: 0 });
+  }
+
+  function toggleFlip(e?: React.MouseEvent) {
+    if (e) e.stopPropagation();
+    setIsFlipped((prev) => !prev);
+  }
+
+  function copyDummyId(e: React.MouseEvent) {
+    e.stopPropagation();
     navigator.clipboard.writeText(DUMMY_PUBLIC_ID);
     setCopiedType("id");
     setTimeout(() => setCopiedType(null), 2000);
   }
 
-  function copyDummyLink() {
+  function copyDummyLink(e: React.MouseEvent) {
+    e.stopPropagation();
     const url = typeof window !== "undefined"
       ? `${window.location.origin}/verify/${DUMMY_PUBLIC_ID}`
       : `https://contrib.dev/verify/${DUMMY_PUBLIC_ID}`;
@@ -77,76 +97,170 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="certificate-stage" aria-label="Contribution Certificate 미리보기">
+          <div className="certificate-stage" aria-label="Contribution Certificate 3D 인터랙티브 미리보기">
             <div className="certificate-glow" />
-            <article className="certificate-preview">
-              <div className="cert-card-header">
-                <div className="cert-title-group">
-                  <span className="cert-sub-label">CONTRIBUTION CERTIFICATE</span>
-                  <strong className="cert-repo-name">hyperion-core / quantum-mesh</strong>
-                </div>
-                <div className="cert-header-badges">
-                  <span className="score-pill" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--primary)", background: "var(--primary-light)", padding: "3px 8px", borderRadius: "9999px" }}>
-                    94점
-                  </span>
-                  <span className="verified-badge valid">VALID</span>
-                  <span className="network-tag">Base Sepolia</span>
-                </div>
-              </div>
+            <div
+              className="certificate-3d-scene"
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div
+                className={`certificate-3d-card ${isFlipped ? "flipped" : ""}`}
+                style={{
+                  transform: isFlipped
+                    ? `rotateY(180deg) rotateX(${tilt.x}deg) rotateY(${-tilt.y}deg)`
+                    : `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+                }}
+                onClick={() => setIsFlipped((prev) => !prev)}
+              >
+                {/* FRONT SIDE */}
+                <article className="certificate-preview certificate-front">
+                  <div className="cert-card-header">
+                    <div className="cert-title-group">
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span className="cert-sub-label">CONTRIBUTION CERTIFICATE</span>
+                        <button
+                          type="button"
+                          className="flip-action-badge"
+                          onClick={toggleFlip}
+                        >
+                          ↻ 3D 뒤집기
+                        </button>
+                      </div>
+                      <strong className="cert-repo-name">hyperion-core / quantum-mesh</strong>
+                    </div>
+                    <div className="cert-header-badges">
+                      <span className="score-pill" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--primary)", background: "var(--primary-light)", padding: "3px 8px", borderRadius: "9999px" }}>
+                        94점
+                      </span>
+                      <span className="verified-badge valid">VALID</span>
+                      <span className="network-tag">Base Sepolia</span>
+                    </div>
+                  </div>
 
-              <div className="cert-public-id-bar">
-                <span className="cert-id-tag">Public ID</span>
-                <code className="cert-id-val">{DUMMY_PUBLIC_ID}</code>
-                <div className="cert-id-btn-group">
-                  <button
-                    type="button"
-                    className="cert-id-copy-action"
-                    onClick={copyDummyId}
-                    style={{ cursor: "pointer", border: "none", background: "none", fontFamily: "inherit" }}
-                    title="Public ID 복사"
-                  >
-                    {copiedType === "id" ? "ID 복사됨!" : "ID 복사"}
-                  </button>
-                  <button
-                    type="button"
-                    className="cert-id-copy-action highlight"
-                    onClick={copyDummyLink}
-                    style={{ cursor: "pointer", border: "none", background: "none", fontFamily: "inherit" }}
-                    title="전체 검증 링크 복사"
-                  >
-                    {copiedType === "link" ? "링크 복사됨!" : "링크 복사"}
-                  </button>
-                </div>
-              </div>
+                  <div className="cert-public-id-bar">
+                    <span className="cert-id-tag">Public ID</span>
+                    <code className="cert-id-val">{DUMMY_PUBLIC_ID}</code>
+                    <div className="cert-id-btn-group">
+                      <button
+                        type="button"
+                        className="cert-id-copy-action"
+                        onClick={copyDummyId}
+                        style={{ cursor: "pointer", border: "none", background: "none", fontFamily: "inherit" }}
+                      >
+                        {copiedType === "id" ? "ID 복사됨!" : "ID 복사"}
+                      </button>
+                      <button
+                        type="button"
+                        className="cert-id-copy-action highlight"
+                        onClick={copyDummyLink}
+                        style={{ cursor: "pointer", border: "none", background: "none", fontFamily: "inherit" }}
+                      >
+                        {copiedType === "link" ? "링크 복사됨!" : "링크 복사"}
+                      </button>
+                    </div>
+                  </div>
 
-              <div className="cert-meta-grid">
-                <div>
-                  <span className="meta-label">Subject Wallet</span>
-                  <span className="meta-val monospace">0x8920...43e7</span>
-                </div>
-                <div>
-                  <span className="meta-label">발급 일시</span>
-                  <span className="meta-val">2026. 8. 28.</span>
-                </div>
-              </div>
+                  <div className="cert-meta-grid">
+                    <div>
+                      <span className="meta-label">Subject Wallet</span>
+                      <span className="meta-val monospace">0x8920...43e7</span>
+                    </div>
+                    <div>
+                      <span className="meta-label">발급 일시</span>
+                      <span className="meta-val">2026. 8. 28.</span>
+                    </div>
+                  </div>
 
-              <div className="area-tags" aria-label="기술 영역">
-                <span>Rust</span>
-                <span>Distributed Systems</span>
-                <span>Wasm</span>
-                <span>Zero Knowledge</span>
-              </div>
+                  <div className="area-tags" aria-label="기술 영역">
+                    <span>Rust</span>
+                    <span>Distributed Systems</span>
+                    <span>Wasm</span>
+                    <span>Zero Knowledge</span>
+                  </div>
 
-              <footer className="certificate-footer-row">
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span className="muted" style={{ fontSize: "0.75rem" }}>Snapshot hash:</span>
-                  <code style={{ fontSize: "0.78rem" }}>0x7a3f...b91d</code>
-                </div>
-                <span style={{ fontSize: "0.76rem", color: "#059669", fontWeight: 700 }}>
-                  ● 온체인 검증 완료
-                </span>
-              </footer>
-            </article>
+                  <footer className="certificate-footer-row">
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span className="muted" style={{ fontSize: "0.75rem" }}>Snapshot hash:</span>
+                      <code style={{ fontSize: "0.78rem" }}>0x7a3f...b91d</code>
+                    </div>
+                    <span style={{ fontSize: "0.76rem", color: "#059669", fontWeight: 700 }}>
+                      ● 온체인 검증 완료
+                    </span>
+                  </footer>
+                </article>
+
+                {/* BACK SIDE (3D FLIPPED) */}
+                <article className="certificate-preview certificate-back">
+                  <div className="cert-card-header">
+                    <div className="cert-title-group">
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span className="cert-sub-label" style={{ color: "#818cf8" }}>EAS ON-CHAIN PROOF</span>
+                        <button
+                          type="button"
+                          className="flip-action-badge back-badge"
+                          onClick={toggleFlip}
+                        >
+                          ↺ 앞면 보기
+                        </button>
+                      </div>
+                      <strong className="cert-repo-name" style={{ color: "#ffffff" }}>
+                        Attestation Smart Contract
+                      </strong>
+                    </div>
+                    <div className="cert-header-badges">
+                      <span className="network-tag" style={{ background: "rgba(129, 140, 248, 0.2)", color: "#c7d2fe", border: "1px solid rgba(129, 140, 248, 0.4)" }}>
+                        Base Sepolia (84532)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="cert-back-metric-grid">
+                    <div className="cert-back-metric-item">
+                      <span className="cert-back-metric-label">Commits</span>
+                      <span className="cert-back-metric-val">142건 (+14.2k / -3.8k)</span>
+                    </div>
+                    <div className="cert-back-metric-item">
+                      <span className="cert-back-metric-label">PRs Merged</span>
+                      <span className="cert-back-metric-val">38건 (Approved)</span>
+                    </div>
+                    <div className="cert-back-metric-item">
+                      <span className="cert-back-metric-label">Code Reviews</span>
+                      <span className="cert-back-metric-val">65건 제출</span>
+                    </div>
+                    <div className="cert-back-metric-item">
+                      <span className="cert-back-metric-label">Active Period</span>
+                      <span className="cert-back-metric-val">180 Days Active</span>
+                    </div>
+                  </div>
+
+                  <div className="cert-meta-grid" style={{ background: "rgba(0,0,0,0.25)", padding: "8px 12px", borderRadius: "8px" }}>
+                    <div>
+                      <span className="meta-label" style={{ color: "#94a3b8" }}>Schema UID</span>
+                      <span className="meta-val monospace" style={{ color: "#cbd5e1" }}>0xd342...9a12</span>
+                    </div>
+                    <div>
+                      <span className="meta-label" style={{ color: "#94a3b8" }}>Attester Node</span>
+                      <span className="meta-val" style={{ color: "#cbd5e1" }}>Contrib Oracle #04</span>
+                    </div>
+                  </div>
+
+                  <div className="cert-back-signature">
+                    <span>ECDSA Sig: <code style={{ color: "#38bdf8" }}>0x3c91...8f2b</code></span>
+                    <span style={{ color: "#34d399", fontWeight: 700 }}>● Verified</span>
+                  </div>
+
+                  <footer className="certificate-footer-row" style={{ borderColor: "rgba(255, 255, 255, 0.1)" }}>
+                    <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                      Merkle Root: <code style={{ color: "#e2e8f0" }}>0x7a3f8c...b91d</code>
+                    </span>
+                    <span style={{ fontSize: "0.74rem", color: "#818cf8", fontWeight: 700 }}>
+                      Non-Fungible Attestation
+                    </span>
+                  </footer>
+                </article>
+              </div>
+            </div>
           </div>
         </section>
 
