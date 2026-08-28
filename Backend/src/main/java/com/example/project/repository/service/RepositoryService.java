@@ -39,16 +39,27 @@ public class RepositoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         String token = accessTokenService.getValidAccessToken(userId);
         Instant now = Instant.now();
+        java.util.Set<Long> syncedGithubRepoIds = new java.util.HashSet<>();
+
         for (GitHubRepositoryDto source : githubApiClient.getPublicRepositories(token)) {
             if (source.privateRepository()) {
                 continue;
             }
+            syncedGithubRepoIds.add(source.id());
             GitHubRepository target = repository.findByUserIdAndGithubRepositoryId(userId, source.id())
                     .orElseGet(() -> GitHubRepository.create(user, source.id()));
             target.synchronize(source.owner().id(), source.owner().login(), source.name(), source.fullName(),
                     source.htmlUrl(), source.defaultBranch(), source.language(), source.archived(), now);
             repository.save(target);
         }
+
+        List<GitHubRepository> existingRepos = repository.findAllByUserIdOrderByFullNameAsc(userId);
+        for (GitHubRepository existing : existingRepos) {
+            if (!syncedGithubRepoIds.contains(existing.getGithubRepositoryId())) {
+                repository.delete(existing);
+            }
+        }
+
         return list(userId);
     }
 
