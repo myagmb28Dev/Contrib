@@ -44,6 +44,8 @@ export type Analysis = {
   id: string;
   jobId: string;
   repositoryId: string;
+  repositoryName?: string;
+  repositoryFullName?: string;
   periodStart: string;
   periodEnd: string;
   metrics: Record<string, number>;
@@ -60,6 +62,8 @@ export type Certificate = {
   id: string;
   publicId: string;
   analysisId: string;
+  repositoryName?: string;
+  repositoryFullName?: string;
   schemaVersion: string;
   payload: Record<string, unknown>;
   hash: `0x${string}`;

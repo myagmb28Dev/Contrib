@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -75,11 +75,19 @@ export function CertificatesClient() {
             const statusInfo = formatStatus(cert.status);
             return (
               <article className="certificate-card" key={cert.id}>
-                <div className="cert-card-top">
-                  <span className={`verified-badge ${statusInfo.className}`}>
-                    {statusInfo.label}
-                  </span>
-                  <span className="network-tag">Base Sepolia</span>
+                <div className="cert-card-top" style={{ alignItems: "flex-start" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: 0 }}>
+                    <span className="cert-label" style={{ fontSize: "0.72rem" }}>Repository</span>
+                    <strong style={{ fontSize: "1.05rem", color: "var(--foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {cert.repositoryName || cert.repositoryFullName || (cert.payload?.repository as string) || "저장소"}
+                    </strong>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+                    <span className={`verified-badge ${statusInfo.className}`}>
+                      {statusInfo.label}
+                    </span>
+                    <span className="network-tag">Base Sepolia</span>
+                  </div>
                 </div>
 
                 <div className="cert-hash-section">

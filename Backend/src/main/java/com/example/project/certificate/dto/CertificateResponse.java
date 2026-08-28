@@ -11,6 +11,8 @@ public record CertificateResponse(
         UUID id,
         UUID publicId,
         UUID analysisId,
+        String repositoryName,
+        String repositoryFullName,
         String schemaVersion,
         JsonNode payload,
         String hash,
@@ -23,8 +25,10 @@ public record CertificateResponse(
 
     public static CertificateResponse from(Certificate certificate, ObjectMapper objectMapper) {
         try {
+            var repo = certificate.getAnalysis().getSnapshot().getRepository();
             return new CertificateResponse(certificate.getId(), certificate.getPublicId(),
-                    certificate.getAnalysis().getId(), certificate.getSchemaVersion(),
+                    certificate.getAnalysis().getId(), repo.getName(), repo.getFullName(),
+                    certificate.getSchemaVersion(),
                     objectMapper.readTree(certificate.getCanonicalPayload()), certificate.getCertificateHash(),
                     certificate.getIssuerWalletAddress(), certificate.getSubjectWalletAddress(),
                     certificate.getStatus().name(), certificate.getIssuedAt(), certificate.getRevokedAt(),

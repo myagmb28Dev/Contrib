@@ -11,6 +11,8 @@ public record AnalysisResponse(
         UUID id,
         UUID jobId,
         UUID repositoryId,
+        String repositoryName,
+        String repositoryFullName,
         Instant periodStart,
         Instant periodEnd,
         JsonNode metrics,
@@ -24,8 +26,10 @@ public record AnalysisResponse(
 
     public static AnalysisResponse from(ContributionAnalysis analysis, ObjectMapper objectMapper) {
         var snapshot = analysis.getSnapshot();
+        var repo = snapshot.getRepository();
         return new AnalysisResponse(analysis.getId(), snapshot.getAnalysisJob().getId(),
-                snapshot.getRepository().getId(), snapshot.getPeriodStart(), snapshot.getPeriodEnd(),
+                repo.getId(), repo.getName(), repo.getFullName(),
+                snapshot.getPeriodStart(), snapshot.getPeriodEnd(),
                 read(objectMapper, analysis.getMetrics()), analysis.getScore(), analysis.getScoreVersion(),
                 analysis.getCalculationRules(), read(objectMapper, analysis.getTechnicalAreas()),
                 analysis.getAiSummary(), analysis.getAiModel(), analysis.getAiPromptVersion());

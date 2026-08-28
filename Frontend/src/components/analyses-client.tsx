@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -57,6 +57,13 @@ export function AnalysesClient() {
             const tier = getScoreTier(analysis.score);
             return (
               <article className="analysis-card" key={analysis.id}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                  <strong style={{ fontSize: "1.05rem", color: "var(--foreground)" }}>
+                    {analysis.repositoryName || analysis.repositoryFullName || "저장소"}
+                  </strong>
+                  <span className="version-tag">{analysis.scoreVersion}</span>
+                </div>
+
                 <div className="analysis-card-header">
                   <div className="score-badge-box">
                     <span className={`score-badge ${tier.className}`}>
@@ -67,7 +74,6 @@ export function AnalysesClient() {
                       <span className="tier-label">{tier.label}</span>
                     </div>
                   </div>
-                  <span className="version-tag">{analysis.scoreVersion}</span>
                 </div>
 
                 <div className="analysis-period-box">
