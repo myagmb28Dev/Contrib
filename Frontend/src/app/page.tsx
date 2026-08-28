@@ -1,49 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProfileDropdown } from "@/components/profile-dropdown";
 import { PublicVerificationForm } from "@/components/public-verification-form";
+import { TypewriterText } from "@/components/typewriter";
 import { apiBaseUrl } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
 const githubLoginUrl = `${apiBaseUrl}/api/auth/github`;
 
-function TypewriterText({ text, speed = 35 }: { text: string; speed?: number }) {
-  const [displayed, setDisplayed] = useState("");
-  const [index, setIndex] = useState(0);
-  const [replayKey, setReplayKey] = useState(0);
-
-  useEffect(() => {
-    setDisplayed("");
-    setIndex(0);
-  }, [text, replayKey]);
-
-  useEffect(() => {
-    if (index < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayed((prev) => prev + text.charAt(index));
-        setIndex((prev) => prev + 1);
-      }, speed);
-      return () => clearTimeout(timer);
-    }
-  }, [index, text, speed, replayKey]);
-
-  function handleReplay() {
-    setReplayKey((prev) => prev + 1);
-  }
-
-  return (
-    <span
-      className="typewriter-interactive"
-      onClick={handleReplay}
-      title="클릭하면 타이핑 애니메이션이 처음부터 다시 재생됩니다"
-    >
-      {displayed}
-      <span className="typing-cursor" aria-hidden="true" />
-    </span>
-  );
-}
+const DUMMY_PUBLIC_ID = "c8d4e2a1-9b7f-4567-a890-123456789abc";
 
 function GitHubMark() {
   return (
@@ -58,6 +25,22 @@ function GitHubMark() {
 
 export default function HomePage() {
   const { user, loading } = useAuth();
+  const [copiedType, setCopiedType] = useState<"id" | "link" | null>(null);
+
+  function copyDummyId() {
+    navigator.clipboard.writeText(DUMMY_PUBLIC_ID);
+    setCopiedType("id");
+    setTimeout(() => setCopiedType(null), 2000);
+  }
+
+  function copyDummyLink() {
+    const url = typeof window !== "undefined"
+      ? `${window.location.origin}/verify/${DUMMY_PUBLIC_ID}`
+      : `https://contrib.dev/verify/${DUMMY_PUBLIC_ID}`;
+    navigator.clipboard.writeText(url);
+    setCopiedType("link");
+    setTimeout(() => setCopiedType(null), 2000);
+  }
 
   return (
     <main className="landing-page">
@@ -86,7 +69,7 @@ export default function HomePage() {
               GitHub 기여를,
               <span>검증 가능한 경력 증명으로.</span>
             </h1>
-            <p className="hero-description">
+            <p className="hero-description" style={{ minHeight: "56px" }}>
               <TypewriterText text={"공개 저장소 활동을 스냅샷으로 고정하고, 일관된 기준으로 분석해\n누구나 확인할 수 있는 Contribution Certificate를 생성합니다."} />
             </p>
             <p className="privacy-note">
@@ -100,11 +83,11 @@ export default function HomePage() {
               <div className="cert-card-header">
                 <div className="cert-title-group">
                   <span className="cert-sub-label">CONTRIBUTION CERTIFICATE</span>
-                  <strong className="cert-repo-name">myagmb28Dev / Contrib</strong>
+                  <strong className="cert-repo-name">hyperion-core / quantum-mesh</strong>
                 </div>
                 <div className="cert-header-badges">
                   <span className="score-pill" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--primary)", background: "var(--primary-light)", padding: "3px 8px", borderRadius: "9999px" }}>
-                    88점
+                    94점
                   </span>
                   <span className="verified-badge valid">VALID</span>
                   <span className="network-tag">Base Sepolia</span>
@@ -113,17 +96,33 @@ export default function HomePage() {
 
               <div className="cert-public-id-bar">
                 <span className="cert-id-tag">Public ID</span>
-                <code className="cert-id-val">3a8f9b2c-e12d-4567-89ab-cdef01234567</code>
+                <code className="cert-id-val">{DUMMY_PUBLIC_ID}</code>
                 <div className="cert-id-btn-group">
-                  <span className="cert-id-copy-action">ID 복사</span>
-                  <span className="cert-id-copy-action highlight">링크 복사</span>
+                  <button
+                    type="button"
+                    className="cert-id-copy-action"
+                    onClick={copyDummyId}
+                    style={{ cursor: "pointer", border: "none", background: "none", fontFamily: "inherit" }}
+                    title="Public ID 복사"
+                  >
+                    {copiedType === "id" ? "ID 복사됨!" : "ID 복사"}
+                  </button>
+                  <button
+                    type="button"
+                    className="cert-id-copy-action highlight"
+                    onClick={copyDummyLink}
+                    style={{ cursor: "pointer", border: "none", background: "none", fontFamily: "inherit" }}
+                    title="전체 검증 링크 복사"
+                  >
+                    {copiedType === "link" ? "링크 복사됨!" : "링크 복사"}
+                  </button>
                 </div>
               </div>
 
               <div className="cert-meta-grid">
                 <div>
                   <span className="meta-label">Subject Wallet</span>
-                  <span className="meta-val monospace">0x71C8...b29F</span>
+                  <span className="meta-val monospace">0x8920...43e7</span>
                 </div>
                 <div>
                   <span className="meta-label">발급 일시</span>
@@ -132,16 +131,16 @@ export default function HomePage() {
               </div>
 
               <div className="area-tags" aria-label="기술 영역">
-                <span>TypeScript</span>
-                <span>Next.js</span>
-                <span>Spring Boot</span>
-                <span>Smart Contract</span>
+                <span>Rust</span>
+                <span>Distributed Systems</span>
+                <span>Wasm</span>
+                <span>Zero Knowledge</span>
               </div>
 
               <footer className="certificate-footer-row">
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <span className="muted" style={{ fontSize: "0.75rem" }}>Snapshot hash:</span>
-                  <code style={{ fontSize: "0.78rem" }}>0x83f1...c42a</code>
+                  <code style={{ fontSize: "0.78rem" }}>0x7a3f...b91d</code>
                 </div>
                 <span style={{ fontSize: "0.76rem", color: "#059669", fontWeight: 700 }}>
                   ● 온체인 검증 완료
