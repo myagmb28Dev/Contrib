@@ -153,36 +153,23 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
         </div>
 
         <form className="form-grid" onSubmit={submit}>
-          {/* Target Branch Selector */}
-          <div className="branch-selector-block" style={{ display: "flex", flexDirection: "column", gap: "6px", gridColumn: "1 / -1" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <label htmlFor="branch-select" style={{ fontWeight: 700, fontSize: "0.88rem", color: "var(--foreground)" }}>
-                분석 대상 브랜치 (Target Branch)
-              </label>
-              {repository?.defaultBranch && (
-                <span className="muted" style={{ fontSize: "0.76rem" }}>
-                  저장소 기본 브랜치: <strong>{repository.defaultBranch}</strong>
-                </span>
-              )}
-            </div>
-            <select
-              id="branch-select"
-              className="filter-select"
-              style={{ width: "100%", padding: "10px 14px", fontSize: "0.92rem", borderRadius: "10px", borderColor: "var(--border)", background: "white" }}
-              value={selectedBranch}
-              onChange={(e) => setSelectedBranch(e.target.value)}
-              disabled={isWorking || loadingBranches}
-              aria-label="분석 대상 브랜치"
-            >
-              {branches.map((b) => (
-                <option key={b} value={b}>
-                  {b} {b === repository?.defaultBranch ? "(기본 브랜치)" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="date-inputs-row">
+          <div className="date-inputs-row" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
+            <label>
+              분석 브랜치
+              <select
+                className="filter-select"
+                style={{ width: "100%", height: "42px", borderRadius: "8px", border: "1px solid var(--border)", padding: "0 10px", background: "white", fontSize: "0.88rem", fontWeight: 600 }}
+                value={selectedBranch}
+                onChange={(e) => setSelectedBranch(e.target.value)}
+                disabled={isWorking || loadingBranches}
+              >
+                {branches.map((b) => (
+                  <option key={b} value={b}>
+                    {b} {b === repository?.defaultBranch ? "(기본)" : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label>
               시작일 (Start Date)
               <input

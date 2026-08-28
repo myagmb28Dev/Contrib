@@ -136,12 +136,7 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
           </div>
           <div className="meta-pill">
             <span className="pill-label">기본 브랜치</span>
-            <strong className="pill-val">
-              {repository.defaultBranch}
-              <small style={{ fontWeight: 500, fontSize: "0.74rem", color: "var(--muted)", marginLeft: "4px" }}>
-                (분석 시 변경 가능)
-              </small>
-            </strong>
+            <strong className="pill-val">{repository.defaultBranch}</strong>
           </div>
           <div className="meta-pill">
             <span className="pill-label">최근 동기화</span>
