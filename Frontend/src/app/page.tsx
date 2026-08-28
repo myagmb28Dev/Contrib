@@ -40,11 +40,6 @@ export default function HomePage() {
     setTilt({ x: 0, y: 0 });
   }
 
-  function toggleFlip(e?: React.MouseEvent) {
-    if (e) e.stopPropagation();
-    setIsFlipped((prev) => !prev);
-  }
-
   function copyDummyId(e: React.MouseEvent) {
     e.stopPropagation();
     navigator.clipboard.writeText(DUMMY_PUBLIC_ID);
@@ -117,16 +112,7 @@ export default function HomePage() {
                 <article className="certificate-preview certificate-front">
                   <div className="cert-card-header">
                     <div className="cert-title-group">
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span className="cert-sub-label">CONTRIBUTION CERTIFICATE</span>
-                        <button
-                          type="button"
-                          className="flip-action-badge"
-                          onClick={toggleFlip}
-                        >
-                          ↻ 3D 뒤집기
-                        </button>
-                      </div>
+                      <span className="cert-sub-label">CONTRIBUTION CERTIFICATE</span>
                       <strong className="cert-repo-name">hyperion-core / quantum-mesh</strong>
                     </div>
                     <div className="cert-header-badges">
@@ -194,16 +180,7 @@ export default function HomePage() {
                 <article className="certificate-preview certificate-back">
                   <div className="cert-card-header">
                     <div className="cert-title-group">
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <span className="cert-sub-label" style={{ color: "#818cf8" }}>EAS ON-CHAIN PROOF</span>
-                        <button
-                          type="button"
-                          className="flip-action-badge back-badge"
-                          onClick={toggleFlip}
-                        >
-                          ↺ 앞면 보기
-                        </button>
-                      </div>
+                      <span className="cert-sub-label" style={{ color: "#818cf8" }}>EAS ON-CHAIN PROOF</span>
                       <strong className="cert-repo-name" style={{ color: "#ffffff" }}>
                         Attestation Smart Contract
                       </strong>
