@@ -85,13 +85,9 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
 
   function setAllTimePreset() {
     const endD = new Date();
-    if (repository?.createdAt) {
-      setStart(new Date(repository.createdAt).toISOString().slice(0, 10));
-    } else {
-      const startD = new Date();
-      startD.setFullYear(startD.getFullYear() - 1);
-      setStart(startD.toISOString().slice(0, 10));
-    }
+    const startD = new Date();
+    startD.setFullYear(startD.getFullYear() - 5);
+    setStart(startD.toISOString().slice(0, 10));
     setEnd(endD.toISOString().slice(0, 10));
   }
 
