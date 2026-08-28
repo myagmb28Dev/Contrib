@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { ApiRequestError, appBaseUrl, getCertificates, type Certificate } from "@/lib/api";
+import { ApiRequestError, getAppOrigin, getCertificates, type Certificate } from "@/lib/api";
 
 function formatStatus(status: string) {
   switch (status.toUpperCase()) {
@@ -50,8 +50,8 @@ export function CertificatesClient() {
   }
 
   function copyLink(publicId: string, id: string) {
-    const base = appBaseUrl.replace(/\/+$/, "");
-    const url = `${base}/verify/${publicId}`;
+    const origin = getAppOrigin();
+    const url = `${origin}/verify/${publicId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);

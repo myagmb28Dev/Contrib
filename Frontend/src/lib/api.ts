@@ -1,11 +1,12 @@
 export const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
-export const appBaseUrl =
-  process.env.NEXT_PUBLIC_APP_URL ??
-  (typeof window !== "undefined" && window.location.origin
-    ? window.location.origin
-    : "http://localhost:3000");
+export function getAppOrigin(): string {
+  if (typeof window !== "undefined" && window.location.origin) {
+    return window.location.origin;
+  }
+  return "http://localhost:3000";
+}
 
 export type CurrentUser = {
   userId: string;
