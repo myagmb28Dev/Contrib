@@ -90,9 +90,9 @@ export function RepositoriesClient() {
           <button
             className={`button ${isUnsyncMode ? "active-toggle" : ""}`}
             onClick={() => setIsUnsyncMode((prev) => !prev)}
-            title={isUnsyncMode ? "동기화 해제 취소" : "동기화 해제"}
+            title={isUnsyncMode ? "동기화 해제 완료" : "동기화 해제"}
           >
-            {isUnsyncMode ? "취소" : "동기화 해제"}
+            {isUnsyncMode ? "완료" : "동기화 해제"}
           </button>
 
           <button
