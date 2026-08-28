@@ -12,6 +12,12 @@ const githubLoginUrl = `${apiBaseUrl}/api/auth/github`;
 function TypewriterText({ text, speed = 35 }: { text: string; speed?: number }) {
   const [displayed, setDisplayed] = useState("");
   const [index, setIndex] = useState(0);
+  const [replayKey, setReplayKey] = useState(0);
+
+  useEffect(() => {
+    setDisplayed("");
+    setIndex(0);
+  }, [text, replayKey]);
 
   useEffect(() => {
     if (index < text.length) {
@@ -21,10 +27,18 @@ function TypewriterText({ text, speed = 35 }: { text: string; speed?: number }) 
       }, speed);
       return () => clearTimeout(timer);
     }
-  }, [index, text, speed]);
+  }, [index, text, speed, replayKey]);
+
+  function handleReplay() {
+    setReplayKey((prev) => prev + 1);
+  }
 
   return (
-    <span>
+    <span
+      className="typewriter-interactive"
+      onClick={handleReplay}
+      title="클릭하면 타이핑 애니메이션이 처음부터 다시 재생됩니다"
+    >
       {displayed}
       <span className="typing-cursor" aria-hidden="true" />
     </span>
@@ -73,7 +87,7 @@ export default function HomePage() {
               <span>검증 가능한 경력 증명으로.</span>
             </h1>
             <p className="hero-description">
-              <TypewriterText text="공개 저장소 활동을 스냅샷으로 고정하고, 일관된 기준으로 분석해 누구나 확인할 수 있는 Contribution Certificate를 생성합니다." />
+              <TypewriterText text={"공개 저장소 활동을 스냅샷으로 고정하고, 일관된 기준으로 분석해\n누구나 확인할 수 있는 Contribution Certificate를 생성합니다."} />
             </p>
             <p className="privacy-note">
               <span aria-hidden="true">●</span> 공개 저장소만 안전하게 분석하며, 객관적인 기여 점수와 AI 요약 리포트를 함께 제공합니다.
