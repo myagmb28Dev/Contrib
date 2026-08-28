@@ -95,19 +95,17 @@ export function CertificatesClient() {
                   </div>
                 </div>
 
-                <div className="cert-hash-section">
-                  <span className="cert-label">공개 검증 ID (Public ID)</span>
-                  <div className="hash-copy-row">
-                    <code className="monospace">{cert.publicId}</code>
-                    <button
-                      type="button"
-                      className="copy-btn"
-                      onClick={() => copyHash(cert.publicId, `pub-${cert.id}`)}
-                      title="공개 검증 ID 복사"
-                    >
-                      {copiedId === `pub-${cert.id}` ? "복사됨" : "ID 복사"}
-                    </button>
-                  </div>
+                <div className="cert-public-id-bar">
+                  <span className="cert-id-tag">Public ID</span>
+                  <code className="cert-id-val">{cert.publicId}</code>
+                  <button
+                    type="button"
+                    className="cert-id-copy-action"
+                    onClick={() => copyHash(cert.publicId, `pub-${cert.id}`)}
+                    title="공개 검증 ID 복사"
+                  >
+                    {copiedId === `pub-${cert.id}` ? "복사됨" : "복사"}
+                  </button>
                 </div>
 
                 <div className="cert-meta-grid">
