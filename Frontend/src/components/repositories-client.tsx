@@ -154,6 +154,7 @@ export function RepositoriesClient() {
                     href={`/repositories/${repo.id}/overview`}
                     className="repo-name"
                     title={repo.fullName}
+                    aria-label={repo.fullName}
                   >
                     <strong>{repo.name}</strong>
                     <small className="muted">@{repo.ownerLogin}</small>
