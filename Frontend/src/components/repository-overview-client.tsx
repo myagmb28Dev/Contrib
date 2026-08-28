@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Breadcrumb } from "./breadcrumb";
-import { ApiRequestError, getRepository, getRepositoryAnalyses, type Analysis, type Repository } from "@/lib/api";
+import {
+  ApiRequestError,
+  deleteRepository,
+  getRepository,
+  getRepositoryAnalyses,
+  type Analysis,
+  type Repository,
+} from "@/lib/api";
 
 function getScoreTier(score: number) {
   if (score >= 80) return { label: "Excellent", className: "tier-high" };
@@ -19,6 +26,7 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     Promise.all([getRepository(repositoryId), getRepositoryAnalyses(repositoryId)])
@@ -35,6 +43,24 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
       })
       .finally(() => setLoading(false));
   }, [repositoryId, router]);
+
+  async function handleUnsync() {
+    if (!repository || !window.confirm(`'${repository.name}' 저장소의 동기화를 해제하시겠습니까?`)) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteRepository(repositoryId);
+      router.replace("/dashboard/repositories");
+    } catch (reason: unknown) {
+      if (reason instanceof ApiRequestError && reason.status === 401) {
+        router.replace("/");
+        return;
+      }
+      setError(reason instanceof Error ? reason.message : "저장소 동기화 해제에 실패했습니다.");
+      setDeleting(false);
+    }
+  }
 
   if (error) {
     return (
@@ -91,6 +117,15 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
             >
               GitHub에서 보기 &rarr;
             </a>
+            <button
+              type="button"
+              className="button danger-outline sm"
+              onClick={handleUnsync}
+              disabled={deleting}
+              title="저장소 동기화 해제"
+            >
+              {deleting ? "해제 중..." : "동기화 해제"}
+            </button>
           </div>
         </div>
 

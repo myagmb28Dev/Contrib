@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { ApiRequestError, getRepositories, syncRepositories, type Repository } from "@/lib/api";
+import { ApiRequestError, deleteRepository, getRepositories, syncRepositories, type Repository } from "@/lib/api";
 
 export function RepositoriesClient() {
   const router = useRouter();
@@ -13,6 +13,7 @@ export function RepositoriesClient() {
   const [message, setMessage] = useState("");
   const [syncing, setSyncing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     getRepositories()
@@ -44,6 +45,25 @@ export function RepositoriesClient() {
       setMessage(error instanceof Error ? error.message : "저장소 동기화에 실패했습니다.");
     } finally {
       setSyncing(false);
+    }
+  }
+
+  async function handleUnsync(repoId: string, repoName: string) {
+    if (!window.confirm(`'${repoName}' 저장소의 동기화를 해제하시겠습니까?`)) {
+      return;
+    }
+    setDeletingId(repoId);
+    try {
+      await deleteRepository(repoId);
+      setItems((prev) => prev.filter((r) => r.id !== repoId));
+    } catch (error) {
+      if (error instanceof ApiRequestError && error.status === 401) {
+        router.replace("/");
+        return;
+      }
+      setMessage(error instanceof Error ? error.message : "동기화 해제에 실패했습니다.");
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -162,6 +182,15 @@ export function RepositoriesClient() {
                   >
                     이력
                   </Link>
+                  <button
+                    type="button"
+                    className="button danger-outline sm"
+                    onClick={() => handleUnsync(repo.id, repo.name)}
+                    disabled={deletingId === repo.id}
+                    title="저장소 동기화 해제"
+                  >
+                    {deletingId === repo.id ? "해제 중..." : "동기화 해제"}
+                  </button>
                 </div>
               </div>
             </article>

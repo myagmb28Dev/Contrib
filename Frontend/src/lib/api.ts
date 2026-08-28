@@ -138,6 +138,13 @@ export async function getRepository(id: string): Promise<Repository> {
   return apiJson(`/api/repositories/${id}`);
 }
 
+export async function deleteRepository(id: string): Promise<void> {
+  const response = await apiFetch(`/api/repositories/${id}`, { method: "DELETE" });
+  if (!response.ok) {
+    throw new ApiRequestError(response.status, "저장소 동기화를 해제하지 못했습니다.");
+  }
+}
+
 export async function getRepositoryAnalyses(repositoryId: string): Promise<Analysis[]> {
   return apiJson(`/api/repositories/${repositoryId}/analyses`);
 }

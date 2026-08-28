@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -130,10 +130,6 @@ export function DashboardClient() {
             }}
           />
           <div className="profile-hero-info">
-            <div className="profile-badge-row">
-              <span className="verified-badge">GitHub 연결됨</span>
-              <span className="ai-badge">AI: Google Gemini 2.0 Flash</span>
-            </div>
             <h2>@{user.githubUsername}</h2>
             <p className="muted">{user.email ?? "GitHub 비공개 이메일"}</p>
           </div>

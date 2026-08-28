@@ -67,4 +67,10 @@ public class RepositoryService {
         return repository.findByIdAndUserId(repositoryId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Repository not found"));
     }
+
+    @Transactional
+    public void delete(UUID userId, UUID repositoryId) {
+        GitHubRepository target = getOwnedRepository(userId, repositoryId);
+        repository.delete(target);
+    }
 }

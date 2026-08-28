@@ -39,4 +39,11 @@ public class RepositoryController {
             @PathVariable UUID repositoryId) {
         return repositoryService.get(principal.getUserId(), repositoryId);
     }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/{repositoryId}")
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
+    public void delete(@AuthenticationPrincipal GitHubPrincipal principal,
+            @PathVariable UUID repositoryId) {
+        repositoryService.delete(principal.getUserId(), repositoryId);
+    }
 }
