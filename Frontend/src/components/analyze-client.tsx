@@ -205,8 +205,7 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
             <div>
               <strong>수집 및 분석 지표</strong>
               <p>
-                커밋(수정/추가 라인 수), 풀 리퀘스트 생성 및 병합, 코드 리뷰 제출, 활동 일수를
-                포괄하여 Contribution Score와 Google Gemini 2.0 Flash AI 요약을 생성합니다.
+                커밋(수정/추가 라인 수), 풀 리퀘스트 생성 및 병합, 코드 리뷰 제출, 활동 일수를 포괄하여 AI 요약을 생성합니다.
               </p>
             </div>
           </div>
