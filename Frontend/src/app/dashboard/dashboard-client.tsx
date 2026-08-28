@@ -4,27 +4,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useAuth } from "@/lib/auth-context";
 import {
-  ApiRequestError,
-  apiBaseUrl,
   getAnalyses,
   getCertificates,
-  getCurrentUser,
   getRepositories,
-  logout,
-  type CurrentUser,
 } from "@/lib/api";
 
-type DashboardState =
-  | { status: "loading" }
-  | { status: "authenticated"; user: CurrentUser }
-  | { status: "error"; message: string };
-
 export function DashboardClient() {
-  const router = useRouter();
-  const [state, setState] = useState<DashboardState>({ status: "loading" });
+  const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
   const [stats, setStats] = useState<{
     repoCount: number | null;
     analysisCount: number | null;
@@ -36,77 +25,31 @@ export function DashboardClient() {
   });
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    getCurrentUser(controller.signal)
-      .then((user) => {
-        setState({ status: "authenticated", user });
-        Promise.allSettled([
-          getRepositories(),
-          getAnalyses(),
-          getCertificates(),
-        ]).then(([repos, analyses, certs]) => {
-          setStats({
-            repoCount: repos.status === "fulfilled" ? repos.value.length : 0,
-            analysisCount: analyses.status === "fulfilled" ? analyses.value.length : 0,
-            certCount: certs.status === "fulfilled" ? certs.value.length : 0,
-          });
-        });
-      })
-      .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
-
-        if (error instanceof ApiRequestError && error.status === 401) {
-          router.replace("/");
-          return;
-        }
-
-        setState({
-          status: "error",
-          message: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.",
-        });
+    Promise.allSettled([
+      getRepositories(),
+      getAnalyses(),
+      getCertificates(),
+    ]).then(([repos, analyses, certs]) => {
+      setStats({
+        repoCount: repos.status === "fulfilled" ? repos.value.length : 0,
+        analysisCount: analyses.status === "fulfilled" ? analyses.value.length : 0,
+        certCount: certs.status === "fulfilled" ? certs.value.length : 0,
       });
-
-    return () => controller.abort();
-  }, [router]);
+    });
+  }, []);
 
   async function handleLogout() {
     setIsLoggingOut(true);
     try {
       await logout();
-      router.replace("/");
-      router.refresh();
-    } catch (error) {
-      setState({
-        status: "error",
-        message: error instanceof Error ? error.message : "로그아웃 중 오류가 발생했습니다.",
-      });
+    } finally {
       setIsLoggingOut(false);
     }
   }
 
-  if (state.status === "loading") {
-    return (
-      <div className="card loading-card">
-        <div className="skeleton-line lg" />
-        <div className="skeleton-line md" />
-        <p className="muted">로그인 정보를 확인하는 중입니다...</p>
-      </div>
-    );
+  if (!user) {
+    return null;
   }
-
-  if (state.status === "error") {
-    return (
-      <div className="card stack">
-        <p className="error-message">{state.message}</p>
-        <a className="button" href={`${apiBaseUrl}/api/auth/github`}>
-          로그인 다시 시도
-        </a>
-      </div>
-    );
-  }
-
-  const { user } = state;
 
   return (
     <div className="dashboard-layout">

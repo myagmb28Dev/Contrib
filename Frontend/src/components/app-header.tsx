@@ -4,36 +4,18 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { ApiRequestError, getCurrentUser, logout, type CurrentUser } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 
 export function AppHeader() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [user, setUser] = useState<CurrentUser | null>(null);
+  const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    getCurrentUser(controller.signal)
-      .then(setUser)
-      .catch((error: unknown) => {
-        if (error instanceof ApiRequestError && error.status === 401) {
-          setUser(null);
-          if (pathname !== "/" && !pathname.startsWith("/verify")) {
-            router.replace("/");
-          }
-        }
-      });
-    return () => controller.abort();
-  }, [pathname, router]);
 
   async function handleLogout() {
     setIsLoggingOut(true);
     try {
       await logout();
-      router.replace("/");
-      router.refresh();
-    } catch {
+    } finally {
       setIsLoggingOut(false);
     }
   }

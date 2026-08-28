@@ -1,5 +1,9 @@
-﻿import { PublicVerificationForm } from "@/components/public-verification-form";
+"use client";
+
+import Link from "next/link";
+import { PublicVerificationForm } from "@/components/public-verification-form";
 import { apiBaseUrl } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 
 const githubLoginUrl = `${apiBaseUrl}/api/auth/github`;
 
@@ -15,17 +19,49 @@ function GitHubMark() {
 }
 
 export default function HomePage() {
+  const { user, loading, logout } = useAuth();
+
   return (
     <main className="landing-page">
       <div className="landing-shell">
         <header className="landing-header">
-          <a className="brand" href="/" aria-label="Contrib 홈">
+          <Link className="brand" href="/" aria-label="Contrib 홈">
             <span className="brand-text">Contrib</span>
-          </a>
-          <a className="header-login" href={githubLoginUrl}>
-            <GitHubMark />
-            GitHub 로그인
-          </a>
+          </Link>
+
+          <div className="landing-header-right">
+            {!loading && user ? (
+              <div className="user-menu" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <Link href="/dashboard" className="user-badge" style={{ textDecoration: "none" }}>
+                  <img
+                    src={`https://github.com/${user.githubUsername}.png`}
+                    alt={user.githubUsername}
+                    className="user-avatar"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
+                  />
+                  <span className="user-name">{user.githubUsername}</span>
+                </Link>
+                <Link href="/dashboard" className="button primary sm">
+                  내 대시보드
+                </Link>
+                <button
+                  type="button"
+                  className="header-logout-button"
+                  onClick={logout}
+                  title="로그아웃"
+                >
+                  로그아웃
+                </button>
+              </div>
+            ) : (
+              <a className="header-login" href={githubLoginUrl}>
+                <GitHubMark />
+                GitHub 로그인
+              </a>
+            )}
+          </div>
         </header>
 
         <section className="landing-hero">
@@ -39,6 +75,13 @@ export default function HomePage() {
               공개 저장소 활동을 스냅샷으로 고정하고, 일관된 기준으로 분석해 누구나 확인할 수 있는
               Contribution Certificate를 생성합니다.
             </p>
+            {!loading && user && (
+              <div style={{ marginTop: "16px", marginBottom: "8px" }}>
+                <Link href="/dashboard" className="button primary" style={{ display: "inline-flex" }}>
+                  내 대시보드로 이동 &rarr;
+                </Link>
+              </div>
+            )}
             <p className="privacy-note">
               <span aria-hidden="true">●</span> 공개 저장소 활동만 수집하며, 점수 계산과 Gemini AI 요약은 분리하여 제공합니다.
             </p>
