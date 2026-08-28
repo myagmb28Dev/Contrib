@@ -27,7 +27,6 @@ function getScoreTier(score: number) {
 export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
   const router = useRouter();
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
-  const [wallet, setWallet] = useState("");
   const [certificateId, setCertificateId] = useState<string | null>(null);
   const [issuing, setIssuing] = useState(false);
   const [error, setError] = useState("");
@@ -48,14 +47,14 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
     setError("");
     setIssuing(true);
     try {
-      const cert = await createCertificate(analysisId, wallet.trim() || null);
+      const cert = await createCertificate(analysisId, null);
       setCertificateId(cert.id);
     } catch (reason) {
       if (reason instanceof ApiRequestError && reason.status === 401) {
         router.replace("/");
         return;
       }
-      setError(reason instanceof Error ? reason.message : "인증서를 생성하지 못했습니다.");
+      setError(reason instanceof Error ? reason.message : "인증서를 발급하지 못했습니다.");
     } finally {
       setIssuing(false);
     }
@@ -162,41 +161,34 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
       {/* Certificate Issuance Section */}
       <section className="card certificate-issue-card full-width">
         <div className="issue-card-header">
-          <h3>온체인 Contribution Certificate 생성</h3>
+          <h3>공식 Contribution Certificate 발급</h3>
           <p className="muted">
-            이 분석 결과를 바탕으로 Base Sepolia 블록체인에 영구 기록할 수 있는 인증서를 생성합니다.
+            이 분석 결과를 바탕으로 공개 검증이 가능한 공식 기여 인증서를 발급합니다. (온체인 발행 및 관리는 인증서 상세에서 진행할 수 있습니다)
           </p>
         </div>
 
-        <div className="wallet-input-section">
-          <label>
-            Subject 지갑 주소 (선택 사항, Base Sepolia 온체인 증명 시 필요)
-            <input
-              type="text"
-              value={wallet}
-              onChange={(event) => setWallet(event.target.value)}
-              placeholder="0x... (지갑 주소를 입력하지 않아도 오프체인 인증서가 먼저 생성됩니다)"
-              className="wallet-address-input"
-            />
-          </label>
-        </div>
-
-        <div className="issue-action-row">
-          <button
-            className="button primary"
-            onClick={issue}
-            disabled={issuing}
-          >
-            {issuing ? "인증서 생성 중..." : "Contribution Certificate 생성하기"}
-          </button>
-          {certificateId && (
-            <Link className="button accent" href={`/certificates/${certificateId}`}>
-              생성된 인증서 열기 & 온체인 발행 &rarr;
-            </Link>
+        <div className="issue-action-row mt" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          {!certificateId ? (
+            <button
+              className="button primary"
+              onClick={issue}
+              disabled={issuing}
+            >
+              {issuing ? "인증서 발급 중..." : "Contribution Certificate 발급하기"}
+            </button>
+          ) : (
+            <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+              <span className="badge-success" style={{ fontWeight: 600, color: "#059669", background: "#ecfdf5", padding: "6px 14px", borderRadius: "8px", border: "1px solid #a7f3d0" }}>
+                인증서 발급 완료
+              </span>
+              <Link className="button primary" href={`/certificates/${certificateId}`}>
+                발급된 인증서 상세 / 온체인 관리 &rarr;
+              </Link>
+            </div>
           )}
         </div>
 
-        {error && <p className="error-message">{error}</p>}
+        {error && <p className="error-message mt">{error}</p>}
       </section>
     </div>
   );
