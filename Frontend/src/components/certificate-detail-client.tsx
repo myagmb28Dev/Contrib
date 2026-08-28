@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createWalletClient, custom, type EIP1193Provider } from "viem";
 
@@ -46,6 +47,7 @@ declare global {
 }
 
 export function CertificateDetailClient({ certificateId }: { certificateId: string }) {
+  const router = useRouter();
   const [certificate, setCertificate] = useState<Certificate | null>(null);
   const [attestation, setAttestation] = useState<Attestation | null>(null);
   const [working, setWorking] = useState(false);
@@ -56,16 +58,26 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
   useEffect(() => {
     getCertificate(certificateId)
       .then(setCertificate)
-      .catch((reason: Error) => setError(reason.message));
+      .catch((reason: unknown) => {
+        if (reason instanceof ApiRequestError && reason.status === 401) {
+          router.replace("/");
+          return;
+        }
+        setError(reason instanceof Error ? reason.message : "인증서 정보를 불러오지 못했습니다.");
+      });
 
     getCertificateAttestation(certificateId)
       .then(setAttestation)
-      .catch((reason: Error) => {
+      .catch((reason: unknown) => {
+        if (reason instanceof ApiRequestError && reason.status === 401) {
+          router.replace("/");
+          return;
+        }
         if (!(reason instanceof ApiRequestError) || reason.status !== 404) {
-          setError(reason.message);
+          setError(reason instanceof Error ? reason.message : "트랜잭션 정보를 불러오지 못했습니다.");
         }
       });
-  }, [certificateId]);
+  }, [certificateId, router]);
 
   useEffect(() => {
     if (
@@ -82,12 +94,16 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
           setCertificate(await getCertificate(certificateId));
         }
       } catch (reason) {
+        if (reason instanceof ApiRequestError && reason.status === 401) {
+          router.replace("/");
+          return;
+        }
         setError(reason instanceof Error ? reason.message : "트랜잭션 상태를 확인하지 못했습니다.");
       }
     }, 1500);
 
     return () => window.clearInterval(timer);
-  }, [attestation, certificateId]);
+  }, [attestation, certificateId, router]);
 
   function copyText(text: string, key: string) {
     navigator.clipboard.writeText(text).then(() => {
@@ -141,6 +157,10 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       });
       setAttestation(await submitAttestation(certificateId, hash, account));
     } catch (reason) {
+      if (reason instanceof ApiRequestError && reason.status === 401) {
+        router.replace("/");
+        return;
+      }
       setError(reason instanceof Error ? reason.message : "온체인 발급에 실패했습니다.");
     } finally {
       setWorking(false);
@@ -167,6 +187,10 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       });
       setAttestation(await submitRevocation(certificateId, hash, account, revocationReason.trim()));
     } catch (reason) {
+      if (reason instanceof ApiRequestError && reason.status === 401) {
+        router.replace("/");
+        return;
+      }
       setError(reason instanceof Error ? reason.message : "온체인 폐기에 실패했습니다.");
     } finally {
       setWorking(false);

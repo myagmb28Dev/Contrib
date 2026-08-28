@@ -1,10 +1,11 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Breadcrumb } from "./breadcrumb";
-import { getRepository, getRepositoryAnalyses, type Analysis, type Repository } from "@/lib/api";
+import { ApiRequestError, getRepository, getRepositoryAnalyses, type Analysis, type Repository } from "@/lib/api";
 
 function getScoreTier(score: number) {
   if (score >= 80) return { label: "Excellent", className: "tier-high" };
@@ -13,6 +14,7 @@ function getScoreTier(score: number) {
 }
 
 export function RepositoryOverviewClient({ repositoryId }: { repositoryId: string }) {
+  const router = useRouter();
   const [repository, setRepository] = useState<Repository | null>(null);
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,9 +26,15 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
         setRepository(repo);
         setAnalyses(values);
       })
-      .catch((reason: Error) => setError(reason.message))
+      .catch((reason: unknown) => {
+        if (reason instanceof ApiRequestError && reason.status === 401) {
+          router.replace("/");
+          return;
+        }
+        setError(reason instanceof Error ? reason.message : "저장소 정보를 불러오지 못했습니다.");
+      })
       .finally(() => setLoading(false));
-  }, [repositoryId]);
+  }, [repositoryId, router]);
 
   if (error) {
     return (
@@ -63,7 +71,6 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
       <section className="card repo-hero-card">
         <div className="repo-hero-main">
           <div className="repo-title-box">
-            <span className="repo-hero-icon">📁</span>
             <div>
               <h2>{repository.name}</h2>
               <span className="muted">소유자: @{repository.ownerLogin} · {repository.visibility}</span>
@@ -74,7 +81,7 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
               className="button primary"
               href={`/repositories/${repositoryId}/analyze`}
             >
-              ⚡ 새 기여 분석 시작
+              새 기여 분석 시작
             </Link>
             <a
               className="button"
@@ -94,7 +101,7 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
           </div>
           <div className="meta-pill">
             <span className="pill-label">기본 브랜치</span>
-            <strong className="pill-val">🌿 {repository.defaultBranch}</strong>
+            <strong className="pill-val">{repository.defaultBranch}</strong>
           </div>
           <div className="meta-pill">
             <span className="pill-label">최근 동기화</span>
@@ -114,7 +121,6 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
 
         {analyses.length === 0 ? (
           <div className="card empty-state-card">
-            <div className="empty-badge-icon">📊</div>
             <h4>아직 진행된 기여 분석이 없습니다</h4>
             <p className="muted">
               기간을 선택하여 커밋, PR, 코드 리뷰 및 변경 라인 수 기반의 기여도를 분석해 보세요.
@@ -146,9 +152,8 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
                   </div>
 
                   <div className="analysis-period-box">
-                    <span className="period-icon">📅</span>
                     <span className="period-text">
-                      {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}
+                      기간: {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}
                       {new Date(analysis.periodEnd).toLocaleDateString()}
                     </span>
                   </div>
@@ -167,7 +172,7 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
 
                   <div className="analysis-card-footer">
                     <span className="ai-model-tag">
-                      🤖 {analysis.aiModel || "Google Gemini 2.0 Flash"}
+                      AI: {analysis.aiModel || "Google Gemini 2.0 Flash"}
                     </span>
                     <Link
                       className="button primary sm"

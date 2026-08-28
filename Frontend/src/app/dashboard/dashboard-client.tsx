@@ -18,7 +18,6 @@ import {
 type DashboardState =
   | { status: "loading" }
   | { status: "authenticated"; user: CurrentUser }
-  | { status: "unauthenticated" }
   | { status: "error"; message: string };
 
 export function DashboardClient() {
@@ -59,7 +58,7 @@ export function DashboardClient() {
         if (controller.signal.aborted) return;
 
         if (error instanceof ApiRequestError && error.status === 401) {
-          setState({ status: "unauthenticated" });
+          router.replace("/");
           return;
         }
 
@@ -70,7 +69,7 @@ export function DashboardClient() {
       });
 
     return () => controller.abort();
-  }, []);
+  }, [router]);
 
   async function handleLogout() {
     setIsLoggingOut(true);
@@ -100,18 +99,6 @@ export function DashboardClient() {
         <div className="skeleton-line lg" />
         <div className="skeleton-line md" />
         <p className="muted">로그인 정보를 확인하는 중입니다...</p>
-      </div>
-    );
-  }
-
-  if (state.status === "unauthenticated") {
-    return (
-      <div className="card stack center-stack">
-        <h2>로그인이 필요합니다</h2>
-        <p className="muted">세션이 만료되었거나 로그인되어 있지 않습니다. GitHub 계정으로 시작하세요.</p>
-        <a className="button primary" href={`${apiBaseUrl}/api/auth/github`}>
-          GitHub 로그인하기
-        </a>
       </div>
     );
   }

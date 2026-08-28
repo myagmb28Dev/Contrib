@@ -1,10 +1,12 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
 import { Breadcrumb } from "./breadcrumb";
 import {
+  ApiRequestError,
   createAnalysis,
   getAnalysisJob,
   getRepository,
@@ -14,6 +16,7 @@ import {
 } from "@/lib/api";
 
 export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
+  const router = useRouter();
   const today = new Date();
   const monthAgo = new Date(today);
   monthAgo.setMonth(today.getMonth() - 1);
@@ -29,8 +32,12 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
   useEffect(() => {
     getRepository(repositoryId)
       .then(setRepository)
-      .catch(() => {});
-  }, [repositoryId]);
+      .catch((err: unknown) => {
+        if (err instanceof ApiRequestError && err.status === 401) {
+          router.replace("/");
+        }
+      });
+  }, [repositoryId, router]);
 
   useEffect(() => {
     if (!job || ["COMPLETED", "FAILED", "CANCELLED"].includes(job.status)) return;
@@ -74,6 +81,10 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
         setAnalysisId(analyses.find((analysis) => analysis.jobId === created.id)?.id ?? null);
       }
     } catch (reason) {
+      if (reason instanceof ApiRequestError && reason.status === 401) {
+        router.replace("/");
+        return;
+      }
       setError(reason instanceof Error ? reason.message : "분석을 시작하지 못했습니다.");
     } finally {
       setSubmitting(false);

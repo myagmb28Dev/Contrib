@@ -1,4 +1,4 @@
-import { PublicVerificationForm } from "@/components/public-verification-form";
+﻿import { PublicVerificationForm } from "@/components/public-verification-form";
 import { apiBaseUrl } from "@/lib/api";
 
 const githubLoginUrl = `${apiBaseUrl}/api/auth/github`;
@@ -40,17 +40,8 @@ export default function HomePage() {
               공개 저장소 활동을 스냅샷으로 고정하고, 일관된 기준으로 분석해 누구나 확인할 수 있는
               Contribution Certificate를 생성합니다.
             </p>
-            <div className="hero-actions">
-              <a className="button primary hero-primary" href={githubLoginUrl}>
-                <GitHubMark />
-                GitHub로 시작하기
-              </a>
-              <a className="button hero-secondary" href="#verify">
-                인증서 검증하기
-              </a>
-            </div>
             <p className="privacy-note">
-              <span aria-hidden="true">●</span> 공개 저장소만 사용하며, 점수 계산과 AI 요약은 분리하여 제공합니다.
+              <span aria-hidden="true">●</span> 공개 저장소 활동만 수집하며, 점수 계산과 Gemini AI 요약은 분리하여 제공합니다.
             </p>
           </div>
 
@@ -62,7 +53,7 @@ export default function HomePage() {
                   <span className="preview-label">CONTRIBUTION CERTIFICATE</span>
                   <strong>Verified contribution</strong>
                 </div>
-                <span className="verified-badge">✓ VERIFIED</span>
+                <span className="verified-badge">VERIFIED</span>
               </header>
               <div className="certificate-repository">
                 <span>Repository</span>

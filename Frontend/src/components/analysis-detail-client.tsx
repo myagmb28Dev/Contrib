@@ -1,10 +1,11 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Breadcrumb } from "./breadcrumb";
-import { createCertificate, getAnalysis, type Analysis } from "@/lib/api";
+import { ApiRequestError, createCertificate, getAnalysis, type Analysis } from "@/lib/api";
 
 const metricLabels: Record<string, { label: string; unit?: string }> = {
   commits: { label: "총 커밋 수", unit: "회" },
@@ -24,6 +25,7 @@ function getScoreTier(score: number) {
 }
 
 export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
+  const router = useRouter();
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [wallet, setWallet] = useState("");
   const [certificateId, setCertificateId] = useState<string | null>(null);
@@ -33,8 +35,14 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
   useEffect(() => {
     getAnalysis(analysisId)
       .then(setAnalysis)
-      .catch((reason: Error) => setError(reason.message));
-  }, [analysisId]);
+      .catch((reason: unknown) => {
+        if (reason instanceof ApiRequestError && reason.status === 401) {
+          router.replace("/");
+          return;
+        }
+        setError(reason instanceof Error ? reason.message : "분석 결과를 불러오지 못했습니다.");
+      });
+  }, [analysisId, router]);
 
   async function issue() {
     setError("");
@@ -43,6 +51,10 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
       const cert = await createCertificate(analysisId, wallet.trim() || null);
       setCertificateId(cert.id);
     } catch (reason) {
+      if (reason instanceof ApiRequestError && reason.status === 401) {
+        router.replace("/");
+        return;
+      }
       setError(reason instanceof Error ? reason.message : "인증서를 생성하지 못했습니다.");
     } finally {
       setIssuing(false);

@@ -1,11 +1,13 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { getRepositories, syncRepositories, type Repository } from "@/lib/api";
+import { ApiRequestError, getRepositories, syncRepositories, type Repository } from "@/lib/api";
 
 export function RepositoriesClient() {
+  const router = useRouter();
   const [items, setItems] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -18,9 +20,15 @@ export function RepositoriesClient() {
         setItems(value);
         setMessage("");
       })
-      .catch((error: Error) => setMessage(error.message))
+      .catch((error: unknown) => {
+        if (error instanceof ApiRequestError && error.status === 401) {
+          router.replace("/");
+          return;
+        }
+        setMessage(error instanceof Error ? error.message : "저장소 목록을 불러오지 못했습니다.");
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [router]);
 
   async function sync() {
     setSyncing(true);
@@ -29,6 +37,10 @@ export function RepositoriesClient() {
       const updated = await syncRepositories();
       setItems(updated);
     } catch (error) {
+      if (error instanceof ApiRequestError && error.status === 401) {
+        router.replace("/");
+        return;
+      }
       setMessage(error instanceof Error ? error.message : "저장소 동기화에 실패했습니다.");
     } finally {
       setSyncing(false);

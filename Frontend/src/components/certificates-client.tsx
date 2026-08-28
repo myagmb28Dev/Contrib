@@ -1,9 +1,10 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { getCertificates, type Certificate } from "@/lib/api";
+import { ApiRequestError, getCertificates, type Certificate } from "@/lib/api";
 
 function formatStatus(status: string) {
   switch (status.toUpperCase()) {
@@ -22,6 +23,7 @@ function formatStatus(status: string) {
 }
 
 export function CertificatesClient() {
+  const router = useRouter();
   const [items, setItems] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -30,9 +32,15 @@ export function CertificatesClient() {
   useEffect(() => {
     getCertificates()
       .then(setItems)
-      .catch((reason: Error) => setError(reason.message))
+      .catch((reason: unknown) => {
+        if (reason instanceof ApiRequestError && reason.status === 401) {
+          router.replace("/");
+          return;
+        }
+        setError(reason instanceof Error ? reason.message : "인증서 목록을 불러오지 못했습니다.");
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [router]);
 
   function copyHash(hash: string, id: string) {
     navigator.clipboard.writeText(hash).then(() => {

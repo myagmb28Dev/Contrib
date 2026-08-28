@@ -1,9 +1,10 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { getAnalyses, type Analysis } from "@/lib/api";
+import { ApiRequestError, getAnalyses, type Analysis } from "@/lib/api";
 
 function getScoreTier(score: number) {
   if (score >= 80) return { label: "Excellent", className: "tier-high" };
@@ -12,6 +13,7 @@ function getScoreTier(score: number) {
 }
 
 export function AnalysesClient() {
+  const router = useRouter();
   const [items, setItems] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,9 +21,15 @@ export function AnalysesClient() {
   useEffect(() => {
     getAnalyses()
       .then(setItems)
-      .catch((reason: Error) => setError(reason.message))
+      .catch((reason: unknown) => {
+        if (reason instanceof ApiRequestError && reason.status === 401) {
+          router.replace("/");
+          return;
+        }
+        setError(reason instanceof Error ? reason.message : "분석 이력을 불러오지 못했습니다.");
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [router]);
 
   return (
     <div className="stack full-width">

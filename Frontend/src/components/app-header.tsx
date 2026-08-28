@@ -16,13 +16,16 @@ export function AppHeader() {
     const controller = new AbortController();
     getCurrentUser(controller.signal)
       .then(setUser)
-      .catch((error) => {
+      .catch((error: unknown) => {
         if (error instanceof ApiRequestError && error.status === 401) {
           setUser(null);
+          if (pathname !== "/" && !pathname.startsWith("/verify")) {
+            router.replace("/");
+          }
         }
       });
     return () => controller.abort();
-  }, []);
+  }, [pathname, router]);
 
   async function handleLogout() {
     setIsLoggingOut(true);
@@ -80,7 +83,6 @@ export function AppHeader() {
                   alt={`@${user.githubUsername}`}
                   className="user-avatar"
                   onError={(e) => {
-                    // Fallback if image fails
                     (e.target as HTMLElement).style.display = "none";
                   }}
                 />
