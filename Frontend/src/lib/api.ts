@@ -1,6 +1,13 @@
 export const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
+export function getAppOrigin(): string {
+  if (typeof window !== "undefined" && window.location.origin) {
+    return window.location.origin;
+  }
+  return "http://localhost:3000";
+}
+
 export type CurrentUser = {
   userId: string;
   githubUserId: number;
@@ -26,6 +33,7 @@ export type Repository = {
   language: string | null;
   archived: boolean;
   lastSyncedAt: string;
+  createdAt?: string;
 };
 
 export type AnalysisJob = {
@@ -44,6 +52,8 @@ export type Analysis = {
   id: string;
   jobId: string;
   repositoryId: string;
+  repositoryName?: string;
+  repositoryFullName?: string;
   periodStart: string;
   periodEnd: string;
   metrics: Record<string, number>;
@@ -60,6 +70,8 @@ export type Certificate = {
   id: string;
   publicId: string;
   analysisId: string;
+  repositoryName?: string;
+  repositoryFullName?: string;
   schemaVersion: string;
   payload: Record<string, unknown>;
   hash: `0x${string}`;
@@ -134,8 +146,44 @@ export async function syncRepositories(): Promise<Repository[]> {
   return apiJson("/api/repositories/sync", { method: "POST" });
 }
 
+export type GitHubAvailableRepo = {
+  id: number;
+  name: string;
+  fullName: string;
+  htmlUrl: string;
+  defaultBranch: string;
+  language: string | null;
+  archived: boolean;
+  owner: {
+    id: number;
+    login: string;
+  };
+};
+
+export async function getAvailableGitHubRepositories(): Promise<GitHubAvailableRepo[]> {
+  return apiJson("/api/repositories/github-available");
+}
+
+export async function syncSelectedRepositories(githubRepositoryIds: number[]): Promise<Repository[]> {
+  return apiJson("/api/repositories/sync-selected", {
+    method: "POST",
+    body: JSON.stringify({ githubRepositoryIds }),
+  });
+}
+
 export async function getRepository(id: string): Promise<Repository> {
   return apiJson(`/api/repositories/${id}`);
+}
+
+export async function getRepositoryBranches(id: string): Promise<string[]> {
+  return apiJson(`/api/repositories/${id}/branches`);
+}
+
+export async function deleteRepository(id: string): Promise<void> {
+  const response = await apiFetch(`/api/repositories/${id}`, { method: "DELETE" });
+  if (!response.ok) {
+    throw new ApiRequestError(response.status, "저장소 동기화를 해제하지 못했습니다.");
+  }
 }
 
 export async function getRepositoryAnalyses(repositoryId: string): Promise<Analysis[]> {
@@ -150,10 +198,15 @@ export async function createAnalysis(
   repositoryId: string,
   periodStart: string,
   periodEnd: string,
+  branch?: string,
 ): Promise<AnalysisJob> {
   return apiJson(`/api/repositories/${repositoryId}/analyses`, {
     method: "POST",
-    body: JSON.stringify({ periodStart, periodEnd }),
+    body: JSON.stringify({
+      periodStart,
+      periodEnd,
+      ...(branch ? { branch } : {}),
+    }),
   });
 }
 

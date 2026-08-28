@@ -1,7 +1,16 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { ProfileDropdown } from "@/components/profile-dropdown";
 import { PublicVerificationForm } from "@/components/public-verification-form";
+import { TypewriterText } from "@/components/typewriter";
 import { apiBaseUrl } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 
 const githubLoginUrl = `${apiBaseUrl}/api/auth/github`;
+
+const DUMMY_PUBLIC_ID = "c8d4e2a1-9b7f-4567-a890-123456789abc";
 
 function GitHubMark() {
   return (
@@ -15,85 +24,220 @@ function GitHubMark() {
 }
 
 export default function HomePage() {
+  const { user, loading } = useAuth();
+  const [copiedType, setCopiedType] = useState<"id" | "link" | null>(null);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: -(y * 12), y: x * 12 });
+  }
+
+  function handleMouseLeave() {
+    setTilt({ x: 0, y: 0 });
+  }
+
+  function copyDummyId(e: React.MouseEvent) {
+    e.stopPropagation();
+    navigator.clipboard.writeText(DUMMY_PUBLIC_ID);
+    setCopiedType("id");
+    setTimeout(() => setCopiedType(null), 2000);
+  }
+
+  function copyDummyLink(e: React.MouseEvent) {
+    e.stopPropagation();
+    const url = typeof window !== "undefined"
+      ? `${window.location.origin}/verify/${DUMMY_PUBLIC_ID}`
+      : `https://contrib.dev/verify/${DUMMY_PUBLIC_ID}`;
+    navigator.clipboard.writeText(url);
+    setCopiedType("link");
+    setTimeout(() => setCopiedType(null), 2000);
+  }
+
   return (
     <main className="landing-page">
       <div className="landing-shell">
         <header className="landing-header">
-          <a className="brand" href="#top" aria-label="Contrib 홈">
-            <span className="brand-mark">C</span>
-            <span>Contrib</span>
-          </a>
-          <a className="header-login" href={githubLoginUrl}>
-            <GitHubMark />
-            GitHub 로그인
-          </a>
+          <Link className="brand" href="/" aria-label="Contrib 홈">
+            <span className="brand-text">Contrib</span>
+          </Link>
+
+          <div className="landing-header-right">
+            {!loading && user ? (
+              <ProfileDropdown />
+            ) : (
+              <a className="header-login" href={githubLoginUrl}>
+                <GitHubMark />
+                GitHub 로그인
+              </a>
+            )}
+          </div>
         </header>
 
-        <section className="landing-hero" id="top">
+        <section className="landing-hero">
           <div className="hero-copy">
             <p className="eyebrow">GitHub Contribution Attestation</p>
             <h1>
               GitHub 기여를,
               <span>검증 가능한 경력 증명으로.</span>
             </h1>
-            <p className="hero-description">
-              공개 저장소 활동을 스냅샷으로 고정하고, 일관된 기준으로 분석해 누구나 확인할 수 있는
-              Contribution Certificate를 생성합니다.
+            <p className="hero-description" style={{ minHeight: "56px" }}>
+              <TypewriterText text={"공개 저장소 활동을 스냅샷으로 고정하고, 일관된 기준으로 분석해\n누구나 확인할 수 있는 Contribution Certificate를 생성합니다."} />
             </p>
-            <div className="hero-actions">
-              <a className="button primary hero-primary" href={githubLoginUrl}>
-                <GitHubMark />
-                GitHub로 시작하기
-              </a>
-              <a className="button hero-secondary" href="#verify">
-                인증서 검증하기
-              </a>
-            </div>
             <p className="privacy-note">
-              <span aria-hidden="true">●</span> 공개 저장소만 사용하며, 점수 계산과 AI 요약은 분리하여 제공합니다.
+              <span aria-hidden="true">●</span> 공개 저장소만 안전하게 분석하며, 객관적인 기여 점수와 AI 요약 리포트를 함께 제공합니다.
             </p>
           </div>
 
-          <div className="certificate-stage" aria-label="Contribution Certificate 미리보기">
+          <div className="certificate-stage" aria-label="Contribution Certificate 3D 인터랙티브 미리보기">
             <div className="certificate-glow" />
-            <article className="certificate-preview">
-              <header className="certificate-heading">
-                <div>
-                  <span className="preview-label">CONTRIBUTION CERTIFICATE</span>
-                  <strong>Verified contribution</strong>
-                </div>
-                <span className="verified-badge">✓ VERIFIED</span>
-              </header>
-              <div className="certificate-repository">
-                <span>Repository</span>
-                <strong>yourname / meaningful-project</strong>
+            <div
+              className="certificate-3d-scene"
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div
+                className={`certificate-3d-card ${isFlipped ? "flipped" : ""}`}
+                style={{
+                  transform: isFlipped
+                    ? `rotateY(180deg) rotateX(${tilt.x}deg) rotateY(${-tilt.y}deg)`
+                    : `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+                }}
+                onClick={() => setIsFlipped((prev) => !prev)}
+              >
+                {/* FRONT SIDE */}
+                <article className="certificate-preview certificate-front">
+                  <div className="cert-card-header">
+                    <div className="cert-title-group">
+                      <span className="cert-sub-label">CONTRIBUTION CERTIFICATE</span>
+                      <strong className="cert-repo-name">hyperion-core / quantum-mesh</strong>
+                    </div>
+                    <div className="cert-header-badges">
+                      <span className="score-pill" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--primary)", background: "var(--primary-light)", padding: "3px 8px", borderRadius: "9999px" }}>
+                        94점
+                      </span>
+                      <span className="verified-badge valid">VALID</span>
+                      <span className="network-tag">Base Sepolia</span>
+                    </div>
+                  </div>
+
+                  <div className="cert-public-id-bar">
+                    <span className="cert-id-tag">Public ID</span>
+                    <code className="cert-id-val">{DUMMY_PUBLIC_ID}</code>
+                    <div className="cert-id-btn-group">
+                      <button
+                        type="button"
+                        className="cert-id-copy-action"
+                        onClick={copyDummyId}
+                        style={{ cursor: "pointer", border: "none", background: "none", fontFamily: "inherit" }}
+                      >
+                        {copiedType === "id" ? "ID 복사됨!" : "ID 복사"}
+                      </button>
+                      <button
+                        type="button"
+                        className="cert-id-copy-action highlight"
+                        onClick={copyDummyLink}
+                        style={{ cursor: "pointer", border: "none", background: "none", fontFamily: "inherit" }}
+                      >
+                        {copiedType === "link" ? "링크 복사됨!" : "링크 복사"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="cert-meta-grid">
+                    <div>
+                      <span className="meta-label">Subject Wallet</span>
+                      <span className="meta-val monospace">0x8920...43e7</span>
+                    </div>
+                    <div>
+                      <span className="meta-label">발급 일시</span>
+                      <span className="meta-val">2026. 8. 28.</span>
+                    </div>
+                  </div>
+
+                  <div className="area-tags" aria-label="기술 영역">
+                    <span>Rust</span>
+                    <span>Distributed Systems</span>
+                    <span>Wasm</span>
+                    <span>Zero Knowledge</span>
+                  </div>
+
+                  <footer className="certificate-footer-row">
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span className="muted" style={{ fontSize: "0.75rem" }}>Snapshot hash:</span>
+                      <code style={{ fontSize: "0.78rem" }}>0x7a3f...b91d</code>
+                    </div>
+                    <span style={{ fontSize: "0.76rem", color: "#059669", fontWeight: 700 }}>
+                      ● 온체인 검증 완료
+                    </span>
+                  </footer>
+                </article>
+
+                {/* BACK SIDE (3D FLIPPED) */}
+                <article className="certificate-preview certificate-back">
+                  <div className="cert-card-header">
+                    <div className="cert-title-group">
+                      <span className="cert-sub-label" style={{ color: "#818cf8" }}>EAS ON-CHAIN PROOF</span>
+                      <strong className="cert-repo-name" style={{ color: "#ffffff" }}>
+                        Attestation Smart Contract
+                      </strong>
+                    </div>
+                    <div className="cert-header-badges">
+                      <span className="network-tag" style={{ background: "rgba(129, 140, 248, 0.2)", color: "#c7d2fe", border: "1px solid rgba(129, 140, 248, 0.4)" }}>
+                        Base Sepolia (84532)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="cert-back-metric-grid">
+                    <div className="cert-back-metric-item">
+                      <span className="cert-back-metric-label">Commits</span>
+                      <span className="cert-back-metric-val">142건 (+14.2k / -3.8k)</span>
+                    </div>
+                    <div className="cert-back-metric-item">
+                      <span className="cert-back-metric-label">PRs Merged</span>
+                      <span className="cert-back-metric-val">38건 (Approved)</span>
+                    </div>
+                    <div className="cert-back-metric-item">
+                      <span className="cert-back-metric-label">Code Reviews</span>
+                      <span className="cert-back-metric-val">65건 제출</span>
+                    </div>
+                    <div className="cert-back-metric-item">
+                      <span className="cert-back-metric-label">Active Period</span>
+                      <span className="cert-back-metric-val">180 Days Active</span>
+                    </div>
+                  </div>
+
+                  <div className="cert-meta-grid" style={{ background: "rgba(0,0,0,0.25)", padding: "8px 12px", borderRadius: "8px" }}>
+                    <div>
+                      <span className="meta-label" style={{ color: "#94a3b8" }}>Schema UID</span>
+                      <span className="meta-val monospace" style={{ color: "#cbd5e1" }}>0xd342...9a12</span>
+                    </div>
+                    <div>
+                      <span className="meta-label" style={{ color: "#94a3b8" }}>Attester Node</span>
+                      <span className="meta-val" style={{ color: "#cbd5e1" }}>Contrib Oracle #04</span>
+                    </div>
+                  </div>
+
+                  <div className="cert-back-signature">
+                    <span>ECDSA Sig: <code style={{ color: "#38bdf8" }}>0x3c91...8f2b</code></span>
+                    <span style={{ color: "#34d399", fontWeight: 700 }}>● Verified</span>
+                  </div>
+
+                  <footer className="certificate-footer-row" style={{ borderColor: "rgba(255, 255, 255, 0.1)" }}>
+                    <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                      Merkle Root: <code style={{ color: "#e2e8f0" }}>0x7a3f8c...b91d</code>
+                    </span>
+                    <span style={{ fontSize: "0.74rem", color: "#818cf8", fontWeight: 700 }}>
+                      Non-Fungible Attestation
+                    </span>
+                  </footer>
+                </article>
               </div>
-              <div className="certificate-score-row">
-                <div className="preview-score">
-                  <span>Contribution score</span>
-                  <strong>82</strong>
-                  <small>/ 100</small>
-                </div>
-                <div className="mini-chart" aria-hidden="true">
-                  <i style={{ height: "38%" }} />
-                  <i style={{ height: "64%" }} />
-                  <i style={{ height: "48%" }} />
-                  <i style={{ height: "84%" }} />
-                  <i style={{ height: "72%" }} />
-                  <i style={{ height: "100%" }} />
-                </div>
-              </div>
-              <div className="area-tags" aria-label="기술 영역 예시">
-                <span>Java</span>
-                <span>Backend</span>
-                <span>Code Review</span>
-              </div>
-              <footer className="certificate-footer">
-                <span>Snapshot hash</span>
-                <code>0x83f1...c42a</code>
-                <span className="chain-dot">Base Sepolia</span>
-              </footer>
-            </article>
+            </div>
           </div>
         </section>
 
@@ -153,9 +297,8 @@ export default function HomePage() {
         <PublicVerificationForm />
 
         <footer className="landing-footer">
-          <a className="brand footer-brand" href="#top">
-            <span className="brand-mark">C</span>
-            <span>Contrib</span>
+          <a className="brand footer-brand" href="/">
+            <span className="brand-text">Contrib</span>
           </a>
           <p>GitHub 활동 기반의 검증 가능한 Contribution Certificate</p>
         </footer>

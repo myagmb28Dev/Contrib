@@ -39,8 +39,40 @@ public class RepositoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         String token = accessTokenService.getValidAccessToken(userId);
         Instant now = Instant.now();
+        java.util.Set<Long> syncedGithubRepoIds = new java.util.HashSet<>();
+
         for (GitHubRepositoryDto source : githubApiClient.getPublicRepositories(token)) {
             if (source.privateRepository()) {
+                continue;
+            }
+            syncedGithubRepoIds.add(source.id());
+            GitHubRepository target = repository.findByUserIdAndGithubRepositoryId(userId, source.id())
+                    .orElseGet(() -> GitHubRepository.create(user, source.id()));
+            target.synchronize(source.owner().id(), source.owner().login(), source.name(), source.fullName(),
+                    source.htmlUrl(), source.defaultBranch(), source.language(), source.archived(), now);
+            repository.save(target);
+        }
+
+        List<GitHubRepository> existingRepos = repository.findAllByUserIdOrderByFullNameAsc(userId);
+        for (GitHubRepository existing : existingRepos) {
+            if (!syncedGithubRepoIds.contains(existing.getGithubRepositoryId())) {
+                repository.delete(existing);
+            }
+        }
+
+        return list(userId);
+    }
+
+    @Transactional
+    public List<RepositoryResponse> syncSelected(UUID userId, List<Long> githubRepositoryIds) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        String token = accessTokenService.getValidAccessToken(userId);
+        Instant now = Instant.now();
+        java.util.Set<Long> selectedIdSet = new java.util.HashSet<>(githubRepositoryIds);
+
+        for (GitHubRepositoryDto source : githubApiClient.getPublicRepositories(token)) {
+            if (source.privateRepository() || !selectedIdSet.contains(source.id())) {
                 continue;
             }
             GitHubRepository target = repository.findByUserIdAndGithubRepositoryId(userId, source.id())
@@ -50,6 +82,14 @@ public class RepositoryService {
             repository.save(target);
         }
         return list(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GitHubRepositoryDto> listAvailableFromGitHub(UUID userId) {
+        String token = accessTokenService.getValidAccessToken(userId);
+        return githubApiClient.getPublicRepositories(token).stream()
+                .filter(repo -> !repo.privateRepository())
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -66,5 +106,25 @@ public class RepositoryService {
     public GitHubRepository getOwnedRepository(UUID userId, UUID repositoryId) {
         return repository.findByIdAndUserId(repositoryId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Repository not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getBranches(UUID userId, UUID repositoryId) {
+        GitHubRepository target = getOwnedRepository(userId, repositoryId);
+        String token = accessTokenService.getValidAccessToken(userId);
+        List<String> branches = githubApiClient.getBranches(token, target.getOwnerLogin(), target.getName())
+                .stream()
+                .map(com.example.project.github.dto.GitHubBranchDto::name)
+                .toList();
+        if (branches.isEmpty() && target.getDefaultBranch() != null) {
+            return List.of(target.getDefaultBranch());
+        }
+        return branches;
+    }
+
+    @Transactional
+    public void delete(UUID userId, UUID repositoryId) {
+        GitHubRepository target = getOwnedRepository(userId, repositoryId);
+        repository.delete(target);
     }
 }

@@ -1,44 +1,225 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { getRepository, getRepositoryAnalyses, type Analysis, type Repository } from "@/lib/api";
+import { Breadcrumb } from "./breadcrumb";
+import {
+  ApiRequestError,
+  deleteRepository,
+  getRepository,
+  getRepositoryAnalyses,
+  type Analysis,
+  type Repository,
+} from "@/lib/api";
+
+function getScoreTier(score: number) {
+  if (score >= 80) return { label: "Excellent", className: "tier-high" };
+  if (score >= 60) return { label: "Good", className: "tier-mid" };
+  return { label: "Developing", className: "tier-low" };
+}
 
 export function RepositoryOverviewClient({ repositoryId }: { repositoryId: string }) {
+  const router = useRouter();
   const [repository, setRepository] = useState<Repository | null>(null);
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     Promise.all([getRepository(repositoryId), getRepositoryAnalyses(repositoryId)])
-      .then(([repo, values]) => { setRepository(repo); setAnalyses(values); })
-      .catch((reason: Error) => setError(reason.message));
-  }, [repositoryId]);
+      .then(([repo, values]) => {
+        setRepository(repo);
+        setAnalyses(values);
+      })
+      .catch((reason: unknown) => {
+        if (reason instanceof ApiRequestError && reason.status === 401) {
+          router.replace("/");
+          return;
+        }
+        setError(reason instanceof Error ? reason.message : "저장소 정보를 불러오지 못했습니다.");
+      })
+      .finally(() => setLoading(false));
+  }, [repositoryId, router]);
 
-  if (error) return <p className="error-message">{error}</p>;
-  if (!repository) return <p className="muted">저장소를 불러오는 중입니다...</p>;
+  async function handleUnsync() {
+    if (!repository || !window.confirm(`'${repository.name}' 저장소의 동기화를 해제하시겠습니까?`)) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteRepository(repositoryId);
+      router.replace("/dashboard/repositories");
+    } catch (reason: unknown) {
+      if (reason instanceof ApiRequestError && reason.status === 401) {
+        router.replace("/");
+        return;
+      }
+      setError(reason instanceof Error ? reason.message : "저장소 동기화 해제에 실패했습니다.");
+      setDeleting(false);
+    }
+  }
+
+  if (error) {
+    return (
+      <div className="card stack">
+        <p className="error-message">{error}</p>
+        <Link href="/dashboard/repositories" className="button">
+          저장소 목록으로 돌아가기
+        </Link>
+      </div>
+    );
+  }
+
+  if (loading || !repository) {
+    return (
+      <div className="card loading-card">
+        <div className="skeleton-line lg" />
+        <div className="skeleton-line md" />
+        <p className="muted">저장소 정보를 불러오는 중입니다...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="stack full-width">
-      <dl className="identity-list">
-        <div><dt>저장소</dt><dd>{repository.fullName}</dd></div>
-        <div><dt>기본 브랜치</dt><dd>{repository.defaultBranch}</dd></div>
-        <div><dt>언어</dt><dd>{repository.language ?? "미지정"}</dd></div>
-      </dl>
-      <div className="actions">
-        <Link className="button primary" href={`/repositories/${repositoryId}/analyze`}>새 분석</Link>
-        <a className="button" href={repository.url} target="_blank" rel="noreferrer">GitHub 열기</a>
-      </div>
-      <h2>완료된 분석</h2>
-      <div className="item-list">
-        {analyses.map((analysis) => (
-          <Link className="list-card" key={analysis.id}
-            href={`/repositories/${repositoryId}/analysis/${analysis.id}`}>
-            <strong>{analysis.score}점</strong>
-            <span>{new Date(analysis.periodStart).toLocaleDateString()} ~ {new Date(analysis.periodEnd).toLocaleDateString()}</span>
-          </Link>
-        ))}
-      </div>
+      <Breadcrumb
+        items={[
+          { label: "대시보드", href: "/dashboard" },
+          { label: "저장소 관리", href: "/dashboard/repositories" },
+          { label: repository.fullName },
+        ]}
+      />
+
+      {/* Repo Hero Card */}
+      <section className="card repo-hero-card">
+        <div className="repo-hero-main">
+          <div className="repo-title-box">
+            <div>
+              <h2>{repository.name}</h2>
+              <span className="muted">소유자: @{repository.ownerLogin} · {repository.visibility}</span>
+            </div>
+          </div>
+          <div className="repo-hero-actions">
+            <Link
+              className="button primary"
+              href={`/repositories/${repositoryId}/analyze`}
+            >
+              새 기여 분석 시작
+            </Link>
+            <a
+              className="button"
+              href={repository.url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub에서 보기 &rarr;
+            </a>
+            <button
+              type="button"
+              className="button danger-outline sm"
+              onClick={handleUnsync}
+              disabled={deleting}
+              title="저장소 동기화 해제"
+            >
+              {deleting ? "해제 중..." : "동기화 해제"}
+            </button>
+          </div>
+        </div>
+
+        <div className="repo-meta-pills">
+          <div className="meta-pill">
+            <span className="pill-label">주요 언어</span>
+            <strong className="pill-val">{repository.language ?? "언어 미지정"}</strong>
+          </div>
+          <div className="meta-pill">
+            <span className="pill-label">기본 브랜치</span>
+            <strong className="pill-val">{repository.defaultBranch}</strong>
+          </div>
+          <div className="meta-pill">
+            <span className="pill-label">최근 동기화</span>
+            <strong className="pill-val">
+              {new Date(repository.lastSyncedAt).toLocaleDateString()}
+            </strong>
+          </div>
+        </div>
+      </section>
+
+      {/* Completed Analyses Section */}
+      <section className="analyses-history-section full-width">
+        <div className="section-header-row">
+          <h3>이 저장소의 기여 분석 이력</h3>
+          <span className="muted">{analyses.length}건 완료됨</span>
+        </div>
+
+        {analyses.length === 0 ? (
+          <div className="card empty-state-card">
+            <h4>아직 진행된 기여 분석이 없습니다</h4>
+            <p className="muted">
+              기간을 선택하여 커밋, PR, 코드 리뷰 및 변경 라인 수 기반의 기여도를 분석해 보세요.
+            </p>
+            <Link
+              className="button primary"
+              href={`/repositories/${repositoryId}/analyze`}
+            >
+              첫 번째 기여 분석 시작
+            </Link>
+          </div>
+        ) : (
+          <div className="analyses-grid">
+            {analyses.map((analysis) => {
+              const tier = getScoreTier(analysis.score);
+              return (
+                <article className="analysis-card" key={analysis.id}>
+                  <div className="analysis-card-header">
+                    <div className="score-badge-box">
+                      <span className={`score-badge ${tier.className}`}>
+                        {analysis.score}
+                      </span>
+                      <div className="score-sub">
+                        <strong>/ 100</strong>
+                        <span className="tier-label">{tier.label}</span>
+                      </div>
+                    </div>
+                    <span className="version-tag">{analysis.scoreVersion}</span>
+                  </div>
+
+                  <div className="analysis-period-box">
+                    <span className="period-text">
+                      기간: {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}
+                      {new Date(analysis.periodEnd).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  {analysis.summary && (
+                    <p className="analysis-summary-text">{analysis.summary}</p>
+                  )}
+
+                  {analysis.technicalAreas && analysis.technicalAreas.length > 0 && (
+                    <div className="area-tags compact">
+                      {analysis.technicalAreas.map((area, idx) => (
+                        <span key={idx}>{area}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="analysis-card-footer">
+                    <span className="ai-model-tag">AI 분석</span>
+                    <Link
+                      className="button primary sm"
+                      href={`/repositories/${repositoryId}/analysis/${analysis.id}`}
+                    >
+                      상세 보기 &rarr;
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

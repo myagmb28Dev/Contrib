@@ -3,18 +3,19 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-contribution}
-      POSTGRES_USER: ${POSTGRES_USER:-contribution}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-contribution}
+      POSTGRES_DB: contribution
+      POSTGRES_USER: contribution
+      POSTGRES_PASSWORD: contribution
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U contribution -d contribution"]
       interval: 5s
       timeout: 5s
       retries: 10
 
 volumes:
   postgres-data:
+

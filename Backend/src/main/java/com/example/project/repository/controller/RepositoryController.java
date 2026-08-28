@@ -24,6 +24,22 @@ public class RepositoryController {
         this.repositoryService = repositoryService;
     }
 
+    @GetMapping("/github-available")
+    public List<com.example.project.github.dto.GitHubRepositoryDto> listAvailableFromGitHub(
+            @AuthenticationPrincipal GitHubPrincipal principal) {
+        return repositoryService.listAvailableFromGitHub(principal.getUserId());
+    }
+
+    public record SyncSelectedRequest(List<Long> githubRepositoryIds) {}
+
+    @PostMapping("/sync-selected")
+    public List<RepositoryResponse> syncSelected(
+            @AuthenticationPrincipal GitHubPrincipal principal,
+            @org.springframework.web.bind.annotation.RequestBody SyncSelectedRequest request) {
+        List<Long> ids = request.githubRepositoryIds() != null ? request.githubRepositoryIds() : List.of();
+        return repositoryService.syncSelected(principal.getUserId(), ids);
+    }
+
     @PostMapping("/sync")
     public List<RepositoryResponse> synchronize(@AuthenticationPrincipal GitHubPrincipal principal) {
         return repositoryService.synchronize(principal.getUserId());
@@ -38,5 +54,18 @@ public class RepositoryController {
     public RepositoryResponse get(@AuthenticationPrincipal GitHubPrincipal principal,
             @PathVariable UUID repositoryId) {
         return repositoryService.get(principal.getUserId(), repositoryId);
+    }
+
+    @GetMapping("/{repositoryId}/branches")
+    public List<String> getBranches(@AuthenticationPrincipal GitHubPrincipal principal,
+            @PathVariable UUID repositoryId) {
+        return repositoryService.getBranches(principal.getUserId(), repositoryId);
+    }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/{repositoryId}")
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
+    public void delete(@AuthenticationPrincipal GitHubPrincipal principal,
+            @PathVariable UUID repositoryId) {
+        repositoryService.delete(principal.getUserId(), repositoryId);
     }
 }

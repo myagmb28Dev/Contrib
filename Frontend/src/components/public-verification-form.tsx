@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
+import { TypewriterText } from "./typewriter";
 
 export function PublicVerificationForm() {
   const router = useRouter();
@@ -20,7 +21,9 @@ export function PublicVerificationForm() {
       <div>
         <p className="eyebrow">Public verification</p>
         <h2>받은 인증서의 유효성을 확인하세요.</h2>
-        <p>로그인 없이 공개 ID만 입력하면 발급·폐기 상태와 Hash 일치 여부를 확인할 수 있습니다.</p>
+        <p style={{ minHeight: "48px" }}>
+          <TypewriterText text={"로그인 없이 공개 ID만 입력하면 발급·폐기 상태와\nHash 일치 여부를 확인할 수 있습니다."} />
+        </p>
       </div>
       <form className="verification-form" onSubmit={handleSubmit}>
         <label htmlFor="public-certificate-id">Certificate public ID</label>

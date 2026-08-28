@@ -35,18 +35,18 @@ class OpenRouterAiSummaryProviderTest {
     }
 
     @Test
-    void requestsNemotronWithStrictJsonSchemaAndParsesResult() {
+    void requestsGeminiWithStrictJsonSchemaAndParsesResult() {
         server.expect(requestTo("https://openrouter.ai/api/v1/chat/completions"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("Authorization", "Bearer test-key"))
                 .andExpect(header("HTTP-Referer", "https://contrib.example"))
                 .andExpect(header("X-OpenRouter-Title", "Contrib"))
-                .andExpect(jsonPath("$.model").value("nvidia/nemotron-3-super-120b-a12b:free"))
+                .andExpect(jsonPath("$.model").value("google/gemini-2.0-flash-001"))
                 .andExpect(jsonPath("$.response_format.type").value("json_schema"))
                 .andExpect(jsonPath("$.response_format.json_schema.strict").value(true))
                 .andRespond(withSuccess("""
                         {
-                          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+                          "model": "google/gemini-2.0-flash-001",
                           "choices": [{
                             "message": {
                               "content": "{\\\"summary\\\":\\\"Java 저장소에서 꾸준히 구현과 협업에 참여했어.\\\",\\\"technicalAreas\\\":[\\\"Java\\\",\\\"협업\\\",\\\"Java\\\"]}"
@@ -60,8 +60,8 @@ class OpenRouterAiSummaryProviderTest {
 
         assertThat(result.summary()).contains("구현과 협업");
         assertThat(result.technicalAreas()).containsExactly("Java", "협업");
-        assertThat(result.model()).isEqualTo("nvidia/nemotron-3-super-120b-a12b:free");
-        assertThat(result.promptVersion()).isEqualTo("openrouter-nemotron-v2");
+        assertThat(result.model()).isEqualTo("google/gemini-2.0-flash-001");
+        assertThat(result.promptVersion()).isEqualTo("openrouter-gemini-v1");
         server.verify();
     }
 
