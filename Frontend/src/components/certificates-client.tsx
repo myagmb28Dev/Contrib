@@ -91,7 +91,22 @@ export function CertificatesClient() {
                 </div>
 
                 <div className="cert-hash-section">
-                  <span className="cert-label">Certificate Hash</span>
+                  <span className="cert-label">공개 검증 ID (Public ID)</span>
+                  <div className="hash-copy-row">
+                    <code className="monospace">{cert.publicId}</code>
+                    <button
+                      type="button"
+                      className="copy-btn"
+                      onClick={() => copyHash(cert.publicId, `pub-${cert.id}`)}
+                      title="공개 검증 ID 복사"
+                    >
+                      {copiedId === `pub-${cert.id}` ? "복사됨" : "ID 복사"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="cert-hash-section" style={{ marginTop: "6px" }}>
+                  <span className="cert-label">온체인 해시 (Keccak-256 Hash)</span>
                   <div className="hash-copy-row">
                     <code className="monospace">{cert.hash}</code>
                     <button
@@ -100,22 +115,7 @@ export function CertificatesClient() {
                       onClick={() => copyHash(cert.hash, cert.id)}
                       title="해시 복사"
                     >
-                      {copiedId === cert.id ? "복사됨" : "복사"}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="cert-hash-section" style={{ marginTop: "6px" }}>
-                  <span className="cert-label">Public ID (공개 검증용)</span>
-                  <div className="hash-copy-row">
-                    <code className="monospace">{cert.publicId}</code>
-                    <button
-                      type="button"
-                      className="copy-btn"
-                      onClick={() => copyHash(cert.publicId, `pub-${cert.id}`)}
-                      title="Public ID 복사"
-                    >
-                      {copiedId === `pub-${cert.id}` ? "복사됨" : "복사"}
+                      {copiedId === cert.id ? "복사됨" : "해시 복사"}
                     </button>
                   </div>
                 </div>
