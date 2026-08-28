@@ -1095,20 +1095,40 @@ a {
   flex: 1 1 auto;
 }
 
+.cert-id-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
 .cert-id-copy-action {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--muted);
   background: white;
   border: 1px solid var(--border);
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 5px;
   cursor: pointer;
   flex-shrink: 0;
   transition: all 0.12s ease;
+  font-family: inherit;
 }
 
 .cert-id-copy-action:hover {
+  background: #f1f4fc;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.cert-id-copy-action.highlight {
+  color: var(--primary);
+  border-color: #cbd5e1;
+  background: white;
+}
+
+.cert-id-copy-action.highlight:hover {
   background: var(--primary);
   color: white;
   border-color: var(--primary);

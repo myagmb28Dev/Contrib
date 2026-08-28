@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { ApiRequestError, getCertificates, type Certificate } from "@/lib/api";
+import { ApiRequestError, appBaseUrl, getCertificates, type Certificate } from "@/lib/api";
 
 function formatStatus(status: string) {
   switch (status.toUpperCase()) {
@@ -42,9 +42,16 @@ export function CertificatesClient() {
       .finally(() => setLoading(false));
   }, [router]);
 
+  function copyId(publicId: string, id: string) {
+    navigator.clipboard.writeText(publicId).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  }
+
   function copyLink(publicId: string, id: string) {
-    const origin = typeof window !== "undefined" ? window.location.origin : "";
-    const url = `${origin}/verify/${publicId}`;
+    const base = appBaseUrl.replace(/\/+$/, "");
+    const url = `${base}/verify/${publicId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
@@ -98,16 +105,26 @@ export function CertificatesClient() {
                 </div>
 
                 <div className="cert-public-id-bar">
-                  <span className="cert-id-tag">검증 링크</span>
+                  <span className="cert-id-tag">Public ID</span>
                   <code className="cert-id-val">{cert.publicId}</code>
-                  <button
-                    type="button"
-                    className="cert-id-copy-action"
-                    onClick={() => copyLink(cert.publicId, `pub-${cert.id}`)}
-                    title="이력서 첨부용 전체 검증 링크 복사"
-                  >
-                    {copiedId === `pub-${cert.id}` ? "링크 복사됨!" : "링크 복사"}
-                  </button>
+                  <div className="cert-id-btn-group">
+                    <button
+                      type="button"
+                      className="cert-id-copy-action"
+                      onClick={() => copyId(cert.publicId, `id-${cert.id}`)}
+                      title="36자리 Public ID 번호 복사"
+                    >
+                      {copiedId === `id-${cert.id}` ? "ID 복사됨!" : "ID 복사"}
+                    </button>
+                    <button
+                      type="button"
+                      className="cert-id-copy-action highlight"
+                      onClick={() => copyLink(cert.publicId, `link-${cert.id}`)}
+                      title="이력서/포트폴리오용 전체 검증 링크 URL 복사"
+                    >
+                      {copiedId === `link-${cert.id}` ? "링크 복사됨!" : "링크 복사"}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="cert-meta-grid">
