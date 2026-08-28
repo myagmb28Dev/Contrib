@@ -72,7 +72,7 @@ export function CertificatesClient() {
         <div className="card empty-state-card">
           <h3>발급된 인증서가 없습니다</h3>
           <p className="muted">
-            기여 분석을 완료한 후 해당 결과에서 온체인 Contribution Certificate를 발급받을 수 있습니다.
+            기여 분석을 완료한 후 해당 결과에서 공식 기여 인증서를 발급받을 수 있습니다.
           </p>
           <Link className="button primary" href="/dashboard/analyses">
             분석 목록에서 인증서 발급하기

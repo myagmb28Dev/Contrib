@@ -161,7 +161,7 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
       {/* Certificate Issuance Section */}
       <section className="card certificate-issue-card full-width">
         <div className="issue-card-header">
-          <h3>공식 Contribution Certificate 발급</h3>
+          <h3>공식 기여 인증서 발급</h3>
           <p className="muted">
             이 분석 결과를 바탕으로 공개 검증이 가능한 공식 기여 인증서를 발급합니다. (온체인 발행 및 관리는 인증서 상세에서 진행할 수 있습니다)
           </p>
@@ -174,7 +174,7 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
               onClick={issue}
               disabled={issuing}
             >
-              {issuing ? "인증서 발급 중..." : "Contribution Certificate 발급하기"}
+              {issuing ? "인증서 발급 중..." : "기여 인증서 발급하기"}
             </button>
           ) : (
             <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
