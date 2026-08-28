@@ -83,6 +83,12 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
     setEnd(endD.toISOString().slice(0, 10));
   }
 
+  function setAllTimePreset() {
+    const endD = new Date();
+    setStart("2015-01-01");
+    setEnd(endD.toISOString().slice(0, 10));
+  }
+
   async function submit(event: FormEvent) {
     event.preventDefault();
     setError("");
@@ -149,6 +155,9 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
           </button>
           <button type="button" className="preset-btn" onClick={() => setPreset(12)}>
             최근 1년
+          </button>
+          <button type="button" className="preset-btn highlight" onClick={setAllTimePreset}>
+            전체 기간
           </button>
         </div>
 

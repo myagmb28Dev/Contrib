@@ -1539,6 +1539,19 @@ a {
   border-color: var(--primary);
 }
 
+.preset-btn.highlight {
+  border-color: #cbd5e1;
+  color: var(--primary);
+  font-weight: 700;
+  background: #f8faff;
+}
+
+.preset-btn.highlight:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
 .date-inputs-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
