@@ -14,6 +14,7 @@ const issueTransaction = `0x${"c".repeat(64)}`;
 const revokeTransaction = `0x${"d".repeat(64)}`;
 
 test("GitHub account to public on-chain verification and revocation", async ({ page }) => {
+  let authenticated = false;
   let repositorySynced = false;
   let jobPolls = 0;
   let issued = false;
@@ -52,7 +53,13 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     });
 
     if (path === "/api/auth/csrf") return json({ headerName: "X-XSRF-TOKEN", parameterName: "_csrf", token: "test" });
-    if (path === "/api/auth/me") return json({ userId: "user-1", githubUserId: 1001, githubUsername: "octocat", email: "octocat@example.com" });
+    if (path === "/api/auth/me") {
+      if (!authenticated) return json({ message: "unauthenticated" }, 401);
+      return json({ userId: "user-1", githubUserId: 1001, githubUsername: "octocat", email: "octocat@example.com" });
+    }
+    if (path === "/api/repositories/github-available") return json([{ id: 2001, name: "demo", fullName: "octocat/demo", language: "TypeScript", defaultBranch: "main", htmlUrl: "https://github.com/octocat/demo", archived: false, owner: { id: 1001, login: "octocat" } }]);
+    if (path === "/api/repositories/sync-selected" && method === "POST") { repositorySynced = true; return json([repository()]); }
+    if (path === `/api/repositories/${repositoryId}/branches`) return json(["main"]);
     if (path === "/api/repositories" && method === "GET") return json(repositorySynced ? [repository()] : []);
     if (path === "/api/repositories/sync" && method === "POST") { repositorySynced = true; return json([repository()]); }
     if (path === `/api/repositories/${repositoryId}`) return json(repository());
@@ -64,17 +71,15 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     if (path === `/api/certificates/${certificateId}`) return json(certificate());
     if (path === `/api/certificates/${certificateId}/attestation` && method === "GET") {
       if (!issued) return json({ message: "not found" }, 404);
-      if (revocationSubmitted && ++revocationPolls > 1) revoked = true;
-      if (!revocationSubmitted) issuePolls++;
-      return json(attestation(issuePolls > 1 ? "CONFIRMED" : "PENDING",
-        revocationSubmitted ? (revoked ? "CONFIRMED" : "PENDING") : null));
+      return json(attestation("CONFIRMED", revocationSubmitted ? "CONFIRMED" : null));
     }
     if (path === `/api/certificates/${certificateId}/attestation-intent` && method === "POST") return json(intent("issue", [onchainId, certificateHash, subject]));
-    if (path === `/api/certificates/${certificateId}/transactions` && method === "POST") { issued = true; return json(attestation("PENDING", null)); }
+    if (path === `/api/certificates/${certificateId}/transactions` && method === "POST") { issued = true; return json(attestation("CONFIRMED", null)); }
     if (path === `/api/certificates/${certificateId}/revocation-intent` && method === "POST") return json(intent("revoke", [onchainId]));
     if (path === `/api/certificates/${certificateId}/revocation-transactions` && method === "POST") {
       revocationSubmitted = true;
-      return json(attestation("CONFIRMED", "PENDING"));
+      revoked = true;
+      return json(attestation("CONFIRMED", "CONFIRMED"));
     }
     if (path === `/api/public/certificates/${publicId}/verification`) return json({
       publicId,
@@ -89,28 +94,30 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
   });
 
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "GitHub로 시작하기" })).toHaveAttribute("href", "http://backend.test/api/auth/github");
+  await expect(page.getByRole("link", { name: "GitHub 로그인" })).toHaveAttribute("href", "http://backend.test/api/auth/github");
 
+  authenticated = true;
   await page.goto("/dashboard");
   await expect(page.getByText("@octocat")).toBeVisible();
-  await page.getByRole("link", { name: "저장소" }).click();
+  await page.getByRole("link", { name: "저장소 관리", exact: true }).click();
   await page.getByRole("button", { name: "GitHub 저장소 동기화" }).click();
+  await page.getByText("octocat/demo").click();
+  await page.getByRole("button", { name: /선택한 저장소 동기화/ }).click();
   await page.getByRole("link", { name: /octocat\/demo/ }).click();
-  await page.getByRole("link", { name: "새 분석" }).click();
-  await page.getByRole("button", { name: "분석 시작" }).click();
-  await page.getByRole("link", { name: "결과 보기" }).click();
-  await expect(page.locator(".score")).toContainText("42");
-  await page.getByLabel("Subject 지갑 주소 (온체인 발급 시 필수)").fill(subject);
-  await page.getByRole("button", { name: "인증서 만들기" }).click();
-  await page.getByRole("link", { name: "인증서 열기" }).click();
+  await page.getByRole("link", { name: "새 기여 분석 시작" }).click();
+  await page.getByRole("button", { name: "기여 분석 시작하기" }).click();
+  await page.getByRole("link", { name: "분석 결과 확인하기" }).click();
+  await expect(page.locator(".score-hero-num")).toContainText("42");
+  await page.getByRole("button", { name: "기여 인증서 발급하기" }).click();
+  await page.getByRole("link", { name: /발급된 인증서 상세/ }).click();
 
-  await page.getByRole("button", { name: "온체인 발급" }).click();
-  await expect(page.locator("p", { hasText: "발급 트랜잭션:" })).toContainText("CONFIRMED", { timeout: 10_000 });
-  await page.getByLabel("폐기 사유").fill("Superseded certificate");
-  await page.getByRole("button", { name: "온체인 폐기" }).click();
-  await expect(page.locator("p", { hasText: "폐기 트랜잭션:" })).toContainText("CONFIRMED", { timeout: 10_000 });
-  await page.getByRole("link", { name: "공개 검증 화면" }).click();
-  await expect(page.getByText("REVOKED", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Base Sepolia 온체인 발급" }).click();
+  await expect(page.locator("body")).toContainText("CONFIRMED", { timeout: 10_000 });
+  await page.getByPlaceholder("예: 기여 내역 재조정 또는 지갑 변경").fill("Superseded certificate");
+  await page.getByRole("button", { name: "온체인 폐기 실행" }).click();
+  await expect(page.locator("body")).toContainText("CONFIRMED", { timeout: 10_000 });
+  await page.getByRole("link", { name: "공개 검증 화면 열기" }).click();
+  await expect(page.locator(".verification-status-pill")).toContainText("REVOKED");
 
   function repository() {
     return { id: repositoryId, githubRepositoryId: 2001, ownerLogin: "octocat", name: "demo",

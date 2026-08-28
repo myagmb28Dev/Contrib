@@ -66,7 +66,7 @@ export function DashboardClient() {
           />
           <div className="profile-hero-info">
             <h2>{user.githubUsername}</h2>
-            <p className="muted">{user.email ?? "GitHub 비공개 이메일"}</p>
+            <p className="muted">@{user.githubUsername} · {user.email ?? "GitHub 비공개 이메일"}</p>
           </div>
         </div>
       </section>
