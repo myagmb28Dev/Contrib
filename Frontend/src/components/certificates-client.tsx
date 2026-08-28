@@ -149,13 +149,7 @@ export function CertificatesClient() {
                     className="button primary sm"
                     href={`/certificates/${cert.id}`}
                   >
-                    인증서 상세 / 온체인 발행 &rarr;
-                  </Link>
-                  <Link
-                    className="button sm"
-                    href={`/verify/${cert.publicId}`}
-                  >
-                    공개 검증
+                    인증서 상세 / 온체인 관리 &rarr;
                   </Link>
                 </div>
               </article>
