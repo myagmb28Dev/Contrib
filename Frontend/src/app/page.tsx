@@ -19,9 +19,8 @@ export default function HomePage() {
     <main className="landing-page">
       <div className="landing-shell">
         <header className="landing-header">
-          <a className="brand" href="#top" aria-label="Contrib 홈">
-            <span className="brand-mark">C</span>
-            <span>Contrib</span>
+          <a className="brand" href="/" aria-label="Contrib 홈">
+            <span className="brand-text">Contrib</span>
           </a>
           <a className="header-login" href={githubLoginUrl}>
             <GitHubMark />
@@ -29,7 +28,7 @@ export default function HomePage() {
           </a>
         </header>
 
-        <section className="landing-hero" id="top">
+        <section className="landing-hero">
           <div className="hero-copy">
             <p className="eyebrow">GitHub Contribution Attestation</p>
             <h1>
@@ -144,9 +143,8 @@ export default function HomePage() {
         <PublicVerificationForm />
 
         <footer className="landing-footer">
-          <a className="brand footer-brand" href="#top">
-            <span className="brand-mark">C</span>
-            <span>Contrib</span>
+          <a className="brand footer-brand" href="/">
+            <span className="brand-text">Contrib</span>
           </a>
           <p>GitHub 활동 기반의 검증 가능한 Contribution Certificate</p>
         </footer>

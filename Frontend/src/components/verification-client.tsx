@@ -135,9 +135,6 @@ export function VerificationClient({ publicId }: { publicId: string }) {
         <Link className="button primary" href="/">
           Contrib 홈으로 이동
         </Link>
-        <Link className="button" href="/dashboard">
-          내 대시보드 열기
-        </Link>
       </div>
     </div>
   );

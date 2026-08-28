@@ -49,8 +49,7 @@ export function AppHeader() {
     <header className="app-header">
       <div className="app-header-inner">
         <div className="header-left">
-          <Link href="/dashboard" className="brand" aria-label="Contrib 홈">
-            <span className="brand-mark">C</span>
+          <Link href="/" className="brand" aria-label="Contrib 홈">
             <span className="brand-text">Contrib</span>
           </Link>
           <nav className="header-nav" aria-label="메인 내비게이션">
