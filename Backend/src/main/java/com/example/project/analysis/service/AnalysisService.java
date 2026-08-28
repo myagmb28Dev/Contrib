@@ -56,18 +56,26 @@ public class AnalysisService {
     }
 
     @Transactional
-    public AnalysisJobResponse create(UUID userId, UUID repositoryId, Instant periodStart, Instant periodEnd) {
+    public AnalysisJobResponse create(UUID userId, UUID repositoryId, Instant periodStart, Instant periodEnd, String branch) {
         GitHubRepository repository = repositoryService.getOwnedRepository(userId, repositoryId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        var existing = jobRepository.findByUserIdAndRepositoryIdAndPeriodStartAndPeriodEndAndCollectorVersion(
-                userId, repositoryId, periodStart, periodEnd, COLLECTOR_VERSION);
+        String targetBranch = (branch != null && !branch.isBlank())
+                ? branch.trim()
+                : (repository.getDefaultBranch() != null ? repository.getDefaultBranch() : "main");
+        var existing = jobRepository.findByUserIdAndRepositoryIdAndPeriodStartAndPeriodEndAndCollectorVersionAndTargetBranch(
+                userId, repositoryId, periodStart, periodEnd, COLLECTOR_VERSION, targetBranch);
         if (existing.isPresent()) {
             return AnalysisJobResponse.from(existing.get());
         }
-        AnalysisJob job = jobRepository.save(AnalysisJob.create(user, repository, periodStart, periodEnd, COLLECTOR_VERSION));
+        AnalysisJob job = jobRepository.save(AnalysisJob.create(user, repository, periodStart, periodEnd, COLLECTOR_VERSION, targetBranch));
         eventPublisher.publishEvent(new AnalysisJobCreatedEvent(job.getId()));
         return AnalysisJobResponse.from(job);
+    }
+
+    @Transactional
+    public AnalysisJobResponse create(UUID userId, UUID repositoryId, Instant periodStart, Instant periodEnd) {
+        return create(userId, repositoryId, periodStart, periodEnd, null);
     }
 
     @Transactional(readOnly = true)

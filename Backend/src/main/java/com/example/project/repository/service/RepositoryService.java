@@ -108,6 +108,20 @@ public class RepositoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Repository not found"));
     }
 
+    @Transactional(readOnly = true)
+    public List<String> getBranches(UUID userId, UUID repositoryId) {
+        GitHubRepository target = getOwnedRepository(userId, repositoryId);
+        String token = accessTokenService.getValidAccessToken(userId);
+        List<String> branches = githubApiClient.getBranches(token, target.getOwnerLogin(), target.getName())
+                .stream()
+                .map(com.example.project.github.dto.GitHubBranchDto::name)
+                .toList();
+        if (branches.isEmpty() && target.getDefaultBranch() != null) {
+            return List.of(target.getDefaultBranch());
+        }
+        return branches;
+    }
+
     @Transactional
     public void delete(UUID userId, UUID repositoryId) {
         GitHubRepository target = getOwnedRepository(userId, repositoryId);

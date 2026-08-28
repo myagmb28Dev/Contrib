@@ -56,6 +56,12 @@ public class RepositoryController {
         return repositoryService.get(principal.getUserId(), repositoryId);
     }
 
+    @GetMapping("/{repositoryId}/branches")
+    public List<String> getBranches(@AuthenticationPrincipal GitHubPrincipal principal,
+            @PathVariable UUID repositoryId) {
+        return repositoryService.getBranches(principal.getUserId(), repositoryId);
+    }
+
     @org.springframework.web.bind.annotation.DeleteMapping("/{repositoryId}")
     @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
     public void delete(@AuthenticationPrincipal GitHubPrincipal principal,

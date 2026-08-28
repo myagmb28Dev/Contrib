@@ -55,11 +55,14 @@ public class GitHubActivityCollector {
                 .thenComparing(CollectedActivity::externalId));
 
         Instant collectedAt = Instant.now();
+        String branch = (job.getTargetBranch() != null && !job.getTargetBranch().isBlank())
+                ? job.getTargetBranch()
+                : repository.getDefaultBranch();
         Map<String, Object> metadata = new LinkedHashMap<>();
         metadata.put("provider", "github");
         metadata.put("repository", repository.getFullName());
-        metadata.put("branch", repository.getDefaultBranch());
-        metadata.put("scope", "default-branch commits; authored pull requests and reviews");
+        metadata.put("branch", branch);
+        metadata.put("scope", "branch commits; authored pull requests and reviews");
         metadata.put("subjectGithubId", subjectGithubId);
         metadata.put("periodStart", job.getPeriodStart().toString());
         metadata.put("periodEnd", job.getPeriodEnd().toString());
@@ -76,8 +79,11 @@ public class GitHubActivityCollector {
 
     private void collectCommits(String token, GitHubRepository repository, AnalysisJob job,
             long subjectGithubId, List<CollectedActivity> target) {
+        String targetBranch = (job.getTargetBranch() != null && !job.getTargetBranch().isBlank())
+                ? job.getTargetBranch()
+                : repository.getDefaultBranch();
         List<GitHubCommitDto> commits = githubApiClient.getCommits(token, repository.getOwnerLogin(),
-                repository.getName(), repository.getDefaultBranch(), job.getPeriodStart(), job.getPeriodEnd());
+                repository.getName(), targetBranch, job.getPeriodStart(), job.getPeriodEnd());
         for (GitHubCommitDto commit : commits) {
             if (!isSubject(commit.author(), subjectGithubId)
                     || commit.parents() == null || commit.parents().size() > 1

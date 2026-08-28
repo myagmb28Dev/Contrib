@@ -18,6 +18,8 @@ public interface AnalysisJobRepository extends JpaRepository<AnalysisJob, UUID> 
     Optional<AnalysisJob> findByIdAndUserId(UUID id, UUID userId);
     @EntityGraph(attributePaths = {"user", "repository"})
     Optional<AnalysisJob> findDetailedById(UUID id);
+    Optional<AnalysisJob> findByUserIdAndRepositoryIdAndPeriodStartAndPeriodEndAndCollectorVersionAndTargetBranch(
+            UUID userId, UUID repositoryId, Instant periodStart, Instant periodEnd, String collectorVersion, String targetBranch);
     Optional<AnalysisJob> findByUserIdAndRepositoryIdAndPeriodStartAndPeriodEndAndCollectorVersion(
             UUID userId, UUID repositoryId, Instant periodStart, Instant periodEnd, String collectorVersion);
     List<AnalysisJob> findAllByRepositoryIdAndUserIdOrderByCreatedAtDesc(UUID repositoryId, UUID userId);

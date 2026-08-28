@@ -41,6 +41,9 @@ public class AnalysisJob extends BaseTimeEntity {
     @Column(name = "collector_version", nullable = false)
     private String collectorVersion;
 
+    @Column(name = "target_branch", nullable = false)
+    private String targetBranch;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AnalysisJobStatus status;
@@ -73,13 +76,16 @@ public class AnalysisJob extends BaseTimeEntity {
     }
 
     private AnalysisJob(UUID id, User user, GitHubRepository repository, Instant periodStart,
-            Instant periodEnd, String collectorVersion) {
+            Instant periodEnd, String collectorVersion, String targetBranch) {
         this.id = id;
         this.user = user;
         this.repository = repository;
         this.periodStart = periodStart;
         this.periodEnd = periodEnd;
         this.collectorVersion = collectorVersion;
+        this.targetBranch = (targetBranch != null && !targetBranch.isBlank())
+                ? targetBranch.trim()
+                : (repository.getDefaultBranch() != null ? repository.getDefaultBranch() : "main");
         this.status = AnalysisJobStatus.PENDING;
         this.progress = 0;
         this.attemptCount = 0;
@@ -87,11 +93,16 @@ public class AnalysisJob extends BaseTimeEntity {
     }
 
     public static AnalysisJob create(User user, GitHubRepository repository, Instant periodStart,
-            Instant periodEnd, String collectorVersion) {
+            Instant periodEnd, String collectorVersion, String targetBranch) {
         if (!periodStart.isBefore(periodEnd)) {
             throw new IllegalArgumentException("periodStart must be before periodEnd");
         }
-        return new AnalysisJob(UUID.randomUUID(), user, repository, periodStart, periodEnd, collectorVersion);
+        return new AnalysisJob(UUID.randomUUID(), user, repository, periodStart, periodEnd, collectorVersion, targetBranch);
+    }
+
+    public static AnalysisJob create(User user, GitHubRepository repository, Instant periodStart,
+            Instant periodEnd, String collectorVersion) {
+        return create(user, repository, periodStart, periodEnd, collectorVersion, repository.getDefaultBranch());
     }
 
     public void startCollection(Instant leaseExpiresAt) {
@@ -145,6 +156,7 @@ public class AnalysisJob extends BaseTimeEntity {
     public Instant getPeriodStart() { return periodStart; }
     public Instant getPeriodEnd() { return periodEnd; }
     public String getCollectorVersion() { return collectorVersion; }
+    public String getTargetBranch() { return targetBranch; }
     public AnalysisJobStatus getStatus() { return status; }
     public int getProgress() { return progress; }
     public String getErrorCode() { return errorCode; }

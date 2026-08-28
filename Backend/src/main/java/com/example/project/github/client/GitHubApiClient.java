@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.example.project.github.dto.GitHubBranchDto;
 import com.example.project.github.dto.GitHubCommitDetailDto;
 import com.example.project.github.dto.GitHubCommitDto;
 import com.example.project.github.dto.GitHubPullRequestDto;
@@ -75,6 +76,13 @@ public class GitHubApiClient {
     public GitHubCommitDetailDto getCommit(String token, String owner, String repository, String sha) {
         return get(token, URI.create("https://api.github.com/repos/%s/%s/commits/%s".formatted(owner, repository, sha)),
                 GitHubCommitDetailDto.class);
+    }
+
+    public List<GitHubBranchDto> getBranches(String token, String owner, String repository) {
+        return getAllPages(token,
+                page -> URI.create("https://api.github.com/repos/%s/%s/branches?per_page=%d&page=%d"
+                        .formatted(owner, repository, PAGE_SIZE, page)),
+                new ParameterizedTypeReference<>() {});
     }
 
     public List<GitHubPullRequestDto> getPullRequests(String token, String owner, String repository) {

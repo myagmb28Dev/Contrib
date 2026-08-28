@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import {
   getAnalysisJob,
   getRepository,
   getRepositoryAnalyses,
+  getRepositoryBranches,
   type AnalysisJob,
   type Repository,
 } from "@/lib/api";
@@ -22,6 +23,10 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
   monthAgo.setMonth(today.getMonth() - 1);
 
   const [repository, setRepository] = useState<Repository | null>(null);
+  const [branches, setBranches] = useState<string[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
+  const [loadingBranches, setLoadingBranches] = useState(true);
+
   const [start, setStart] = useState(monthAgo.toISOString().slice(0, 10));
   const [end, setEnd] = useState(today.toISOString().slice(0, 10));
   const [job, setJob] = useState<AnalysisJob | null>(null);
@@ -30,13 +35,27 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    getRepository(repositoryId)
-      .then(setRepository)
+    Promise.all([
+      getRepository(repositoryId),
+      getRepositoryBranches(repositoryId).catch(() => []),
+    ])
+      .then(([repo, branchList]) => {
+        setRepository(repo);
+        const list =
+          branchList.length > 0
+            ? branchList
+            : repo.defaultBranch
+            ? [repo.defaultBranch]
+            : ["main"];
+        setBranches(list);
+        setSelectedBranch(repo.defaultBranch || list[0] || "main");
+      })
       .catch((err: unknown) => {
         if (err instanceof ApiRequestError && err.status === 401) {
           router.replace("/");
         }
-      });
+      })
+      .finally(() => setLoadingBranches(false));
   }, [repositoryId, router]);
 
   useEffect(() => {
@@ -73,7 +92,8 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
       const created = await createAnalysis(
         repositoryId,
         new Date(`${start}T00:00:00Z`).toISOString(),
-        new Date(`${end}T23:59:59.999Z`).toISOString()
+        new Date(`${end}T23:59:59.999Z`).toISOString(),
+        selectedBranch || undefined
       );
       setJob(created);
       if (created.status === "COMPLETED") {
@@ -111,7 +131,7 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
         <div className="analyze-card-header">
           <h2>GitHub 기여 분석 실행</h2>
           <p className="muted">
-            분석할 활동 기간(UTC 기준)을 선택하면 GitHub 활동을 수집하고 Gemini AI가 기여도를 요약합니다.
+            분석할 브랜치와 활동 기간(UTC 기준)을 선택하면 GitHub 활동을 수집하고 Gemini AI가 기여도를 요약합니다.
           </p>
         </div>
 
@@ -133,6 +153,35 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
         </div>
 
         <form className="form-grid" onSubmit={submit}>
+          {/* Target Branch Selector */}
+          <div className="branch-selector-block" style={{ display: "flex", flexDirection: "column", gap: "6px", gridColumn: "1 / -1" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <label htmlFor="branch-select" style={{ fontWeight: 700, fontSize: "0.88rem", color: "var(--foreground)" }}>
+                분석 대상 브랜치 (Target Branch)
+              </label>
+              {repository?.defaultBranch && (
+                <span className="muted" style={{ fontSize: "0.76rem" }}>
+                  저장소 기본 브랜치: <strong>{repository.defaultBranch}</strong>
+                </span>
+              )}
+            </div>
+            <select
+              id="branch-select"
+              className="filter-select"
+              style={{ width: "100%", padding: "10px 14px", fontSize: "0.92rem", borderRadius: "10px", borderColor: "var(--border)", background: "white" }}
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value)}
+              disabled={isWorking || loadingBranches}
+              aria-label="분석 대상 브랜치"
+            >
+              {branches.map((b) => (
+                <option key={b} value={b}>
+                  {b} {b === repository?.defaultBranch ? "(기본 브랜치)" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="date-inputs-row">
             <label>
               시작일 (Start Date)

@@ -174,6 +174,10 @@ export async function getRepository(id: string): Promise<Repository> {
   return apiJson(`/api/repositories/${id}`);
 }
 
+export async function getRepositoryBranches(id: string): Promise<string[]> {
+  return apiJson(`/api/repositories/${id}/branches`);
+}
+
 export async function deleteRepository(id: string): Promise<void> {
   const response = await apiFetch(`/api/repositories/${id}`, { method: "DELETE" });
   if (!response.ok) {
@@ -193,10 +197,15 @@ export async function createAnalysis(
   repositoryId: string,
   periodStart: string,
   periodEnd: string,
+  branch?: string,
 ): Promise<AnalysisJob> {
   return apiJson(`/api/repositories/${repositoryId}/analyses`, {
     method: "POST",
-    body: JSON.stringify({ periodStart, periodEnd }),
+    body: JSON.stringify({
+      periodStart,
+      periodEnd,
+      ...(branch ? { branch } : {}),
+    }),
   });
 }
 
