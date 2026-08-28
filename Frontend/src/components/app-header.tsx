@@ -1,27 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
+import { ProfileDropdown } from "./profile-dropdown";
 import { useAuth } from "@/lib/auth-context";
 
 export function AppHeader() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  async function handleLogout() {
-    setIsLoggingOut(true);
-    try {
-      await logout();
-    } finally {
-      setIsLoggingOut(false);
-    }
-  }
+  const { user } = useAuth();
 
   const navItems = [
-    { label: "계정 개요", href: "/dashboard", exact: true },
+    { label: "대시보드", href: "/dashboard", exact: true },
     { label: "저장소 관리", href: "/dashboard/repositories" },
     { label: "기여 분석", href: "/dashboard/analyses" },
     { label: "인증서", href: "/dashboard/certificates" },
@@ -57,28 +47,7 @@ export function AppHeader() {
             공개 검증
           </Link>
           {user ? (
-            <div className="user-menu">
-              <div className="user-badge" title={`User ID: ${user.userId}`}>
-                <img
-                  src={`https://github.com/${user.githubUsername}.png`}
-                  alt={`@${user.githubUsername}`}
-                  className="user-avatar"
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = "none";
-                  }}
-                />
-                <span className="user-name">{user.githubUsername}</span>
-              </div>
-              <button
-                type="button"
-                className="header-logout-button"
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                title="로그아웃"
-              >
-                {isLoggingOut ? "..." : "로그아웃"}
-              </button>
-            </div>
+            <ProfileDropdown />
           ) : (
             <Link href="/" className="button primary sm">
               로그인
