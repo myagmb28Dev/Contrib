@@ -2199,21 +2199,62 @@ pre {
 .modal-item-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  flex: 1 1 auto;
   min-width: 0;
+}
+
+.modal-item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .modal-repo-info {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
-.modal-repo-info strong {
+.modal-repo-name {
   font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--foreground);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.modal-repo-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-check-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: white;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: white;
+  transition: all 0.15s ease;
+}
+
+.modal-repo-item:hover .custom-check-box {
+  border-color: var(--primary);
+}
+
+.modal-repo-item.selected .custom-check-box {
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .synced-tag {

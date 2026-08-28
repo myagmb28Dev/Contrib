@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -90,9 +90,9 @@ export function RepositoriesClient() {
           <button
             className={`button ${isUnsyncMode ? "active-toggle" : ""}`}
             onClick={() => setIsUnsyncMode((prev) => !prev)}
-            title={isUnsyncMode ? "동기화 해제 모드 종료" : "동기화 해제 모드 활성화"}
+            title={isUnsyncMode ? "동기화 해제 취소" : "동기화 해제"}
           >
-            {isUnsyncMode ? "동기화 해제 모드 완료" : "동기화 해제"}
+            {isUnsyncMode ? "취소" : "동기화 해제"}
           </button>
 
           <button
@@ -105,14 +105,6 @@ export function RepositoriesClient() {
       </div>
 
       {message && <p className="error-message">{message}</p>}
-
-      {isUnsyncMode && items.length > 0 && (
-        <div className="card" style={{ background: "#fef2f2", borderColor: "#fca5a5", padding: "14px 20px" }}>
-          <p style={{ margin: 0, color: "#991b1b", fontSize: "0.88rem", fontWeight: 600 }}>
-            동기화 해제 모드가 켜져 있습니다. 제외할 저장소의 오른쪽 위 &apos;-&apos; 버튼을 누르면 목록에서 안전하게 해제됩니다.
-          </p>
-        </div>
-      )}
 
       {loading ? (
         <div className="card loading-card">

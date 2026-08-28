@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import {
@@ -175,15 +175,25 @@ export function SyncRepositoriesModal({
                     onClick={() => toggleSelect(repo.id)}
                   >
                     <div className="modal-item-left">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelect(repo.id)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
+                      <div className="custom-check-box" aria-hidden="true">
+                        {isSelected && (
+                          <svg
+                            viewBox="0 0 16 16"
+                            width="12"
+                            height="12"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="3.5 8.5 6.5 11.5 12.5 4.5" />
+                          </svg>
+                        )}
+                      </div>
                       <div className="modal-repo-info">
-                        <strong>{repo.name}</strong>
-                        <small className="muted">@{repo.fullName}</small>
+                        <span className="modal-repo-name">{repo.name}</span>
+                        <span className="modal-repo-sub">{repo.fullName}</span>
                       </div>
                     </div>
 
