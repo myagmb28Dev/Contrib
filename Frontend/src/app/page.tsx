@@ -54,7 +54,7 @@ export default function HomePage() {
               Contribution Certificate를 생성합니다.
             </p>
             <p className="privacy-note">
-              <span aria-hidden="true">●</span> 공개 저장소 활동만 수집하며, 점수 계산과 Gemini AI 요약은 분리하여 제공합니다.
+              <span aria-hidden="true">●</span> 공개 저장소 활동만 수집하며, 점수 계산과 AI 요약은 분리하여 제공합니다.
             </p>
           </div>
 

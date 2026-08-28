@@ -1075,12 +1075,20 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  background: #f1f4fa;
-  padding: 6px 10px;
+  background: #f8faff;
+  border: 1px solid var(--border);
+  padding: 4px 8px 4px 10px;
   border-radius: 8px;
+  transition: border-color 0.15s ease;
+}
+
+.hash-copy-row:hover {
+  border-color: var(--primary);
 }
 
 .hash-copy-row code {
+  font-size: 0.78rem;
+  color: var(--foreground);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

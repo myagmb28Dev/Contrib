@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -206,9 +206,7 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
                   )}
 
                   <div className="analysis-card-footer">
-                    <span className="ai-model-tag">
-                      AI: {analysis.aiModel || "Google Gemini 2.0 Flash"}
-                    </span>
+                    <span className="ai-model-tag">AI 분석</span>
                     <Link
                       className="button primary sm"
                       href={`/repositories/${repositoryId}/analysis/${analysis.id}`}

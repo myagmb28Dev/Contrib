@@ -96,9 +96,7 @@ export function AnalysesClient() {
                 )}
 
                 <div className="analysis-card-footer">
-                  <span className="ai-model-tag">
-                    AI: {analysis.aiModel || "Google Gemini 2.0 Flash"}
-                  </span>
+                  <span className="ai-model-tag">AI 분석</span>
                   <Link
                     className="button primary sm"
                     href={`/repositories/${analysis.repositoryId}/analysis/${analysis.id}`}

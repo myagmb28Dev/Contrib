@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -110,7 +110,7 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
 
         <div className="analysis-ai-block">
           <div className="ai-block-header">
-            <span className="ai-badge">AI: {analysis.aiModel || "Google Gemini 2.0 Flash"}</span>
+            <span className="ai-badge">AI 분석</span>
             <span className="analysis-period-tag">
               {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}
               {new Date(analysis.periodEnd).toLocaleDateString()}

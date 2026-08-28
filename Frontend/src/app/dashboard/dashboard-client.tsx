@@ -132,7 +132,7 @@ export function DashboardClient() {
           <Link href="/dashboard/analyses" className="action-card">
             <div>
               <strong>기여 분석 결과 검토</strong>
-              <p>Gemini 2.0 Flash가 요약한 기여 지표와 점수를 확인합니다.</p>
+              <p>AI가 요약한 기여 지표와 점수를 확인합니다.</p>
             </div>
           </Link>
 
