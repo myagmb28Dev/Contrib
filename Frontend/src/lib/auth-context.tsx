@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
@@ -35,7 +35,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    fetchUser();
+    let ignore = false;
+
+    getCurrentUser()
+      .then((currentUser) => {
+        if (!ignore) setUser(currentUser);
+      })
+      .catch(() => {
+        if (!ignore) setUser(null);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   async function logout() {
