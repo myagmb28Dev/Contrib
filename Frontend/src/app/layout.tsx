@@ -3,7 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
-  title: "Contrib - GitHub 기여도 증명 및 온체인 인증서",
+  title: "Contrib",
   description: "GitHub 활동 기반 검증 가능한 Contribution Certificate",
 };
 
