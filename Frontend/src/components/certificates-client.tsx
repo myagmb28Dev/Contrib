@@ -42,8 +42,10 @@ export function CertificatesClient() {
       .finally(() => setLoading(false));
   }, [router]);
 
-  function copyHash(hash: string, id: string) {
-    navigator.clipboard.writeText(hash).then(() => {
+  function copyLink(publicId: string, id: string) {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const url = `${origin}/verify/${publicId}`;
+    navigator.clipboard.writeText(url).then(() => {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     });
@@ -96,15 +98,15 @@ export function CertificatesClient() {
                 </div>
 
                 <div className="cert-public-id-bar">
-                  <span className="cert-id-tag">Public ID</span>
+                  <span className="cert-id-tag">검증 링크</span>
                   <code className="cert-id-val">{cert.publicId}</code>
                   <button
                     type="button"
                     className="cert-id-copy-action"
-                    onClick={() => copyHash(cert.publicId, `pub-${cert.id}`)}
-                    title="공개 검증 ID 복사"
+                    onClick={() => copyLink(cert.publicId, `pub-${cert.id}`)}
+                    title="이력서 첨부용 전체 검증 링크 복사"
                   >
-                    {copiedId === `pub-${cert.id}` ? "복사됨" : "복사"}
+                    {copiedId === `pub-${cert.id}` ? "링크 복사됨!" : "링크 복사"}
                   </button>
                 </div>
 
