@@ -134,6 +134,31 @@ export async function syncRepositories(): Promise<Repository[]> {
   return apiJson("/api/repositories/sync", { method: "POST" });
 }
 
+export type GitHubAvailableRepo = {
+  id: number;
+  name: string;
+  fullName: string;
+  htmlUrl: string;
+  defaultBranch: string;
+  language: string | null;
+  archived: boolean;
+  owner: {
+    id: number;
+    login: string;
+  };
+};
+
+export async function getAvailableGitHubRepositories(): Promise<GitHubAvailableRepo[]> {
+  return apiJson("/api/repositories/github-available");
+}
+
+export async function syncSelectedRepositories(githubRepositoryIds: number[]): Promise<Repository[]> {
+  return apiJson("/api/repositories/sync-selected", {
+    method: "POST",
+    body: JSON.stringify({ githubRepositoryIds }),
+  });
+}
+
 export async function getRepository(id: string): Promise<Repository> {
   return apiJson(`/api/repositories/${id}`);
 }

@@ -4,16 +4,18 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { ApiRequestError, deleteRepository, getRepositories, syncRepositories, type Repository } from "@/lib/api";
+import { SyncRepositoriesModal } from "./sync-repositories-modal";
+import { ApiRequestError, deleteRepository, getRepositories, type Repository } from "@/lib/api";
 
 export function RepositoriesClient() {
   const router = useRouter();
   const [items, setItems] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [syncing, setSyncing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isUnsyncMode, setIsUnsyncMode] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     getRepositories()
@@ -30,23 +32,6 @@ export function RepositoriesClient() {
       })
       .finally(() => setLoading(false));
   }, [router]);
-
-  async function sync() {
-    setSyncing(true);
-    setMessage("");
-    try {
-      const updated = await syncRepositories();
-      setItems(updated);
-    } catch (error) {
-      if (error instanceof ApiRequestError && error.status === 401) {
-        router.replace("/");
-        return;
-      }
-      setMessage(error instanceof Error ? error.message : "저장소 동기화에 실패했습니다.");
-    } finally {
-      setSyncing(false);
-    }
-  }
 
   async function handleUnsync(repoId: string, repoName: string) {
     if (!window.confirm(`'${repoName}' 저장소의 동기화를 해제하시겠습니까?`)) {
@@ -76,8 +61,10 @@ export function RepositoriesClient() {
     );
   });
 
+  const alreadySyncedRepoIds = items.map((r) => r.githubRepositoryId);
+
   return (
-    <div className="stack full-width">
+    <div className={`stack full-width ${isUnsyncMode ? "unsync-mode-active" : ""}`}>
       {/* Top Toolbar */}
       <div className="toolbar-row">
         <div className="search-box">
@@ -99,16 +86,33 @@ export function RepositoriesClient() {
           )}
         </div>
 
-        <button
-          className="button primary"
-          onClick={sync}
-          disabled={syncing}
-        >
-          {syncing ? "GitHub 저장소 동기화 중..." : "GitHub 저장소 동기화"}
-        </button>
+        <div className="toolbar-actions" style={{ display: "flex", gap: "10px" }}>
+          <button
+            className={`button ${isUnsyncMode ? "active-toggle" : ""}`}
+            onClick={() => setIsUnsyncMode((prev) => !prev)}
+            title={isUnsyncMode ? "동기화 해제 모드 종료" : "동기화 해제 모드 활성화"}
+          >
+            {isUnsyncMode ? "동기화 해제 모드 완료" : "동기화 해제"}
+          </button>
+
+          <button
+            className="button primary"
+            onClick={() => setIsModalOpen(true)}
+          >
+            GitHub 저장소 동기화
+          </button>
+        </div>
       </div>
 
       {message && <p className="error-message">{message}</p>}
+
+      {isUnsyncMode && items.length > 0 && (
+        <div className="card" style={{ background: "#fef2f2", borderColor: "#fca5a5", padding: "14px 20px" }}>
+          <p style={{ margin: 0, color: "#991b1b", fontSize: "0.88rem", fontWeight: 600 }}>
+            동기화 해제 모드가 켜져 있습니다. 제외할 저장소의 오른쪽 위 &apos;-&apos; 버튼을 누르면 목록에서 안전하게 해제됩니다.
+          </p>
+        </div>
+      )}
 
       {loading ? (
         <div className="card loading-card">
@@ -120,10 +124,10 @@ export function RepositoriesClient() {
         <div className="card empty-state-card">
           <h3>동기화된 저장소가 없습니다</h3>
           <p className="muted">
-            GitHub 계정의 공개 저장소를 동기화하여 기여도 분석을 시작하세요.
+            GitHub 계정의 공개 저장소를 선택하여 기여도 분석을 시작하세요.
           </p>
-          <button className="button primary" onClick={sync} disabled={syncing}>
-            {syncing ? "동기화 중..." : "지금 저장소 동기화하기"}
+          <button className="button primary" onClick={() => setIsModalOpen(true)}>
+            저장소 선택하여 동기화하기
           </button>
         </div>
       ) : filteredItems.length === 0 ? (
@@ -138,6 +142,20 @@ export function RepositoriesClient() {
         <div className="repository-grid">
           {filteredItems.map((repo) => (
             <article className="repository-card" key={repo.id}>
+              {/* Panic Shaking Minus Button in Unsync Mode */}
+              {isUnsyncMode && (
+                <button
+                  type="button"
+                  className="unsync-minus-btn"
+                  onClick={() => handleUnsync(repo.id, repo.name)}
+                  disabled={deletingId === repo.id}
+                  title={`'${repo.name}' 동기화 해제`}
+                  aria-label={`'${repo.name}' 동기화 해제`}
+                >
+                  -
+                </button>
+              )}
+
               <div className="repo-card-header">
                 <div className="repo-card-title">
                   <Link
@@ -182,21 +200,23 @@ export function RepositoriesClient() {
                   >
                     이력
                   </Link>
-                  <button
-                    type="button"
-                    className="button danger-outline sm"
-                    onClick={() => handleUnsync(repo.id, repo.name)}
-                    disabled={deletingId === repo.id}
-                    title="저장소 동기화 해제"
-                  >
-                    {deletingId === repo.id ? "해제 중..." : "동기화 해제"}
-                  </button>
                 </div>
               </div>
             </article>
           ))}
         </div>
       )}
+
+      {/* Selective Sync Modal Dialog */}
+      <SyncRepositoriesModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={(updatedRepos) => {
+          setItems(updatedRepos);
+          setMessage("");
+        }}
+        alreadySyncedRepoIds={alreadySyncedRepoIds}
+      />
     </div>
   );
 }

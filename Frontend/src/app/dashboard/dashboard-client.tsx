@@ -24,7 +24,6 @@ export function DashboardClient() {
   const router = useRouter();
   const [state, setState] = useState<DashboardState>({ status: "loading" });
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const [stats, setStats] = useState<{
     repoCount: number | null;
@@ -86,13 +85,6 @@ export function DashboardClient() {
     }
   }
 
-  function copyToClipboard(text: string, key: string) {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedKey(key);
-      setTimeout(() => setCopiedKey(null), 2000);
-    });
-  }
-
   if (state.status === "loading") {
     return (
       <div className="card loading-card">
@@ -123,34 +115,15 @@ export function DashboardClient() {
         <div className="profile-hero-content">
           <img
             src={`https://github.com/${user.githubUsername}.png`}
-            alt={`@${user.githubUsername}`}
+            alt={user.githubUsername}
             className="profile-hero-avatar"
             onError={(e) => {
               (e.target as HTMLElement).style.display = "none";
             }}
           />
           <div className="profile-hero-info">
-            <h2>@{user.githubUsername}</h2>
+            <h2>{user.githubUsername}</h2>
             <p className="muted">{user.email ?? "GitHub 비공개 이메일"}</p>
-          </div>
-        </div>
-
-        <div className="profile-id-pills">
-          <div className="id-pill">
-            <span className="pill-label">GitHub User ID</span>
-            <span className="pill-value monospace">{user.githubUserId}</span>
-          </div>
-          <div className="id-pill">
-            <span className="pill-label">내부 User ID</span>
-            <span className="pill-value monospace">{user.userId}</span>
-            <button
-              type="button"
-              className="copy-btn"
-              onClick={() => copyToClipboard(user.userId, "userId")}
-              title="ID 복사"
-            >
-              {copiedKey === "userId" ? "복사됨" : "복사"}
-            </button>
           </div>
         </div>
       </section>

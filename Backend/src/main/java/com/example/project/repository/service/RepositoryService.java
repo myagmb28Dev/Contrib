@@ -63,6 +63,35 @@ public class RepositoryService {
         return list(userId);
     }
 
+    @Transactional
+    public List<RepositoryResponse> syncSelected(UUID userId, List<Long> githubRepositoryIds) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        String token = accessTokenService.getValidAccessToken(userId);
+        Instant now = Instant.now();
+        java.util.Set<Long> selectedIdSet = new java.util.HashSet<>(githubRepositoryIds);
+
+        for (GitHubRepositoryDto source : githubApiClient.getPublicRepositories(token)) {
+            if (source.privateRepository() || !selectedIdSet.contains(source.id())) {
+                continue;
+            }
+            GitHubRepository target = repository.findByUserIdAndGithubRepositoryId(userId, source.id())
+                    .orElseGet(() -> GitHubRepository.create(user, source.id()));
+            target.synchronize(source.owner().id(), source.owner().login(), source.name(), source.fullName(),
+                    source.htmlUrl(), source.defaultBranch(), source.language(), source.archived(), now);
+            repository.save(target);
+        }
+        return list(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GitHubRepositoryDto> listAvailableFromGitHub(UUID userId) {
+        String token = accessTokenService.getValidAccessToken(userId);
+        return githubApiClient.getPublicRepositories(token).stream()
+                .filter(repo -> !repo.privateRepository())
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public List<RepositoryResponse> list(UUID userId) {
         return repository.findAllByUserIdOrderByFullNameAsc(userId).stream().map(RepositoryResponse::from).toList();

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -85,7 +85,7 @@ export function AppHeader() {
                     (e.target as HTMLElement).style.display = "none";
                   }}
                 />
-                <span className="user-name">@{user.githubUsername}</span>
+                <span className="user-name">{user.githubUsername}</span>
               </div>
               <button
                 type="button"
