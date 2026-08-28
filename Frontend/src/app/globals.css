@@ -1376,15 +1376,23 @@ a {
   white-space: pre-line;
   word-break: keep-all;
   user-select: none;
-  transition: color 0.15s ease;
-}
-
-.typewriter-interactive:hover {
-  color: var(--foreground);
+  transition: opacity 0.15s ease, color 0.15s ease;
 }
 
 .typewriter-interactive:active .typing-cursor {
   transform: scale(1.3);
+}
+
+.verify-section .typewriter-interactive {
+  color: #aeb7ca;
+}
+
+.verify-section .typewriter-interactive:hover {
+  color: #ffffff;
+}
+
+.verify-section .typing-cursor {
+  background-color: #818cf8;
 }
 
 .cert-card-header {
