@@ -43,7 +43,6 @@ export function DashboardClient() {
     getCurrentUser(controller.signal)
       .then((user) => {
         setState({ status: "authenticated", user });
-        // Fetch background counts for overview stats
         Promise.allSettled([
           getRepositories(),
           getAnalyses(),
@@ -108,7 +107,6 @@ export function DashboardClient() {
   if (state.status === "unauthenticated") {
     return (
       <div className="card stack center-stack">
-        <div className="empty-badge-icon">🔒</div>
         <h2>로그인이 필요합니다</h2>
         <p className="muted">세션이 만료되었거나 로그인되어 있지 않습니다. GitHub 계정으로 시작하세요.</p>
         <a className="button primary" href={`${apiBaseUrl}/api/auth/github`}>
@@ -146,7 +144,7 @@ export function DashboardClient() {
           />
           <div className="profile-hero-info">
             <div className="profile-badge-row">
-              <span className="verified-badge">✓ GitHub 연결됨</span>
+              <span className="verified-badge">GitHub 연결됨</span>
               <span className="ai-badge">AI: Google Gemini 2.0 Flash</span>
             </div>
             <h2>@{user.githubUsername}</h2>
@@ -168,7 +166,7 @@ export function DashboardClient() {
               onClick={() => copyToClipboard(user.userId, "userId")}
               title="ID 복사"
             >
-              {copiedKey === "userId" ? "복사됨!" : "복사"}
+              {copiedKey === "userId" ? "복사됨" : "복사"}
             </button>
           </div>
         </div>
@@ -179,7 +177,6 @@ export function DashboardClient() {
         <div className="stat-card">
           <div className="stat-card-header">
             <span className="stat-label">동기화된 저장소</span>
-            <span className="stat-icon">📦</span>
           </div>
           <strong className="stat-value">
             {stats.repoCount === null ? "..." : `${stats.repoCount}개`}
@@ -192,7 +189,6 @@ export function DashboardClient() {
         <div className="stat-card">
           <div className="stat-card-header">
             <span className="stat-label">완료된 기여 분석</span>
-            <span className="stat-icon">📊</span>
           </div>
           <strong className="stat-value">
             {stats.analysisCount === null ? "..." : `${stats.analysisCount}건`}
@@ -205,7 +201,6 @@ export function DashboardClient() {
         <div className="stat-card">
           <div className="stat-card-header">
             <span className="stat-label">발급된 인증서</span>
-            <span className="stat-icon">📜</span>
           </div>
           <strong className="stat-value">
             {stats.certCount === null ? "..." : `${stats.certCount}건`}
@@ -218,7 +213,6 @@ export function DashboardClient() {
         <div className="stat-card">
           <div className="stat-card-header">
             <span className="stat-label">온체인 네트워크</span>
-            <span className="stat-icon">🔗</span>
           </div>
           <strong className="stat-value">Base Sepolia</strong>
           <span className="stat-subtext">Chain ID: 84532</span>
@@ -230,15 +224,13 @@ export function DashboardClient() {
         <h3 className="section-title">빠른 작업</h3>
         <div className="action-cards-grid">
           <Link href="/dashboard/repositories" className="action-card">
-            <span className="action-card-icon">🔄</span>
             <div>
-              <strong>저장소 동기화 & 분석</strong>
+              <strong>저장소 동기화 및 분석</strong>
               <p>GitHub 공개 저장소를 가져와 새 기여도 분석을 시작합니다.</p>
             </div>
           </Link>
 
           <Link href="/dashboard/analyses" className="action-card">
-            <span className="action-card-icon">⚡</span>
             <div>
               <strong>기여 분석 결과 검토</strong>
               <p>Gemini 2.0 Flash가 요약한 기여 지표와 점수를 확인합니다.</p>
@@ -246,15 +238,13 @@ export function DashboardClient() {
           </Link>
 
           <Link href="/dashboard/certificates" className="action-card">
-            <span className="action-card-icon">💎</span>
             <div>
-              <strong>온체인 인증서 발급/폐기</strong>
+              <strong>온체인 인증서 발급 및 관리</strong>
               <p>Base Sepolia 스마트 컨트랙트에 기여 증명을 기록합니다.</p>
             </div>
           </Link>
 
           <Link href="/#verify" className="action-card">
-            <span className="action-card-icon">🔍</span>
             <div>
               <strong>공개 인증서 검증</strong>
               <p>Public ID 또는 해시를 통해 진위 여부를 직접 검증합니다.</p>

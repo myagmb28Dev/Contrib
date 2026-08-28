@@ -146,7 +146,6 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
           </div>
 
           <div className="analysis-info-box">
-            <span className="info-icon">💡</span>
             <div>
               <strong>수집 및 분석 지표</strong>
               <p>
@@ -161,7 +160,7 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
             type="submit"
             disabled={isWorking}
           >
-            {isWorking ? "분석 작업 진행 중..." : "🚀 기여 분석 시작하기"}
+            {isWorking ? "분석 작업 진행 중..." : "기여 분석 시작하기"}
           </button>
         </form>
 

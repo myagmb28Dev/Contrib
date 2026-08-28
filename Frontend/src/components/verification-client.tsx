@@ -66,7 +66,7 @@ export function VerificationClient({ publicId }: { publicId: string }) {
                 : "status-revoked"
             }`}
           >
-            {isValid ? "✓ VERIFIED ATTESTATION" : `✕ ${verification.status}`}
+            {isValid ? "VERIFIED ATTESTATION" : verification.status}
           </div>
           <span className="network-pill">Base Sepolia (Chain ID: 84532)</span>
         </div>
@@ -113,7 +113,7 @@ export function VerificationClient({ publicId }: { publicId: string }) {
                   rel="noreferrer"
                   className="tx-link"
                 >
-                  {verification.transactionHash} ↗ (Basescan)
+                  {verification.transactionHash} (Basescan)
                 </a>
               ) : (
                 "오프체인 또는 미발행 상태"

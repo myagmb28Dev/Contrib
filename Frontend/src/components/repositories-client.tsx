@@ -62,7 +62,7 @@ export function RepositoriesClient() {
               className="clear-search"
               onClick={() => setSearchQuery("")}
             >
-              ✕
+              초기화
             </button>
           )}
         </div>
@@ -72,7 +72,7 @@ export function RepositoriesClient() {
           onClick={sync}
           disabled={syncing}
         >
-          {syncing ? "GitHub 저장소 동기화 중..." : "🔄 GitHub 저장소 동기화"}
+          {syncing ? "GitHub 저장소 동기화 중..." : "GitHub 저장소 동기화"}
         </button>
       </div>
 
@@ -86,7 +86,6 @@ export function RepositoriesClient() {
         </div>
       ) : items.length === 0 ? (
         <div className="card empty-state-card">
-          <div className="empty-badge-icon">📦</div>
           <h3>동기화된 저장소가 없습니다</h3>
           <p className="muted">
             GitHub 계정의 공개 저장소를 동기화하여 기여도 분석을 시작하세요.
@@ -97,7 +96,6 @@ export function RepositoriesClient() {
         </div>
       ) : filteredItems.length === 0 ? (
         <div className="card empty-state-card">
-          <div className="empty-badge-icon">🔍</div>
           <h3>검색 결과가 없습니다</h3>
           <p className="muted">&apos;{searchQuery}&apos;에 해당하는 저장소를 찾을 수 없습니다.</p>
           <button className="button sm" onClick={() => setSearchQuery("")}>
@@ -110,7 +108,6 @@ export function RepositoriesClient() {
             <article className="repository-card" key={repo.id}>
               <div className="repo-card-header">
                 <div className="repo-card-title">
-                  <span className="repo-icon">📁</span>
                   <Link
                     href={`/repositories/${repo.id}/overview`}
                     className="repo-name"
@@ -131,7 +128,7 @@ export function RepositoriesClient() {
                   </span>
                 )}
                 <span className="branch-tag">
-                  🌿 {repo.defaultBranch}
+                  브랜치: {repo.defaultBranch}
                 </span>
                 {repo.archived && <span className="archived-tag">보관됨</span>}
               </div>

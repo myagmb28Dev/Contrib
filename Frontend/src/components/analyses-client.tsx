@@ -35,7 +35,6 @@ export function AnalysesClient() {
         </div>
       ) : items.length === 0 ? (
         <div className="card empty-state-card">
-          <div className="empty-badge-icon">📊</div>
           <h3>완료된 기여 분석이 없습니다</h3>
           <p className="muted">
             동기화된 저장소를 선택하여 첫 번째 GitHub 기여 분석을 시작해 보세요.
@@ -64,9 +63,8 @@ export function AnalysesClient() {
                 </div>
 
                 <div className="analysis-period-box">
-                  <span className="period-icon">📅</span>
                   <span className="period-text">
-                    {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}
+                    기간: {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}
                     {new Date(analysis.periodEnd).toLocaleDateString()}
                   </span>
                 </div>
@@ -85,7 +83,7 @@ export function AnalysesClient() {
 
                 <div className="analysis-card-footer">
                   <span className="ai-model-tag">
-                    🤖 {analysis.aiModel || "Google Gemini 2.0 Flash"}
+                    AI: {analysis.aiModel || "Google Gemini 2.0 Flash"}
                   </span>
                   <Link
                     className="button primary sm"

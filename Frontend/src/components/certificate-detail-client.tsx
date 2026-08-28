@@ -213,7 +213,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
                 certificate.status === "REVOKED" ? "status-revoked" : "status-valid"
               }`}
             >
-              {certificate.status === "REVOKED" ? "✕ REVOKED" : "✓ " + certificate.status}
+              {certificate.status}
             </span>
           </header>
 
@@ -242,7 +242,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
                 className="copy-btn"
                 onClick={() => copyText(certificate.hash, "hash")}
               >
-                {copiedKey === "hash" ? "복사됨!" : "복사"}
+                {copiedKey === "hash" ? "복사됨" : "복사"}
               </button>
             </div>
           </footer>
@@ -276,7 +276,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
                 className="copy-btn ml"
                 onClick={() => copyText(certificate.publicId, "publicId")}
               >
-                {copiedKey === "publicId" ? "복사됨!" : "ID 복사"}
+                {copiedKey === "publicId" ? "복사됨" : "ID 복사"}
               </button>
             </dd>
           </div>
@@ -294,7 +294,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
                   rel="noreferrer"
                   className="tx-link"
                 >
-                  {attestation.transactionHash} ↗
+                  {attestation.transactionHash}
                 </a>{" "}
                 ({attestation.status})
               </dd>
@@ -308,10 +308,10 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
             onClick={publish}
             disabled={working || !certificate.subjectWalletAddress || certificate.status === "REVOKED"}
           >
-            {working ? "지갑 서명 진행 중..." : "🚀 Base Sepolia 온체인 발급"}
+            {working ? "지갑 서명 진행 중..." : "Base Sepolia 온체인 발급"}
           </button>
           <Link className="button" href={`/verify/${certificate.publicId}`}>
-            🔍 공개 검증 화면 열기
+            공개 검증 화면 열기
           </Link>
         </div>
 
@@ -340,7 +340,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
               onClick={revoke}
               disabled={working || attestation.revocationStatus === "PENDING"}
             >
-              {attestation.revocationStatus === "PENDING" ? "폐기 확인 중..." : "⚠️ 온체인 폐기 실행"}
+              {attestation.revocationStatus === "PENDING" ? "폐기 확인 중..." : "온체인 폐기 실행"}
             </button>
           </div>
         </section>

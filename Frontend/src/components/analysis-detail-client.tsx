@@ -6,15 +6,15 @@ import { useEffect, useState } from "react";
 import { Breadcrumb } from "./breadcrumb";
 import { createCertificate, getAnalysis, type Analysis } from "@/lib/api";
 
-const metricLabels: Record<string, { label: string; unit?: string; icon: string }> = {
-  commits: { label: "총 커밋 수", unit: "회", icon: "📝" },
-  pullRequestsCreated: { label: "생성한 PR", unit: "개", icon: "🔀" },
-  pullRequestsMerged: { label: "병합된 PR", unit: "개", icon: "✅" },
-  pullRequestReviews: { label: "코드 리뷰", unit: "건", icon: "👀" },
-  linesAdded: { label: "추가된 라인", unit: "줄", icon: "➕" },
-  linesDeleted: { label: "삭제된 라인", unit: "줄", icon: "➖" },
-  activeDays: { label: "기여 활동 일수", unit: "일", icon: "📅" },
-  comments: { label: "이슈/PR 댓글", unit: "개", icon: "💬" },
+const metricLabels: Record<string, { label: string; unit?: string }> = {
+  commits: { label: "총 커밋 수", unit: "회" },
+  pullRequestsCreated: { label: "생성한 PR", unit: "개" },
+  pullRequestsMerged: { label: "병합된 PR", unit: "개" },
+  pullRequestReviews: { label: "코드 리뷰", unit: "건" },
+  linesAdded: { label: "추가된 라인", unit: "줄" },
+  linesDeleted: { label: "삭제된 라인", unit: "줄" },
+  activeDays: { label: "기여 활동 일수", unit: "일" },
+  comments: { label: "이슈/PR 댓글", unit: "개" },
 };
 
 function getScoreTier(score: number) {
@@ -98,7 +98,7 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
 
         <div className="analysis-ai-block">
           <div className="ai-block-header">
-            <span className="ai-badge">✨ {analysis.aiModel || "Google Gemini 2.0 Flash"} 분석</span>
+            <span className="ai-badge">AI: {analysis.aiModel || "Google Gemini 2.0 Flash"}</span>
             <span className="analysis-period-tag">
               {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}
               {new Date(analysis.periodEnd).toLocaleDateString()}
@@ -131,13 +131,11 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
             const meta = metricLabels[key] || {
               label: key,
               unit: "",
-              icon: "📊",
             };
             return (
               <div className="metric-box" key={key}>
                 <div className="metric-box-top">
                   <span className="metric-box-label">{meta.label}</span>
-                  <span className="metric-box-icon">{meta.icon}</span>
                 </div>
                 <strong className="metric-box-val">
                   {value.toLocaleString()}
@@ -177,11 +175,11 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
             onClick={issue}
             disabled={issuing}
           >
-            {issuing ? "인증서 생성 중..." : "📜 Contribution Certificate 생성하기"}
+            {issuing ? "인증서 생성 중..." : "Contribution Certificate 생성하기"}
           </button>
           {certificateId && (
             <Link className="button accent" href={`/certificates/${certificateId}`}>
-              🎉 생성된 인증서 열기 & 온체인 발행 &rarr;
+              생성된 인증서 열기 & 온체인 발행 &rarr;
             </Link>
           )}
         </div>
