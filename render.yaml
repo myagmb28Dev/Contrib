@@ -32,7 +32,7 @@ services:
       - key: FRONTEND_URL
         value: https://contrib-frontend.onrender.com
       - key: CORS_ALLOWED_ORIGINS
-        value: https://contrib-frontend.onrender.com,http://localhost:3000
+        value: https://contrib-frontend.onrender.com
       - key: SESSION_COOKIE_SECURE
         value: "true"
       - key: SESSION_COOKIE_SAME_SITE
