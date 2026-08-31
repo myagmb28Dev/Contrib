@@ -25,18 +25,8 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Sync Backend Environment Variables
-        if: env.RENDER_API_KEY != '' && env.RENDER_BACKEND_SERVICE_ID != ''
+      - name: Sync Render Environment Variables
+        if: env.RENDER_API_KEY != ''
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
-          RENDER_ENV_VARS_JSON: ${{ secrets.RENDER_BACKEND_ENV_JSON }}
-        run: node scripts/sync-render-env.mjs
-
-      - name: Sync Frontend Environment Variables
-        if: env.RENDER_API_KEY != '' && env.RENDER_FRONTEND_SERVICE_ID != ''
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_FRONTEND_SERVICE_ID }}
-          RENDER_ENV_VARS_JSON: ${{ secrets.RENDER_FRONTEND_ENV_JSON }}
         run: node scripts/sync-render-env.mjs
