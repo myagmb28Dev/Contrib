@@ -49,14 +49,41 @@ const LOCAL_ONLY_KEYS = new Set([
   "POSTGRES_PORT",
 ]);
 
+async function getOwnerIds() {
+  try {
+    const res = await fetch("https://api.render.com/v1/owners", { headers: authHeader });
+    if (res.ok) {
+      const data = await res.json();
+      return data.map((o) => o.owner?.id).filter(Boolean);
+    }
+  } catch {}
+  return [];
+}
+
 async function getServices() {
-  const res = await fetch("https://api.render.com/v1/services?limit=50", {
-    headers: authHeader,
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch Render services: ${res.status} ${await res.text()}`);
+  const ownerIds = await getOwnerIds();
+  const allServices = [];
+
+  if (ownerIds.length > 0) {
+    for (const ownerId of ownerIds) {
+      const res = await fetch(`https://api.render.com/v1/services?ownerId=${ownerId}&limit=50`, {
+        headers: authHeader,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        allServices.push(...data.map((item) => item.service));
+      }
+    }
+  } else {
+    const res = await fetch("https://api.render.com/v1/services?limit=50", {
+      headers: authHeader,
+    });
+    if (res.ok) {
+      const data = await res.json();
+      allServices.push(...data.map((item) => item.service));
+    }
   }
-  return (await res.json()).map((item) => item.service);
+  return allServices;
 }
 
 async function getExistingEnvVars(serviceId) {
