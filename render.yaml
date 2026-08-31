@@ -64,9 +64,8 @@ services:
     dockerfilePath: ./Frontend/Dockerfile
     plan: free
     region: singapore
-    dockerBuildArgs:
+    envVars:
       - key: NEXT_PUBLIC_API_BASE_URL
         value: https://contrib-backend.onrender.com
-    envVars:
       - key: NODE_ENV
         value: production
