@@ -1,0 +1,72 @@
+# ==============================================================================
+# Contrib Render Blueprint Specification (render.yaml)
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Backend Web Service (Spring Boot 3 / Java 17)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: contrib-backend
+    runtime: docker
+    dockerContext: ./Backend
+    dockerfilePath: ./Backend/Dockerfile
+    plan: free
+    region: singapore
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        sync: false
+      - key: POSTGRES_USER
+        value: neondb_owner
+      - key: POSTGRES_PASSWORD
+        sync: false
+      - key: TOKEN_ENCRYPTION_KEY
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        value: Ov23li27c05YziljEWJy
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://contrib-frontend.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://contrib-frontend.onrender.com,http://localhost:3000
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
+      - key: SESSION_COOKIE_SAME_SITE
+        value: "none"
+      - key: MONITORING_TOKEN
+        sync: false
+      - key: BASE_SEPOLIA_RPC_URL
+        value: https://base-sepolia-rpc.publicnode.com
+      - key: ATTESTATION_CONTRACT_ADDRESS
+        value: 0xEb1C46cd85512b27c5ac5Aa001fcaa9A91B187d1
+      - key: AI_PROVIDER
+        value: openrouter
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: google/gemini-2.0-flash-001
+      - key: OPENROUTER_SITE_URL
+        value: https://contrib-frontend.onrender.com
+      - key: OPENROUTER_APP_NAME
+        value: Contrib
+
+  # ----------------------------------------------------------------------------
+  # Frontend Web Service (Next.js 16 / React 19)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: contrib-frontend
+    runtime: docker
+    dockerContext: ./Frontend
+    dockerfilePath: ./Frontend/Dockerfile
+    plan: free
+    region: singapore
+    dockerBuildArgs:
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: https://contrib-backend.onrender.com
+    envVars:
+      - key: NODE_ENV
+        value: production
