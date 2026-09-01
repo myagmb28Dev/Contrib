@@ -48,7 +48,8 @@ services:
       - key: OPENROUTER_API_KEY
         sync: false
       - key: OPENROUTER_MODEL
-        value: google/gemini-2.0-flash-001
+        value: google/gemini-2.5-flash
+
       - key: OPENROUTER_SITE_URL
         value: https://contrib-frontend.onrender.com
       - key: OPENROUTER_APP_NAME
