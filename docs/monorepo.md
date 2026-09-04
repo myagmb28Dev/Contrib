@@ -26,5 +26,5 @@ Frontend는 Blockchain RPC를 직접 다루지 않고, Wallet 서명 결과와 T
 - 기능 작업: `feat/<short-name>`
 - 버그 수정: `fix/<short-name>`
 - PR 하나는 관련된 Backend/Frontend/contracts 변경을 함께 포함할 수 있음
-- `.github/workflows/ci.yml`에서 세 영역을 독립적으로 검사
+- `.github/workflows/ci.yml`은 PR과 `main` push에서 Backend, Frontend, contracts, 배포 아티팩트를 독립적으로 검사
 - Secret은 Repository Secret 또는 배포 플랫폼 Secret에만 저장
