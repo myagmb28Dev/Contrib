@@ -116,7 +116,7 @@ export function RepositoriesClient() {
         <div className="card empty-state-card">
           <h3>동기화된 저장소가 없습니다</h3>
           <p className="muted">
-            GitHub 계정의 공개 저장소를 선택하여 기여도 분석을 시작하세요.
+            GitHub 계정의 공개·비공개 저장소를 선택하여 기여도 분석을 시작하세요.
           </p>
           <button className="button primary" onClick={() => setIsModalOpen(true)}>
             저장소 선택하여 동기화하기

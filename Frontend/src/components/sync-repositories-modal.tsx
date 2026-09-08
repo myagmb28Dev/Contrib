@@ -25,6 +25,7 @@ export function SyncRepositoriesModal({
   const [availableRepos, setAvailableRepos] = useState<GitHubAvailableRepo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [visibility, setVisibility] = useState("public");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -63,6 +64,8 @@ export function SyncRepositoriesModal({
   if (!isOpen) return null;
 
   const filteredRepos = availableRepos.filter((repo) => {
+    if (visibility === "public" && repo.private) return false;
+    if (visibility === "private" && !repo.private) return false;
     const q = searchQuery.toLowerCase().trim();
     if (!q) return true;
     return (
@@ -116,7 +119,7 @@ export function SyncRepositoriesModal({
           <div>
             <h3>GitHub 저장소 선택 동기화</h3>
             <p className="muted">
-              Contrib에서 분석 및 인증서를 생성할 GitHub 공개 저장소를 선택해 주세요.
+              Contrib에서 분석 및 인증서를 생성할 GitHub 저장소를 선택해 주세요.
             </p>
           </div>
           <button
@@ -133,6 +136,12 @@ export function SyncRepositoriesModal({
           {error && <p className="error-message">{error}</p>}
 
           <div className="modal-toolbar">
+            <select aria-label="저장소 공개 범위" className="search-input"
+              value={visibility} onChange={(e) => setVisibility(e.target.value)}>
+              <option value="public">Public (공개)</option>
+              <option value="private">Private (비공개)</option>
+              <option value="all">전체</option>
+            </select>
             <input
               type="text"
               placeholder="저장소 이름 또는 언어로 검색..."
@@ -163,12 +172,12 @@ export function SyncRepositoriesModal({
             <div className="loading-card" style={{ padding: "40px 0" }}>
               <div className="skeleton-line lg" />
               <div className="skeleton-line md" />
-              <p className="muted">GitHub에서 공개 저장소 목록을 조회하는 중입니다...</p>
+              <p className="muted">GitHub에서 저장소 목록을 조회하는 중입니다...</p>
             </div>
-          ) : availableRepos.length === 0 ? (
+          ) : filteredRepos.length === 0 ? (
             <div className="empty-state-card" style={{ padding: "30px 0" }}>
-              <h4>동기화 가능한 공개 저장소가 없습니다</h4>
-              <p className="muted">GitHub 계정에 공개(Public) 저장소가 있는지 확인해 주세요.</p>
+              <h4>조건에 맞는 저장소가 없습니다</h4>
+              <p className="muted">검색어나 공개 범위를 바꿔 주세요. Private 저장소가 보이지 않으면 다시 로그인해 GitHub 저장소 접근 권한을 허용해 주세요.</p>
             </div>
           ) : (
             <div className="modal-repo-list">
@@ -208,6 +217,7 @@ export function SyncRepositoriesModal({
                     </div>
 
                     <div className="modal-item-right">
+                      <span className="visibility-badge">{repo.private ? "Private" : "Public"}</span>
                       {isAlreadySynced && (
                         <span className="synced-tag">동기화됨</span>
                       )}

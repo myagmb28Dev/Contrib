@@ -112,6 +112,28 @@ class ContributionWorkflowIntegrationTest {
         assertThat(verificationService.verify(certificate.publicId()).status()).isEqualTo(VerificationStatus.REVOKED);
     }
 
+    @Test
+    void selectsPrivateRepositoriesAndPreservesThemDuringPublicSync() {
+        var principal = accountConnectionService.connect(
+                new GitHubProfile(9001L, "private-user", "private@example.com"),
+                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        var userId = principal.getUserId();
+        when(accessTokenService.getValidAccessToken(userId)).thenReturn("private-token");
+        var owner = new GitHubUserDto(9001L, "private-user");
+        var privateRepo = new GitHubRepositoryDto(9002L, owner, "secret", "private-user/secret",
+                "https://github.com/private-user/secret", true, "main", "Java", false);
+        var publicRepo = new GitHubRepositoryDto(9003L, owner, "public", "private-user/public",
+                "https://github.com/private-user/public", false, "main", "Java", false);
+        when(gitHubApiClient.getAccessibleRepositories("private-token"))
+                .thenReturn(List.of(privateRepo, publicRepo));
+        assertThat(repositoryService.listAvailableFromGitHub(userId)).containsExactly(privateRepo, publicRepo);
+        assertThat(repositoryService.syncSelected(userId, List.of(9002L)))
+                .singleElement().satisfies(repo -> assertThat(repo.visibility()).isEqualTo("PRIVATE"));
+        when(gitHubApiClient.getPublicRepositories("private-token")).thenReturn(List.of(publicRepo));
+        assertThat(repositoryService.synchronize(userId))
+                .extracting(repo -> repo.visibility()).containsExactlyInAnyOrder("PRIVATE", "PUBLIC");
+    }
+
     private void waitForCompletion(java.util.UUID jobId) throws InterruptedException {
         for (int attempt = 0; attempt < 100; attempt++) {
             var job = jobRepository.findById(jobId).orElseThrow();

@@ -147,6 +147,7 @@ export async function syncRepositories(): Promise<Repository[]> {
 }
 
 export type GitHubAvailableRepo = {
+  private: boolean;
   id: number;
   name: string;
   fullName: string;
@@ -161,7 +162,15 @@ export type GitHubAvailableRepo = {
 };
 
 export async function getAvailableGitHubRepositories(): Promise<GitHubAvailableRepo[]> {
-  return apiJson("/api/repositories/github-available");
+  const repos = await apiJson<(GitHubAvailableRepo & {
+    full_name: string; html_url: string; default_branch: string;
+  })[]>("/api/repositories/github-available");
+  return repos.map((repo) => ({
+    ...repo,
+    fullName: repo.full_name ?? repo.fullName,
+    htmlUrl: repo.html_url ?? repo.htmlUrl,
+    defaultBranch: repo.default_branch ?? repo.defaultBranch,
+  }));
 }
 
 export async function syncSelectedRepositories(githubRepositoryIds: number[]): Promise<Repository[]> {

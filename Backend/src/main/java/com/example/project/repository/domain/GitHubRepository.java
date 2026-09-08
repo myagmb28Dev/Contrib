@@ -100,6 +100,10 @@ public class GitHubRepository extends BaseTimeEntity {
         this.lastSyncedAt = synchronizedAt;
     }
 
+    public void updateVisibility(boolean privateRepository) {
+        this.visibility = privateRepository ? RepositoryVisibility.PRIVATE : RepositoryVisibility.PUBLIC;
+    }
+
     public UUID getId() { return id; }
     public User getUser() { return user; }
     public long getGithubRepositoryId() { return githubRepositoryId; }
