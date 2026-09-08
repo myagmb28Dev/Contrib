@@ -55,7 +55,8 @@ public class RepositoryService {
 
         List<GitHubRepository> existingRepos = repository.findAllByUserIdOrderByFullNameAsc(userId);
         for (GitHubRepository existing : existingRepos) {
-            if (!syncedGithubRepoIds.contains(existing.getGithubRepositoryId())) {
+            if (existing.getVisibility() == com.example.project.repository.domain.RepositoryVisibility.PUBLIC
+                    && !syncedGithubRepoIds.contains(existing.getGithubRepositoryId())) {
                 repository.delete(existing);
             }
         }
@@ -71,14 +72,15 @@ public class RepositoryService {
         Instant now = Instant.now();
         java.util.Set<Long> selectedIdSet = new java.util.HashSet<>(githubRepositoryIds);
 
-        for (GitHubRepositoryDto source : githubApiClient.getPublicRepositories(token)) {
-            if (source.privateRepository() || !selectedIdSet.contains(source.id())) {
+        for (GitHubRepositoryDto source : githubApiClient.getAccessibleRepositories(token)) {
+            if (!selectedIdSet.contains(source.id())) {
                 continue;
             }
             GitHubRepository target = repository.findByUserIdAndGithubRepositoryId(userId, source.id())
                     .orElseGet(() -> GitHubRepository.create(user, source.id()));
             target.synchronize(source.owner().id(), source.owner().login(), source.name(), source.fullName(),
                     source.htmlUrl(), source.defaultBranch(), source.language(), source.archived(), now);
+            target.updateVisibility(source.privateRepository());
             repository.save(target);
         }
         return list(userId);
@@ -87,9 +89,7 @@ public class RepositoryService {
     @Transactional(readOnly = true)
     public List<GitHubRepositoryDto> listAvailableFromGitHub(UUID userId) {
         String token = accessTokenService.getValidAccessToken(userId);
-        return githubApiClient.getPublicRepositories(token).stream()
-                .filter(repo -> !repo.privateRepository())
-                .toList();
+        return githubApiClient.getAccessibleRepositories(token);
     }
 
     @Transactional(readOnly = true)

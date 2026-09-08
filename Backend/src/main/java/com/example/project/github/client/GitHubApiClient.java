@@ -60,6 +60,13 @@ public class GitHubApiClient {
                 new ParameterizedTypeReference<>() {});
     }
 
+    public List<GitHubRepositoryDto> getAccessibleRepositories(String token) {
+        return getAllPages(token,
+                page -> URI.create("https://api.github.com/user/repos?visibility=all&affiliation=owner,collaborator&sort=full_name&per_page="
+                        + PAGE_SIZE + "&page=" + page),
+                new ParameterizedTypeReference<>() {});
+    }
+
     public List<GitHubCommitDto> getCommits(String token, String owner, String repository,
             String branch, Instant since, Instant until) {
         return getAllPages(token,

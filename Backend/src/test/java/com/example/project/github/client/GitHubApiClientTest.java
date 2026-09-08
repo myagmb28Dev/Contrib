@@ -20,6 +20,19 @@ import org.springframework.web.client.RestClient;
 class GitHubApiClientTest {
 
     @Test
+    void fetchesPrivateRepositoriesWithAllVisibility() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        GitHubApiClient client = new GitHubApiClient(builder, 1, Duration.ZERO,
+                Duration.ZERO, millis -> { });
+        server.expect(requestTo("https://api.github.com/user/repos?visibility=all&affiliation=owner,collaborator&sort=full_name&per_page=100&page=1"))
+                .andRespond(withSuccess("[{\"id\":1,\"private\":true}]", MediaType.APPLICATION_JSON));
+        assertThat(client.getAccessibleRepositories("token")).singleElement()
+                .satisfies(repo -> assertThat(repo.privateRepository()).isTrue());
+        server.verify();
+    }
+
+    @Test
     void retriesRateLimitedRequestAndKeepsPaginationResult() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();

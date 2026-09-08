@@ -35,6 +35,7 @@ spring:
             scope:
               - read:user
               - user:email
+              - repo
         provider:
           github:
             user-name-attribute: id
