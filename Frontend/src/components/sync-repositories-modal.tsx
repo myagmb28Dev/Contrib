@@ -114,7 +114,7 @@ export function SyncRepositoriesModal({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-dialog repo-sync-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>
             <h3>GitHub 저장소 선택 동기화</h3>
@@ -148,24 +148,30 @@ export function SyncRepositoriesModal({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
-              style={{ flex: 1 }}
+              aria-label="저장소 검색"
             />
-            <button
-              type="button"
-              className="button sm"
-              onClick={selectAll}
-              disabled={loading || filteredRepos.length === 0}
-            >
-              전체 선택
-            </button>
-            <button
-              type="button"
-              className="button sm"
-              onClick={deselectAll}
-              disabled={loading || selectedIds.length === 0}
-            >
-              선택 해제
-            </button>
+          </div>
+
+          <div className="repo-selection-toolbar">
+            <span className="repo-result-count">{loading ? "저장소 조회 중" : `${filteredRepos.length}개 저장소`}</span>
+            <div className="repo-selection-actions">
+              <button
+                type="button"
+                className="repo-text-action"
+                onClick={selectAll}
+                disabled={loading || submitting || filteredRepos.length === 0 || filteredRepos.every((repo) => selectedIds.includes(repo.id))}
+              >
+                전체 선택
+              </button>
+              <button
+                type="button"
+                className="repo-text-action"
+                onClick={deselectAll}
+                disabled={loading || submitting || !filteredRepos.some((repo) => selectedIds.includes(repo.id))}
+              >
+                선택 해제
+              </button>
+            </div>
           </div>
 
           {loading ? (
@@ -236,26 +242,30 @@ export function SyncRepositoriesModal({
         </div>
 
         <div className="modal-footer">
-          <button
-            type="button"
-            className="button"
-            onClick={onClose}
-            disabled={submitting}
-          >
-            취소
-          </button>
-          <button
-            type="button"
-            className="button primary"
-            onClick={handleSubmit}
-            disabled={submitting || loading}
-          >
-            {submitting
-              ? "동기화 적용 중..."
-              : newSelectionCount > 0
-              ? `선택한 저장소 동기화 (${selectedIds.length}개, 신규 +${newSelectionCount})`
-              : `선택한 저장소 동기화 (${selectedIds.length}개)`}
-          </button>
+          <div className="repo-selection-summary" role="status">
+            <strong>{selectedIds.length}개 선택</strong>
+            {newSelectionCount > 0 && <span>신규 {newSelectionCount}개</span>}
+          </div>
+          <div className="repo-footer-actions">
+            <button
+              type="button"
+              className="button repo-cancel-button"
+              onClick={onClose}
+              disabled={submitting}
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              className="button primary"
+              onClick={handleSubmit}
+              disabled={submitting || loading}
+            >
+              {submitting
+                ? "동기화 적용 중..."
+                : "선택한 저장소 동기화"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
