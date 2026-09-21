@@ -9,6 +9,7 @@ import { ApiRequestError, getAppOrigin, getCertificates, type Certificate } from
 function formatStatus(status: string) {
   switch (status.toUpperCase()) {
     case "ISSUED":
+      return { label: "증명서 생성 완료", className: "status-default" };
     case "CONFIRMED":
     case "VERIFIED":
     case "VALID":
@@ -188,7 +189,6 @@ export function CertificatesClient() {
                         <span className={`verified-badge ${statusInfo.className}`}>
                           {statusInfo.label}
                         </span>
-                        <span className="network-tag">Base Sepolia</span>
                       </div>
                     </div>
 
@@ -252,7 +252,7 @@ export function CertificatesClient() {
                   <tr>
                     <th>저장소</th>
                     <th>기여 점수</th>
-                    <th>상태 / 네트워크</th>
+                    <th>증명서 상태</th>
                     <th>공개 검증 ID (복사)</th>
                     <th>발급 일시</th>
                     <th style={{ textAlign: "right" }}>작업</th>
@@ -282,7 +282,6 @@ export function CertificatesClient() {
                             <span className={`verified-badge ${statusInfo.className}`} style={{ padding: "2px 6px", fontSize: "0.72rem" }}>
                               {statusInfo.label}
                             </span>
-                            <span className="network-tag" style={{ padding: "2px 6px", fontSize: "0.72rem" }}>Base Sepolia</span>
                           </div>
                         </td>
                         <td>

@@ -5,6 +5,7 @@ public enum VerificationStatus {
     HASH_MISMATCH,
     REVOKED,
     NOT_FOUND,
+    NOT_REGISTERED,
     PENDING,
     CHAIN_UNAVAILABLE
 }

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createWalletClient, custom, type EIP1193Provider } from "viem";
 
 import { Breadcrumb } from "./breadcrumb";
+import { verificationStatusLabel } from "@/lib/verification-status";
 import {
   ApiRequestError,
   getAttestationIntent,
@@ -14,6 +15,7 @@ import {
   getRevocationIntent,
   submitAttestation,
   submitRevocation,
+  verifyCertificate,
   type Attestation,
   type AttestationIntent,
   type Certificate,
@@ -50,10 +52,20 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
   const router = useRouter();
   const [certificate, setCertificate] = useState<Certificate | null>(null);
   const [attestation, setAttestation] = useState<Attestation | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const [revocationReason, setRevocationReason] = useState("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!certificate) return;
+    let active = true;
+    verifyCertificate(certificate.publicId)
+      .then((result) => { if (active) setVerificationStatus(result.status); })
+      .catch(() => { if (active) setVerificationStatus("UNAVAILABLE"); });
+    return () => { active = false; };
+  }, [certificate, attestation]);
 
   useEffect(() => {
     getCertificate(certificateId)
@@ -230,14 +242,14 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
           <header className="certificate-heading">
             <div>
               <span className="preview-label">CONTRIBUTION CERTIFICATE</span>
-              <strong>Verified GitHub Contribution</strong>
+              <strong>GitHub Contribution</strong>
             </div>
             <span
               className={`verified-badge ${
-                certificate.status === "REVOKED" ? "status-revoked" : "status-valid"
+                certificate.status === "REVOKED" ? "status-revoked" : "status-default"
               }`}
             >
-              {certificate.status}
+              {certificate.status === "ISSUED" ? "증명서 생성 완료" : "증명서 폐기됨"}
             </span>
           </header>
 
@@ -253,7 +265,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
               <small>/ 100</small>
             </div>
             <div className="chain-badge-box">
-              <span className="network-pill">Base Sepolia</span>
+              {attestation && <span className="network-pill">Base Sepolia</span>}
             </div>
           </div>
 
@@ -277,15 +289,19 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       <section className="card full-width">
         <div className="card-header-simple">
           <h3>인증서 상세 메타데이터</h3>
-          <p className="muted">온체인 증명 상태 및 공개 검증 링크 정보입니다.</p>
+          <p className="muted">증명서는 생성 후 바로 조회하고 공유할 수 있습니다. 온체인 등록은 선택 사항입니다.</p>
         </div>
 
         <dl className="identity-list">
           <div>
-            <dt>발급 상태</dt>
+            <dt>증명서 상태</dt>
             <dd>
-              <strong>{certificate.status}</strong>
+              <strong>{certificate.status === "ISSUED" ? "증명서 생성 완료" : "증명서 폐기됨"}</strong>
             </dd>
+          </div>
+          <div>
+            <dt>온체인 검증 상태</dt>
+            <dd>{verificationStatus === null ? "확인 중..." : verificationStatusLabel(verificationStatus)}</dd>
           </div>
           <div>
             <dt>Subject 지갑 주소</dt>
@@ -330,7 +346,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
           <button
             className="button primary"
             onClick={publish}
-            disabled={working || !certificate.subjectWalletAddress || certificate.status === "REVOKED"}
+            disabled={working || !certificate.subjectWalletAddress || certificate.status === "REVOKED" || attestation?.status === "CONFIRMED" || attestation?.status === "PENDING"}
           >
             {working ? "지갑 서명 진행 중..." : "Base Sepolia 온체인 발급"}
           </button>

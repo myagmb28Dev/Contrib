@@ -55,7 +55,11 @@ public class VerificationService {
             return response(publicId, VerificationStatus.REVOKED, certificate.getCertificateHash(),
                     calculated, txHash, certificate.getRevocationReason());
         }
-        if (attestation.isEmpty() || attestation.get().getStatus() == AttestationStatus.PENDING) {
+        if (attestation.isEmpty()) {
+            return response(publicId, VerificationStatus.NOT_REGISTERED, certificate.getCertificateHash(),
+                    calculated, null, "Certificate created; on-chain registration is optional and has not been submitted");
+        }
+        if (attestation.get().getStatus() == AttestationStatus.PENDING) {
             return response(publicId, VerificationStatus.PENDING, certificate.getCertificateHash(),
                     calculated, txHash, "Blockchain attestation is pending");
         }
