@@ -18,9 +18,7 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
   let repositorySynced = false;
   let jobPolls = 0;
   let issued = false;
-  let issuePolls = 0;
   let revocationSubmitted = false;
-  let revocationPolls = 0;
   let revoked = false;
 
   await page.addInitScript(({ walletAddress, issueHash, revokeHash }) => {
@@ -68,6 +66,7 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     if (path === `/api/repositories/${repositoryId}/analyses` && method === "GET") return json(jobPolls > 1 ? [analysis()] : []);
     if (path === `/api/analyses/${analysisId}`) return json(analysis());
     if (path === "/api/certificates" && method === "POST") return json(certificate());
+    if (path === "/api/certificates" && method === "GET") return json([certificate()]);
     if (path === `/api/certificates/${certificateId}`) return json(certificate());
     if (path === `/api/certificates/${certificateId}/attestation` && method === "GET") {
       if (!issued) return json({ message: "not found" }, 404);
@@ -83,10 +82,10 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     }
     if (path === `/api/public/certificates/${publicId}/verification`) return json({
       publicId,
-      status: revoked ? "REVOKED" : "VALID",
+      status: revoked ? "REVOKED" : issued ? "VALID" : "NOT_REGISTERED",
       storedHash: certificateHash,
       calculatedHash: certificateHash,
-      transactionHash: issueTransaction,
+      transactionHash: issued ? issueTransaction : null,
       message: revoked ? "Certificate was revoked on-chain" : "Payload, database, and on-chain hash match",
     });
     if (path === `/api/public/certificates/${publicId}`) return json(certificate());
@@ -111,13 +110,31 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
   await page.getByRole("button", { name: "기여 인증서 발급하기" }).click();
   await page.getByRole("link", { name: /발급된 인증서 상세/ }).click();
 
+  await page.goto("/dashboard/certificates");
+  await expect(page.locator(".verified-badge")).toHaveText("증명서 생성 완료");
+  await expect(page.locator(".network-tag")).toHaveCount(0);
+  await page.getByRole("button", { name: "컴팩트 뷰" }).click();
+  await expect(page.locator(".verified-badge")).toHaveText("증명서 생성 완료");
+  await page.goto(`/certificates/${certificateId}`);
+
+  await expect(page.getByText("온체인 미등록", { exact: true })).toBeVisible();
+  await expect(page.getByText("증명서 생성 완료", { exact: true }).first()).toBeVisible();
+  await page.getByRole("link", { name: "공개 검증 화면 열기" }).click();
+  await expect(page.locator(".verification-status-pill")).toHaveText("온체인 미등록");
+  await expect(page.getByRole("heading", { name: "증명서 생성이 완료되었습니다" })).toBeVisible();
+  await page.goto(`/certificates/${certificateId}`);
+
   await page.getByRole("button", { name: "Base Sepolia 온체인 발급" }).click();
   await expect(page.locator("body")).toContainText("CONFIRMED", { timeout: 10_000 });
+  await expect(page.getByText("온체인 검증 완료", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "공개 검증 화면 열기" }).click();
+  await expect(page.locator(".verification-status-pill")).toHaveText("온체인 검증 완료");
+  await page.goto(`/certificates/${certificateId}`);
   await page.getByPlaceholder("예: 기여 내역 재조정 또는 지갑 변경").fill("Superseded certificate");
   await page.getByRole("button", { name: "온체인 폐기 실행" }).click();
   await expect(page.locator("body")).toContainText("CONFIRMED", { timeout: 10_000 });
   await page.getByRole("link", { name: "공개 검증 화면 열기" }).click();
-  await expect(page.locator(".verification-status-pill")).toContainText("REVOKED");
+  await expect(page.locator(".verification-status-pill")).toHaveText("증명서 폐기됨");
 
   function repository() {
     return { id: repositoryId, githubRepositoryId: 2001, ownerLogin: "octocat", name: "demo",

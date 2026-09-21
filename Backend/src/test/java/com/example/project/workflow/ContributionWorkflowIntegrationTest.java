@@ -93,7 +93,13 @@ class ContributionWorkflowIntegrationTest {
         assertThat(analysis.scoreVersion()).isEqualTo("score-v1");
 
         var certificate = certificateService.create(principal.getUserId(), analysis.id(), SUBJECT);
+        assertThat(verificationService.verify(certificate.publicId()).status())
+                .isEqualTo(VerificationStatus.NOT_REGISTERED);
         var intent = blockchainService.intent(principal.getUserId(), certificate.id());
+        when(rpcClient.getTransactionReceipt(ISSUE_TX)).thenReturn(null);
+        assertThat(blockchainService.submit(principal.getUserId(), certificate.id(), ISSUE_TX, ISSUER).status())
+                .isEqualTo("PENDING");
+        assertThat(verificationService.verify(certificate.publicId()).status()).isEqualTo(VerificationStatus.PENDING);
         when(rpcClient.getTransactionReceipt(ISSUE_TX)).thenReturn(issueReceipt(
                 ISSUE_TX, intent.onchainCertificateId(), certificate.hash()));
         var attestation = blockchainService.submit(principal.getUserId(), certificate.id(), ISSUE_TX, ISSUER);
