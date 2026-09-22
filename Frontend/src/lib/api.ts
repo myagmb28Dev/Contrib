@@ -1,5 +1,5 @@
 export const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+  (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080").replace(/\/$/, "");
 
 export function getAppOrigin(): string {
   if (typeof window !== "undefined" && window.location.origin) {

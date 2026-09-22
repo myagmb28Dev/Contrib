@@ -1,14 +1,32 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { resolve } from "node:path";
+import { createServer } from "node:http";
 
 const projectRoot = resolve(import.meta.dirname, "..");
 const nextCli = resolve(projectRoot, "node_modules", "next", "dist", "bin", "next");
 const playwrightCli = resolve(projectRoot, "node_modules", "@playwright", "test", "cli.js");
-const testEnv = { ...process.env, NEXT_PUBLIC_API_BASE_URL: "http://backend.test" };
+const testEnv = { ...process.env, NEXT_PUBLIC_API_BASE_URL: "/", API_PROXY_TARGET: "http://127.0.0.1:3101" };
 let server;
+const upstream = createServer(async (request, response) => {
+  if (request.url === "/oauth2/authorization/github") {
+    response.writeHead(302, { Location: "https://github.com/login/oauth/authorize?state=proxy-test", "Set-Cookie": "JSESSIONID=proxy-session; Path=/; HttpOnly; SameSite=Lax" });
+    response.end();
+    return;
+  }
+  if (!request.url?.startsWith("/api/proxy-test")) {
+    response.writeHead(404).end();
+    return;
+  }
+  let body = "";
+  for await (const chunk of request) body += chunk;
+  response.writeHead(200, { "Content-Type": "application/json", "X-Request-ID": "proxy-request" });
+  response.end(JSON.stringify({ url: request.url, method: request.method, cookie: request.headers.cookie, csrf: request.headers["x-xsrf-token"], body }));
+});
 
 try {
+  upstream.listen(3101, "127.0.0.1");
+  await once(upstream, "listening");
   await run(process.execPath, [nextCli, "build"], testEnv);
   server = spawn(process.execPath, [nextCli, "start", "--hostname", "127.0.0.1", "--port", "3100"], {
     cwd: projectRoot,
@@ -23,6 +41,8 @@ try {
   console.error(error);
 } finally {
   await stopServer(server);
+  upstream.closeAllConnections();
+  await new Promise((resolvePromise) => upstream.close(resolvePromise));
 }
 process.exit(process.exitCode ?? 0);
 
