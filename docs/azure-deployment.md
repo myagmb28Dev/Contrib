@@ -10,7 +10,7 @@ Contrib uses Azure for Students with its spending limit enabled. Do not convert 
 - Backend ingress is internal. The frontend proxies `/api/*` and `/oauth2/*`, so browser requests and session cookies use the same public origin.
 - Existing Neon PostgreSQL is retained. Never regenerate the token encryption key: it protects existing GitHub credentials in the database.
 - ACR Basic stores private images. Apps use a pull-only managed identity; GitHub Actions uses a separate OIDC identity restricted to this repository's `main` branch.
-- Deployment identity has AcrPush only on this registry, plus Azure ContainerApps Contributor only on the two application resources. No subscription-wide Contributor role or stored Azure API secret is needed.
+- Deployment identity has AcrPush only on this registry, plus Container Apps Contributor only on the two application resources. No subscription-wide Contributor role or stored Azure API secret is needed.
 - No dedicated workload profile or Log Analytics workspace is provisioned. Live logs remain available; historical log retention requires a separately budgeted configuration.
 
 ## Configuration
