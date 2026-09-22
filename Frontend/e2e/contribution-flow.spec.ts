@@ -39,7 +39,7 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     });
   }, { walletAddress: issuer, issueHash: issueTransaction, revokeHash: revokeTransaction });
 
-  await page.route("http://backend.test/**", async (route) => {
+  await page.route("**/api/**", async (route) => {
     const request = route.request();
     const url = new URL(request.url());
     const path = url.pathname;
@@ -93,7 +93,7 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
   });
 
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "GitHub 로그인" })).toHaveAttribute("href", "http://backend.test/api/auth/github");
+  await expect(page.getByRole("link", { name: "GitHub 로그인" })).toHaveAttribute("href", "/api/auth/github");
 
   authenticated = true;
   await page.goto("/dashboard");

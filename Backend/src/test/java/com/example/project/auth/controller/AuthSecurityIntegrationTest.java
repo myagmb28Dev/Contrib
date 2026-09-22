@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
         "management.endpoints.web.exposure.include=health,info,prometheus",
         "management.prometheus.metrics.export.enabled=true",
         "app.monitoring.token=test-monitoring-token",
+        "GITHUB_REDIRECT_URI=https://contrib.example/api/auth/github/callback/github",
         "app.security.token-encryption-key=" + AuthSecurityIntegrationTest.TEST_KEY
 })
 @AutoConfigureMockMvc
@@ -40,6 +41,16 @@ class AuthSecurityIntegrationTest {
         mockMvc.perform(get("/api/auth/github"))
                 .andExpect(status().isFound())
                 .andExpect(header().string("Location", "/oauth2/authorization/github"));
+    }
+
+    @Test
+    void usesPublicCallbackWhenBehindTheFrontendProxy() throws Exception {
+        var result = mockMvc.perform(get("/oauth2/authorization/github"))
+                .andExpect(status().isFound()).andReturn();
+        var location = result.getResponse().getHeader("Location");
+        var decoded = java.net.URLDecoder.decode(location, java.nio.charset.StandardCharsets.UTF_8);
+        org.assertj.core.api.Assertions.assertThat(decoded)
+                .contains("redirect_uri=https://contrib.example/api/auth/github/callback/github");
     }
 
     @Test
