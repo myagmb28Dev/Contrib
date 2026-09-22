@@ -32,9 +32,11 @@ Use HTTP readiness and liveness probes on `/actuator/health/readiness` and `/act
 
 1. Merge a reviewed feature PR and wait for the `CI` workflow to pass on that exact `main` commit.
 2. Set repository variables `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP`, `AZURE_REGISTRY`, `AZURE_API_PROXY_TARGET`, and `AZURE_PUBLIC_ORIGIN`.
-3. Run **Deploy Azure** on `main`. The workflow verifies the CI result, builds both images with the commit SHA, and updates the apps using OIDC. It does not run automatically on every push, to avoid unwanted student-credit consumption.
+3. Run **Deploy Azure** on `main`. The workflow verifies the CI result, tags both images with the commit SHA, workflow run ID, and attempt, and updates the apps using OIDC. Unique tags ensure a configuration-only rebuild also creates a fresh revision. It does not run automatically on every push, to avoid unwanted student-credit consumption.
 4. For first-time provisioning only, run with `deploy_apps=false` to publish the images before creating the apps with the pull identity and secret configuration. Subsequent runs use `deploy_apps=true`.
 5. Verify the homepage, CSRF endpoint, actual GitHub sign-in, existing repository/analysis/certificate data, and a completed analysis job. A successful image build alone is not a completed deployment.
+
+Use the backend's actual `properties.configuration.ingress.fqdn` as the proxy target. Do not infer an `.internal` DNS label: internal visibility is controlled by `ingress.external=false`. Match the GitHub OIDC subject to the issued claim, which can include immutable owner and repository IDs; allow time for updated federated credentials to propagate.
 
 ## Cost and lifecycle
 

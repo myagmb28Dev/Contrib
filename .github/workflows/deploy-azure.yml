@@ -27,6 +27,7 @@ jobs:
       BACKEND_APP: contrib-backend
       FRONTEND_APP: contrib-frontend
       API_PROXY_TARGET: ${{ vars.AZURE_API_PROXY_TARGET }}
+      IMAGE_TAG: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v6
       - name: Require successful CI on the exact deployment commit
@@ -46,17 +47,17 @@ jobs:
         run: |
           az acr login --name "$AZURE_REGISTRY"
           registry="$AZURE_REGISTRY.azurecr.io"
-          docker build -t "$registry/contrib-backend:$GITHUB_SHA" Backend
-          docker build --build-arg NEXT_PUBLIC_API_BASE_URL=/ --build-arg API_PROXY_TARGET="$API_PROXY_TARGET" -t "$registry/contrib-frontend:$GITHUB_SHA" Frontend
-          docker push "$registry/contrib-backend:$GITHUB_SHA"
-          docker push "$registry/contrib-frontend:$GITHUB_SHA"
+          docker build -t "$registry/contrib-backend:$IMAGE_TAG" Backend
+          docker build --build-arg NEXT_PUBLIC_API_BASE_URL=/ --build-arg API_PROXY_TARGET="$API_PROXY_TARGET" -t "$registry/contrib-frontend:$IMAGE_TAG" Frontend
+          docker push "$registry/contrib-backend:$IMAGE_TAG"
+          docker push "$registry/contrib-frontend:$IMAGE_TAG"
       - name: Deploy verified images
         if: inputs.deploy_apps
         run: |
           registry="$AZURE_REGISTRY.azurecr.io"
           az extension add --name containerapp --upgrade --only-show-errors
-          az containerapp update --resource-group "$AZURE_RESOURCE_GROUP" --name "$BACKEND_APP" --image "$registry/contrib-backend:$GITHUB_SHA" --output none
-          az containerapp update --resource-group "$AZURE_RESOURCE_GROUP" --name "$FRONTEND_APP" --image "$registry/contrib-frontend:$GITHUB_SHA" --output none
+          az containerapp update --resource-group "$AZURE_RESOURCE_GROUP" --name "$BACKEND_APP" --image "$registry/contrib-backend:$IMAGE_TAG" --output none
+          az containerapp update --resource-group "$AZURE_RESOURCE_GROUP" --name "$FRONTEND_APP" --image "$registry/contrib-frontend:$IMAGE_TAG" --output none
       - name: Check the public application
         if: inputs.deploy_apps
         env:
