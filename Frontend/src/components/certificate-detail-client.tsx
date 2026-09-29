@@ -304,9 +304,6 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       </section>
 
       {/* Attestation Details & Action Section */}
-      <Link className="certificate-comparison-link" href={`/verify/${certificate.publicId}#activity-comparison`}>
-        산정 근거 확인
-      </Link>
       <section className="card full-width">
         <div className="card-header-simple">
           <h3>인증서 상세 메타데이터</h3>
