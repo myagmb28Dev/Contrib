@@ -65,6 +65,9 @@ public class GitHubRepository extends BaseTimeEntity {
     @Column(name = "last_synced_at", nullable = false)
     private Instant lastSyncedAt;
 
+    @Column(name = "github_created_at")
+    private Instant githubCreatedAt;
+
     protected GitHubRepository() {
     }
 
@@ -117,4 +120,8 @@ public class GitHubRepository extends BaseTimeEntity {
     public String getLanguage() { return language; }
     public boolean isArchived() { return archived; }
     public Instant getLastSyncedAt() { return lastSyncedAt; }
+    public Instant getGithubCreatedAt() { return githubCreatedAt; }
+    public void updateGithubCreatedAt(Instant value) {
+        if (value != null) githubCreatedAt = value;
+    }
 }

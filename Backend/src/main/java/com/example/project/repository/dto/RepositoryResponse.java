@@ -17,13 +17,14 @@ public record RepositoryResponse(
         String language,
         boolean archived,
         Instant lastSyncedAt,
-        Instant createdAt) {
+        Instant createdAt,
+        Instant githubCreatedAt) {
 
     public static RepositoryResponse from(GitHubRepository repository) {
         return new RepositoryResponse(repository.getId(), repository.getGithubRepositoryId(),
                 repository.getOwnerLogin(), repository.getName(), repository.getFullName(),
                 repository.getHtmlUrl(), repository.getVisibility().name(), repository.getDefaultBranch(),
                 repository.getLanguage(), repository.isArchived(), repository.getLastSyncedAt(),
-                repository.getCreatedAt());
+                repository.getCreatedAt(), repository.getGithubCreatedAt());
     }
 }

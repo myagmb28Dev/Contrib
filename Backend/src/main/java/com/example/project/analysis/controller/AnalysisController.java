@@ -34,7 +34,7 @@ public class AnalysisController {
     public ResponseEntity<AnalysisJobResponse> create(@AuthenticationPrincipal GitHubPrincipal principal,
             @PathVariable UUID repositoryId, @Valid @RequestBody CreateAnalysisRequest request) {
         return ResponseEntity.accepted().body(analysisService.create(principal.getUserId(), repositoryId,
-                request.periodStart(), request.periodEnd(), request.branch()));
+                request.periodStart(), request.periodEnd(), request.allTime()));
     }
 
     @GetMapping("/analysis-jobs/{jobId}")

@@ -1,37 +1,39 @@
-# Activity scoring and comparison model
+# 활동 점수와 백분위 계산 기준
 
-## Meaning and compatibility
+## 점수의 의미와 기존 데이터 호환성
 
-The existing `score-v1` is an **experimental activity score**, not a measure of developer ability, quality, or productivity. Its capped arithmetic is unchanged: commits 25, PR creation/merge 30, reviews 20, active days 15, changed-file occurrences 10 points maximum.
+기존 `score-v1`은 **실험적 활동 점수**입니다. 개발자의 실력, 코드 품질, 생산성을 평가하는 수치가 아닙니다. 계산식과 항목별 상한은 그대로 유지합니다. 커밋은 최대 25점, PR 생성·병합은 최대 30점, 리뷰는 최대 20점, 활동 일수는 최대 15점, 변경 파일 수 합계는 최대 10점입니다.
 
-New analyses add immutable `activityComparison` JSON. Certificates containing it use schema 1.1. Legacy analyses and certificates remain unchanged; certificates created from legacy analyses retain schema 1.0. Hash verification certifies payload integrity, not fairness or external endorsement of the score.
+새 분석에는 한 번 저장하면 변경하지 않는 `activityComparison` JSON을 추가합니다. 이 비교 결과를 포함한 인증서는 스키마 1.1을 사용합니다. 기존 분석과 이미 발급된 인증서는 변경하지 않으며, 기존 분석으로 새로 발급하는 인증서도 스키마 1.0을 유지합니다. 해시 검증은 저장된 내용의 무결성을 확인하는 기능입니다. 점수의 공정성이나 외부 기관의 공인을 보장하지 않습니다.
 
-## github-v2 collection contract
+## github-v2 수집 기준
 
-- Exact UTC `[start,end)`. UI end dates are inclusive calendar dates and are submitted as midnight on the following day.
-- Non-merge selected-branch commits returned by GitHub's since/until endpoint, additionally filtered by author timestamp. Merge strategy and author attribution affect observed counts.
-- PRs created in the interval. Merged PRs are the subset also merged before the exclusive end; future merges do not inflate past periods.
-- Reviews submitted in the interval **on PRs created in that interval only**. Pending and self reviews are excluded. Reviews on older PRs are outside the model. API state is observed at collection time, not a reconstruction of deleted history.
-- Exclude GitHub Bot account type and `[bot]` login suffix, not arbitrary human names containing `bot`. Unknown/deleted authors are excluded. Automation using human accounts remains a limitation.
-- Deduplicate type/external ID. Count distinct active UTC dates. Missing API responses, rate-limit failures and pagination-cap exhaustion fail collection instead of producing unmarked partial scores.
-- Collect repository-wide activity size, but persist only the subject's raw events in their personal snapshot. Public benchmark exports contain numeric aggregates and event fingerprints, not tokens, emails, titles, bodies or private repository data.
+- 새 개인 분석은 `main` 브랜치로 고정하며 화면에서 브랜치를 선택하지 않습니다. `main`이 없거나 접근할 수 없으면 오류를 표시합니다. 기존 다른 브랜치의 분석 기록은 보존하며, 해당 작업의 재시도 대신 `main`으로 새 분석을 요청해야 합니다. 공개 기준 데이터는 기존대로 각 저장소의 기본 브랜치에서 수집하므로, 개인 저장소의 `main`이 기본 브랜치가 아니면 백분위 비교는 보류합니다.
+- **전체 기간**은 서버가 GitHub의 실제 `created_at`을 조회해 저장소 생성 시각부터 요청 처리 시각까지 결정합니다. 1년이나 5년으로 기간을 제한하지 않습니다. 로컬 DB 등록일(`createdAt`)과 GitHub 생성일(`githubCreatedAt`)은 별도로 저장합니다. 생성 시각을 확인할 수 없으면 임의 날짜로 대체하지 않고 오류를 표시합니다. 현재 시각은 DB와 동일한 마이크로초 정밀도로 고정해 응답과 실제 수집 기간이 일치하도록 합니다. 전체 기간에 정확히 대응하는 공개 기준 데이터가 없으면 활동 지표·기존 활동 점수는 계산하고 백분위만 보류합니다.
+- 분석 기간은 UTC 기준 `[start,end)`입니다. 시작 시각은 포함하고 종료 시각은 제외합니다. 화면에서 선택한 마지막 날짜는 분석에 포함되며, 서버에는 그다음 날 자정을 종료 시각으로 전송합니다.
+- 개인 분석에서는 `main`에서 GitHub의 `since`·`until` 조건으로 반환된 커밋을 수집하고, 작성자 시각이 분석 기간에 포함되는지 추가로 확인합니다. 병합 커밋은 제외합니다. 저장소의 병합 방식과 작성자 식별 여부에 따라 관찰되는 커밋 수가 달라질 수 있습니다.
+- 분석 기간에 생성된 PR을 수집합니다. 병합된 PR 수는 그중 분석 종료 시각 전에 병합된 PR만 셉니다. 종료 이후의 병합으로 과거 기간의 수치가 증가하지 않도록 합니다.
+- **분석 기간에 생성된 PR에 한해**, 같은 기간에 제출된 리뷰를 수집합니다. 제출 대기 중인 리뷰와 본인 PR에 작성한 리뷰는 제외합니다. 분석 기간 이전에 생성된 PR의 리뷰는 이 모델의 수집 범위에 포함되지 않습니다. API 상태는 수집 당시 확인되는 상태이며, 삭제된 과거 이력을 복원한 결과가 아닙니다.
+- GitHub 계정 유형이 Bot이거나 로그인 이름이 `[bot]`으로 끝나는 계정은 제외합니다. 이름에 `bot`이라는 글자가 들어 있다는 이유만으로 일반 사용자를 제외하지 않습니다. 작성자를 식별할 수 없거나 작성자 계정이 삭제된 활동도 제외합니다. 일반 사용자 계정으로 수행하는 자동화 활동을 완전히 구분하지 못하는 한계는 남아 있습니다.
+- 활동 유형과 외부 ID를 기준으로 중복을 제거합니다. 활동 일수는 서로 다른 UTC 날짜 수로 계산합니다. API 응답 누락, 호출 제한에 따른 실패, 페이지 수집 상한 도달 시에는 수집을 실패 처리합니다. 일부 데이터만 수집된 사실을 숨긴 채 점수를 산출하지 않습니다.
+- 저장소 전체의 활동 규모를 수집하지만, 개인 분석 스냅샷에는 분석 대상자의 원시 이벤트만 저장합니다. 공개 비교 데이터에는 집계 수치와 이벤트 식별 정보를 요약한 해시만 포함합니다. 인증 토큰, 이메일, 제목, 본문, 비공개 저장소 데이터는 포함하지 않습니다.
 
-## activity-percentile-v1
+## activity-percentile-v1 계산 방식
 
-1. Match exact period, primary language, and active-contributor band: 1-9, 10-49, or 50+. Only public, non-fork, non-archived default branches qualify. These are coarse environmental proxies, not controls for developer role or team workflow.
-2. Exclude the subject's GitHub ID from every reference repository. Require at least **3 represented repositories and 20 distinct remaining contributors**. Do not silently broaden the cohort.
-3. Observation unit: contributor-repository pair. A person present in k matched repositories gives each observation weight 1/k, so their total influence is 1. Report both observation count and distinct-person count.
-4. Candidate dimensions: commits, created PRs, reviews, active days. Retain dimensions with positive activity from at least `max(5, ceil(20% of unique people))` people. Require at least two supported dimensions. Apply equal weights to supported dimensions and display them. Merged PRs and changed files are supplementary, with no extra percentile bonus.
-5. Dimension rank: `100 * (weight below + 0.5 * weight tied) / total weight`. Average the unrounded dimension ranks into a composite. The **final percentile** is the weighted midrank of that composite among identically calculated reference composites. An average of percentiles alone is not labelled as a percentile.
-6. Display one decimal. 100 means above all reference composites, not perfect ability. Ties get the middle rank. Different cohorts/periods are not directly comparable; list sorting stays explicitly based on the legacy activity score.
-7. No observed activity gives NO_ACTIVITY. Other unavailable states: UNSUPPORTED_SCOPE, NO_REFERENCE_PERIOD, INSUFFICIENT_COHORT, INSUFFICIENT_DIMENSIONS. No numeric percentile is fabricated in these states.
-8. Compute local sensitivity to adding one commit, PR or review while holding other dimensions fixed. Changes of at least 20 percentile points show a prominent warning. This diagnostic is not a confidence interval; sparse samples and ties can cause large jumps.
+1. 분석 기간, 저장소의 주요 언어, 활동 기여자 수 구간이 같은 데이터를 비교합니다. 규모 구간은 1~9명, 10~49명, 50명 이상입니다. 공개 상태이고 포크·보관 처리되지 않은 저장소의 기본 브랜치만 비교 대상이 됩니다. 이 조건은 저장소 환경을 대략적으로 맞추기 위한 기준이며, 개발자의 역할이나 팀의 작업 방식까지 통제하지는 못합니다.
+2. 모든 비교 저장소에서 분석 대상자의 GitHub ID를 제외합니다. 제외 후에도 **최소 3개 저장소와 서로 다른 기여자 20명**이 있어야 합니다. 결과를 만들기 위해 비교 범위를 알리지 않고 넓히지 않습니다.
+3. 관측 단위는 ‘기여자와 저장소의 조합’입니다. 동일 인물이 비교 대상 저장소 k개에 등장하면 각 관측치에 1/k의 가중치를 부여합니다. 한 사람이 갖는 전체 가중치의 합은 1이 됩니다. 화면에는 관측치 수와 중복을 제거한 기여자 수를 함께 표시합니다.
+4. 비교 항목은 커밋, 생성한 PR, 리뷰, 활동 일수입니다. 항목별로 실제 활동이 있는 사람이 `max(5, ceil(고유 기여자 수 × 20%))`명 이상일 때만 계산에 사용합니다. `ceil`은 소수점 이하를 올림하는 연산입니다. 이 조건을 만족하는 항목이 최소 2개 있어야 합니다. 사용 가능한 항목에는 동일한 가중치를 부여하고 실제 적용 비중을 표시합니다. PR 병합과 변경 파일 수는 보조 지표이며 백분위에 추가 점수를 부여하지 않습니다.
+5. 항목별 백분위는 `100 × (대상자보다 낮은 관측치의 가중치 합 + 0.5 × 동점 관측치의 가중치 합) / 전체 가중치 합`으로 계산합니다. 반올림하지 않은 항목별 백분위를 평균하여 종합값을 만듭니다. **최종 백분위**는 같은 방식으로 계산한 비교 관측치의 종합값 사이에서 다시 구한 가중 중간 순위입니다. 항목별 백분위의 평균 자체를 최종 백분위라고 표시하지 않습니다.
+6. 결과는 소수점 첫째 자리까지 표시합니다. 100백분위는 모든 비교 관측치의 종합값보다 높다는 뜻이며, 완벽한 개발 실력을 의미하지 않습니다. 동점에는 중간 순위를 부여합니다. 비교 집단이나 기간이 다른 결과는 직접 비교할 수 없습니다. 목록 정렬은 기존 활동 점수를 기준으로 한다는 점을 명시합니다.
+7. 관찰된 활동이 없으면 `NO_ACTIVITY`로 표시합니다. 그 밖의 산정 보류 상태는 비교 범위가 맞지 않는 `UNSUPPORTED_SCOPE`, 같은 기간의 기준 데이터가 없는 `NO_REFERENCE_PERIOD`, 비교 집단이 부족한 `INSUFFICIENT_COHORT`, 비교 가능한 항목이 부족한 `INSUFFICIENT_DIMENSIONS`입니다. 이 상태에서는 임의의 백분위 수치를 만들지 않습니다.
+8. 다른 항목을 고정한 채 커밋·PR·리뷰 중 한 항목에 활동 1건을 추가했을 때 순위가 얼마나 달라지는지 계산합니다. 변화가 20백분위 포인트 이상이면 눈에 띄는 주의 안내를 표시합니다. 이 검사는 순위 민감도를 확인하기 위한 진단이며 통계적 신뢰구간이 아닙니다. 표본이 적거나 동점이 많으면 작은 활동 변화로도 순위가 크게 움직일 수 있습니다.
 
-## Public reference data
+## 공개 비교 데이터
 
-Initial bundled coverage is C# repositories for August 2026 and June-August 2026. This is a curated convenience sample, not a representative population. Other languages, dates or missing size bands deliberately show an unavailable comparison. The analysis form lists published reference periods.
+초기 제공 데이터는 C# 저장소의 2026년 8월 및 2026년 6~8월 활동입니다. 수집할 저장소를 선정해 구성한 편의 표본이므로 전체 개발자 집단을 대표하지 않습니다. 다른 언어·기간이거나 해당 규모 구간의 표본이 없으면 비교 불가 상태를 표시합니다. 분석 화면에서 공개된 기준 데이터의 기간을 선택할 수 있습니다.
 
-Export explicitly, offline, with `GH_TOKEN` in the process environment:
+서버의 실시간 분석과 별도로, 프로세스 환경 변수에 `GH_TOKEN`을 설정한 뒤 다음 명령으로 비교 데이터를 수집·검증합니다.
 
 ```powershell
 cd Backend
@@ -39,14 +41,16 @@ cd Backend
 .\gradlew.bat -q validateBenchmark '-PbenchmarkArgs=src/main/resources/benchmarks/new.json'
 ```
 
-The exporter rejects open/future periods, private/fork/archived repositories, and file overwrites. The catalog rejects duplicate periods/repositories/people, wrong schema/collector versions, negative counts and impossible active-day counts. Review sample selection before publication.
+내보내기 도구는 아직 종료되지 않았거나 미래에 해당하는 기간, 비공개·포크·보관 처리된 저장소, 기존 파일 덮어쓰기를 거부합니다. 비교 데이터 카탈로그는 중복 기간·저장소·기여자, 잘못된 스키마·수집기 버전, 음수 활동 수, 기간상 불가능한 활동 일수를 거부합니다. 데이터를 공개하기 전에 표본 선정이 적절한지 검토해야 합니다.
 
-Dataset ID is SHA-256 of UTF-8 JSON with LF line endings. `/api/public/benchmarks/{id}` returns exactly these normalized bytes. Preserve published files permanently. Adding more languages to an existing period requires explicit catalog versioning rather than modifying already referenced snapshots. Model version, dataset and cohort IDs, period, repository list, population counts, weights and rules are frozen per result. Job deduplication uses a pipeline version containing a digest of the model and reference dataset (or `none`), so publishing a previously missing reference permits a new analysis without rewriting an old result. Identical period/branch/model/reference requests return the original snapshot. The source metadata records the underlying collection version separately.
+데이터셋 ID는 줄바꿈을 LF로 통일한 UTF-8 JSON의 SHA-256 해시입니다. `/api/public/benchmarks/{id}`는 이 정규화된 파일과 정확히 같은 바이트를 반환합니다. 공개한 파일은 영구 보존해야 합니다. 기존 기간에 다른 언어의 데이터를 추가하려면 카탈로그의 버전 관리 방식을 명시적으로 설계해야 하며, 이미 참조 중인 스냅샷을 수정해서는 안 됩니다.
 
-See [real-data validation](activity-benchmark-validation.md) for distributions and perturbation checks. Passing software tests does not establish empirical validity as a measure of developer value.
+모델 버전, 데이터셋·비교 집단 ID, 기간, 저장소 목록, 표본 수, 가중치, 계산 규칙은 각 결과에 고정됩니다. 분석 작업의 중복 판별에는 모델과 기준 데이터셋 또는 `none`의 해시를 포함한 파이프라인 버전을 사용합니다. 따라서 이전에 없던 기준 데이터가 공개되면 과거 결과를 덮어쓰지 않고 새로운 분석을 수행할 수 있습니다. 기간·브랜치·모델·기준 데이터가 모두 같은 요청은 기존 스냅샷을 반환합니다. 원천 메타데이터에는 실제 수집기 버전도 별도로 기록합니다.
 
-## References
+점수 분포와 활동 변화에 따른 민감도는 [실데이터 검증 결과](activity-benchmark-validation.md)를 참고하세요. 소프트웨어 테스트를 통과했다는 사실만으로 개발자의 가치를 평가하는 지표로서의 타당성이 입증되는 것은 아닙니다.
 
-- [CHAOSS metrics](https://handbook.chaoss.community/community-handbook/community-initiatives/metrics): community activity measurement, not approval of our weights or individual rankings.
-- [SPACE](https://www.microsoft.com/en-us/research/publication/the-space-of-developer-productivity-theres-more-to-it-than-you-think/): productivity cannot be reduced to a single activity dimension.
-- [GitHub PR API](https://docs.github.com/en/rest/pulls/pulls): creation-order pagination and event fields.
+## 참고 자료
+
+- [CHAOSS 지표](https://handbook.chaoss.community/community-handbook/community-initiatives/metrics): 커뮤니티 활동 측정의 참고 자료입니다. 이 서비스의 가중치나 개인 순위를 공인하는 근거가 아닙니다.
+- [SPACE 프레임워크](https://www.microsoft.com/en-us/research/publication/the-space-of-developer-productivity-theres-more-to-it-than-you-think/): 생산성을 하나의 활동 항목으로 환원할 수 없다는 관점을 참고합니다.
+- [GitHub PR API](https://docs.github.com/en/rest/pulls/pulls): 생성 시각 순 페이지 수집과 이벤트 필드의 기준입니다.

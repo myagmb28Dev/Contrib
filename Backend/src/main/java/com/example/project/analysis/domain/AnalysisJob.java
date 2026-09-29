@@ -85,7 +85,7 @@ public class AnalysisJob extends BaseTimeEntity {
         this.collectorVersion = collectorVersion;
         this.targetBranch = (targetBranch != null && !targetBranch.isBlank())
                 ? targetBranch.trim()
-                : (repository.getDefaultBranch() != null ? repository.getDefaultBranch() : "main");
+                : "main";
         this.status = AnalysisJobStatus.PENDING;
         this.progress = 0;
         this.attemptCount = 0;
@@ -102,7 +102,7 @@ public class AnalysisJob extends BaseTimeEntity {
 
     public static AnalysisJob create(User user, GitHubRepository repository, Instant periodStart,
             Instant periodEnd, String collectorVersion) {
-        return create(user, repository, periodStart, periodEnd, collectorVersion, repository.getDefaultBranch());
+        return create(user, repository, periodStart, periodEnd, collectorVersion, "main");
     }
 
     public void startCollection(Instant leaseExpiresAt) {

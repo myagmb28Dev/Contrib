@@ -1,12 +1,14 @@
-# Public benchmark validation
+# 공개 비교 데이터의 실데이터 검증 결과
 
-Reference observations are evaluated with each subject excluded. These are activity ranks, not quality labels.
+각 관측치의 기여자 본인을 비교 집단에서 제외한 뒤 결과를 계산했습니다. 여기서 산출한 순위는 관찰된 활동 수준을 나타내며, 개발 실력이나 코드 품질의 등급이 아닙니다.
 
-## 2026-08-01T00:00:00Z to 2026-09-01T00:00:00Z (end excluded)
+## 2026년 8월 데이터
 
-Dataset: `0xb1ddf031b73d0f53ade08c58b283c2b61183ff495a5b8603537dcdf31a694f95`
+분석 기간: `2026-08-01T00:00:00Z` 이상, `2026-09-01T00:00:00Z` 미만입니다. 종료 시각은 포함하지 않습니다.
 
-| Repository | Language | Active contributors |
+데이터셋 ID: `0xb1ddf031b73d0f53ade08c58b283c2b61183ff495a5b8603537dcdf31a694f95`
+
+| 저장소 | 주요 언어 | 활동 기여자 수 |
 |---|---|---:|
 | CommunityToolkit/dotnet | C# | 2 |
 | Cysharp/MemoryPack | C# | 0 |
@@ -15,15 +17,17 @@ Dataset: `0xb1ddf031b73d0f53ade08c58b283c2b61183ff495a5b8603537dcdf31a694f95`
 | Tyrrrz/CliWrap | C# | 1 |
 | spectreconsole/spectre.console | C# | 1 |
 
-Result counts: {INSUFFICIENT_COHORT=8}
+검증 결과는 **비교 집단 부족(`INSUFFICIENT_COHORT`) 8건**입니다. 최소 비교 조건을 충족하지 못해 백분위는 산출하지 않았습니다. 건수의 단위는 기여자와 저장소의 조합으로 구성된 관측치입니다.
 
-Monotonicity violations after adding one commit: 0.
+커밋 1개 추가 후 백분위가 낮아지는 단조성 위반의 집계값은 0건입니다. 다만 이 기간에는 백분위가 산출된 관측치가 없으므로, 이 수치를 단조성이 검증됐다는 근거로 해석해서는 안 됩니다.
 
-## 2026-06-01T00:00:00Z to 2026-09-01T00:00:00Z (end excluded)
+## 2026년 6~8월 데이터
 
-Dataset: `0x3cb7ab96f6e3e8abda4c6790b83a324b94bf1074210f391e5efedf3b0244b754`
+분석 기간: `2026-06-01T00:00:00Z` 이상, `2026-09-01T00:00:00Z` 미만입니다. 종료 시각은 포함하지 않습니다.
 
-| Repository | Language | Active contributors |
+데이터셋 ID: `0x3cb7ab96f6e3e8abda4c6790b83a324b94bf1074210f391e5efedf3b0244b754`
+
+| 저장소 | 주요 언어 | 활동 기여자 수 |
 |---|---|---:|
 | CommunityToolkit/Maui | C# | 13 |
 | CommunityToolkit/dotnet | C# | 5 |
@@ -38,20 +42,26 @@ Dataset: `0x3cb7ab96f6e3e8abda4c6790b83a324b94bf1074210f391e5efedf3b0244b754`
 | serilog/serilog | C# | 2 |
 | spectreconsole/spectre.console | C# | 14 |
 
-Result counts: {AVAILABLE=90}
+검증 결과는 **백분위 산정 가능(`AVAILABLE`) 90건**입니다. 이 역시 중복을 제거한 사람 수가 아니라 기여자와 저장소의 조합으로 구성된 관측치 수입니다.
 
-Observed percentile range: 0.0 to 100.0; middle observation: 36.9.
+관찰된 백분위 범위는 **0.0~100.0**이고, 결과를 정렬했을 때 중앙 위치의 관측값은 **36.9**입니다.
 
-| Percentile band | Observations |
+| 백분위 구간 | 관측치 수 |
 |---|---:|
-| 0-20 | 7 |
-| 20-40 | 42 |
-| 40-60 | 7 |
-| 60-80 | 17 |
-| 80-100 | 17 |
+| 0 이상 20 미만 | 7 |
+| 20 이상 40 미만 | 42 |
+| 40 이상 60 미만 | 7 |
+| 60 이상 80 미만 | 17 |
+| 80 이상 100 이하 | 17 |
 
-Largest change after adding one commit (other dimensions fixed): 63.6 percentile points.
+다른 항목을 고정하고 커밋 1개를 추가했을 때, 백분위 변화의 최댓값은 **63.6백분위 포인트**였습니다.
 
-Monotonicity violations after adding one commit: 0.
+커밋 1개 추가 후 백분위가 낮아지는 단조성 위반은 **0건**이었습니다. 활동을 추가했을 때 순위가 역으로 내려가지는 않았지만, 일부 관측치에서는 변화 폭이 매우 컸습니다.
 
-Limits: curated convenience sample, not a representative population; repository size and language do not control developer role or workflow. Small samples and ties can produce large rank jumps. The equal-weight model remains experimental and requires broader calibration before use in high-stakes evaluation.
+## 해석상의 한계
+
+이번 데이터는 선정한 저장소에서 수집한 편의 표본이며 전체 개발자 집단을 대표하지 않습니다. 저장소 규모와 언어를 맞추더라도 개발자의 역할이나 작업 방식까지 통제할 수는 없습니다.
+
+표본이 작거나 동점이 많으면 활동 한 건의 차이로 순위가 크게 달라질 수 있습니다. 이번 검증에서 확인된 최대 63.6백분위 포인트의 변화도 이런 민감도를 보여줍니다. 따라서 작은 백분위 차이를 실력이나 기여 가치의 차이로 해석해서는 안 됩니다.
+
+동일 가중치를 사용하는 현재 모델은 **실험적 모델**입니다. 중요한 평가에 활용하려면 더 넓은 데이터로 모델을 보정하고 타당성을 검증해야 합니다. 세부 수식과 산정 보류 조건은 [계산 기준 문서](activity-scoring.md)를 참고하세요.

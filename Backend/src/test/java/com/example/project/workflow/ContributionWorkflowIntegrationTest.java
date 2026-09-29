@@ -182,6 +182,33 @@ class ContributionWorkflowIntegrationTest {
         assertThat(certificateService.create(principal.getUserId(), analysis.id(), null).hash()).isEqualTo(certificate.hash());
     }
 
+    @Test
+    void allTimeUsesGitHubCreationUntilNowAndAlwaysCollectsMain() throws Exception {
+        var principal = accountConnectionService.connect(new GitHubProfile(33001L, "history-user", null),
+                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        when(accessTokenService.getValidAccessToken(principal.getUserId())).thenReturn("history-token");
+        var owner = new GitHubUserDto(33001L, "history-user");
+        // A legacy local row has no GitHub creation timestamp, and its default branch is not main.
+        var legacyMetadata = new GitHubRepositoryDto(33002L, owner, "history", "history-user/history",
+                "https://github.com/history-user/history", false, "develop", "Java", false);
+        var createdAt = Instant.parse("2011-04-12T13:45:27Z");
+        var freshMetadata = new GitHubRepositoryDto(33002L, owner, "history", "history-user/history",
+                "https://github.com/history-user/history", false, "develop", "Java", false, false, createdAt);
+        when(gitHubApiClient.getPublicRepositories("history-token")).thenReturn(List.of(legacyMetadata));
+        when(gitHubApiClient.getRepository("history-token", "history-user", "history")).thenReturn(freshMetadata);
+        var repo = repositoryService.synchronize(principal.getUserId()).get(0);
+        assertThat(repo.githubCreatedAt()).isNull();
+        var before = Instant.now();
+        var job = analysisService.create(principal.getUserId(), repo.id(), null, null, true);
+        var after = Instant.now();
+        assertThat(job.periodStart()).isEqualTo(createdAt);
+        assertThat(job.periodEnd()).isBetween(before, after);
+        assertThat(jobRepository.findById(job.id()).orElseThrow().getTargetBranch()).isEqualTo("main");
+        waitForCompletion(job.id());
+        org.mockito.Mockito.verify(gitHubApiClient).getCommits("history-token", "history-user", "history", "main", createdAt, job.periodEnd());
+        assertThat(repositoryService.get(principal.getUserId(), repo.id()).githubCreatedAt()).isEqualTo(createdAt);
+    }
+
     private void waitForCompletion(java.util.UUID jobId) throws InterruptedException {
         for (int attempt = 0; attempt < 100; attempt++) {
             var job = jobRepository.findById(jobId).orElseThrow();

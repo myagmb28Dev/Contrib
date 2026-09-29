@@ -12,6 +12,18 @@ import com.example.project.github.dto.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class RepositoryActivityCollectorTest {
+    @Test void missingMainFailsClearlyWithoutFallingBackToAnotherBranch() {
+        var api = mock(GitHubApiClient.class);
+        var collector = new RepositoryActivityCollector(api, new ObjectMapper().findAndRegisterModules());
+        when(api.getRepository("token", "owner", "demo")).thenReturn(new GitHubRepositoryDto(1,
+                new GitHubUserDto(1, "owner"), "demo", "owner/demo", "https://github.com/owner/demo", false, "develop", "Java", false));
+        when(api.getCommits(anyString(), anyString(), anyString(), eq("main"), any(), any()))
+                .thenThrow(new com.example.project.github.client.GitHubApiException(404, "not found"));
+        assertThatThrownBy(() -> collector.collect("token", "owner", "demo", "main",
+                Instant.parse("2026-01-01T00:00:00Z"), Instant.parse("2026-02-01T00:00:00Z"), 1L))
+                .isInstanceOf(IllegalStateException.class).hasMessageContaining("main 브랜치를 찾을 수 없습니다");
+        verify(api, never()).getCommits(anyString(), anyString(), anyString(), eq("develop"), any(), any());
+    }
     @Test void filtersBotsSelfReviewsDuplicatesAndEndBoundaryWithoutFutureMergeLeakage() {
         var api = mock(GitHubApiClient.class);
         var mapper = new ObjectMapper().findAndRegisterModules();

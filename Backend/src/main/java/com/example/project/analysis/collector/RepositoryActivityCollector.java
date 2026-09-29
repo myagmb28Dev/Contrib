@@ -37,7 +37,16 @@ public class RepositoryActivityCollector {
         if (repository == null) throw new IllegalStateException("GitHub repository metadata is missing");
         String selectedBranch = branch == null || branch.isBlank() ? repository.defaultBranch() : branch;
         Map<String, CollectedActivity> events = new LinkedHashMap<>();
-        for (var commit : api.getCommits(token, owner, name, selectedBranch, start, end)) {
+        List<com.example.project.github.dto.GitHubCommitDto> commits;
+        try {
+            commits = api.getCommits(token, owner, name, selectedBranch, start, end);
+        } catch (com.example.project.github.client.GitHubApiException exception) {
+            if (exception.getStatusCode() == 404) {
+                throw new IllegalStateException(selectedBranch + " 브랜치를 찾을 수 없습니다. 저장소와 해당 브랜치의 접근 권한을 확인해주세요.", exception);
+            }
+            throw exception;
+        }
+        for (var commit : commits) {
             if (!human(commit.author()) || commit.parents() == null || commit.parents().size() > 1
                     || commit.commit() == null || commit.commit().author() == null
                     || !inside(commit.commit().author().date(), start, end)) continue;

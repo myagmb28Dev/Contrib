@@ -12,9 +12,14 @@ public record GitHubRepositoryDto(
         @JsonProperty("default_branch") String defaultBranch,
         String language,
         boolean archived,
-        boolean fork) {
+        boolean fork,
+        @JsonProperty("created_at") java.time.Instant createdAt) {
     public GitHubRepositoryDto(long id, GitHubUserDto owner, String name, String fullName,
             String htmlUrl, boolean privateRepository, String defaultBranch, String language, boolean archived) {
-        this(id, owner, name, fullName, htmlUrl, privateRepository, defaultBranch, language, archived, false);
+        this(id, owner, name, fullName, htmlUrl, privateRepository, defaultBranch, language, archived, false, null);
+    }
+    public GitHubRepositoryDto(long id, GitHubUserDto owner, String name, String fullName,
+            String htmlUrl, boolean privateRepository, String defaultBranch, String language, boolean archived, boolean fork) {
+        this(id, owner, name, fullName, htmlUrl, privateRepository, defaultBranch, language, archived, fork, null);
     }
 }

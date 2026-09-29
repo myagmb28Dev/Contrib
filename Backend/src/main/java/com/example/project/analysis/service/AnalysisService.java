@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnalysisService {
 
     public static final String COLLECTOR_VERSION = "github-v2";
+    public static final String ANALYSIS_BRANCH = "main";
 
     private final AnalysisJobRepository jobRepository;
     private final ContributionAnalysisRepository analysisRepository;
@@ -42,12 +43,13 @@ public class AnalysisService {
     private final RepositorySnapshotRepository snapshotRepository;
     private final ActivityEventRepository eventRepository;
     private final BenchmarkCatalog benchmarkCatalog;
+    private final AnalysisPeriodResolver periodResolver;
 
     public AnalysisService(AnalysisJobRepository jobRepository,
             ContributionAnalysisRepository analysisRepository, UserRepository userRepository,
             RepositoryService repositoryService, ApplicationEventPublisher eventPublisher, ObjectMapper objectMapper,
             AiSummaryService aiSummaryService, RepositorySnapshotRepository snapshotRepository,
-            ActivityEventRepository eventRepository, BenchmarkCatalog benchmarkCatalog) {
+            ActivityEventRepository eventRepository, BenchmarkCatalog benchmarkCatalog, AnalysisPeriodResolver periodResolver) {
         this.jobRepository = jobRepository;
         this.analysisRepository = analysisRepository;
         this.userRepository = userRepository;
@@ -58,16 +60,18 @@ public class AnalysisService {
         this.snapshotRepository = snapshotRepository;
         this.eventRepository = eventRepository;
         this.benchmarkCatalog = benchmarkCatalog;
+        this.periodResolver = periodResolver;
     }
 
     @Transactional
-    public AnalysisJobResponse create(UUID userId, UUID repositoryId, Instant periodStart, Instant periodEnd, String branch) {
+    public AnalysisJobResponse create(UUID userId, UUID repositoryId, Instant periodStart, Instant periodEnd, boolean allTime) {
         GitHubRepository repository = repositoryService.getOwnedRepository(userId, repositoryId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        String targetBranch = (branch != null && !branch.isBlank())
-                ? branch.trim()
-                : (repository.getDefaultBranch() != null ? repository.getDefaultBranch() : "main");
+        var period = periodResolver.resolve(userId, repository, periodStart, periodEnd, allTime);
+        periodStart = period.start();
+        periodEnd = period.end();
+        String targetBranch = ANALYSIS_BRANCH;
         var reference = benchmarkCatalog.forPeriod(periodStart, periodEnd);
         String pipelineVersion = pipelineVersion(reference == null ? "none" : reference.id());
         var existing = jobRepository.findByUserIdAndRepositoryIdAndPeriodStartAndPeriodEndAndCollectorVersionAndTargetBranch(
@@ -86,7 +90,7 @@ public class AnalysisService {
 
     @Transactional
     public AnalysisJobResponse create(UUID userId, UUID repositoryId, Instant periodStart, Instant periodEnd) {
-        return create(userId, repositoryId, periodStart, periodEnd, null);
+        return create(userId, repositoryId, periodStart, periodEnd, false);
     }
 
     @Transactional(readOnly = true)
@@ -100,6 +104,9 @@ public class AnalysisService {
     public AnalysisJobResponse retry(UUID userId, UUID jobId) {
         AnalysisJob job = jobRepository.findByIdAndUserId(jobId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Analysis job not found"));
+        if (!ANALYSIS_BRANCH.equals(job.getTargetBranch())) {
+            throw new IllegalArgumentException("이전 브랜치 작업을 재시도할 수 없습니다. main 기준으로 새 분석을 실행해주세요.");
+        }
         snapshotRepository.findByAnalysisJobId(jobId).ifPresent(snapshot -> {
             analysisRepository.findBySnapshotId(snapshot.getId()).ifPresent(analysisRepository::delete);
             eventRepository.deleteAllBySnapshotId(snapshot.getId());

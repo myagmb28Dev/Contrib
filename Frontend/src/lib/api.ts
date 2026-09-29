@@ -34,6 +34,7 @@ export type Repository = {
   archived: boolean;
   lastSyncedAt: string;
   createdAt?: string;
+  githubCreatedAt?: string | null;
 };
 
 export type AnalysisJob = {
@@ -216,10 +217,6 @@ export async function getRepository(id: string): Promise<Repository> {
   return apiJson(`/api/repositories/${id}`);
 }
 
-export async function getRepositoryBranches(id: string): Promise<string[]> {
-  return apiJson(`/api/repositories/${id}/branches`);
-}
-
 export async function deleteRepository(id: string): Promise<void> {
   const response = await apiFetch(`/api/repositories/${id}`, { method: "DELETE" });
   if (!response.ok) {
@@ -235,19 +232,14 @@ export async function getAnalyses(): Promise<Analysis[]> {
   return apiJson("/api/analyses");
 }
 
-export async function createAnalysis(
-  repositoryId: string,
-  periodStart: string,
-  periodEnd: string,
-  branch?: string,
-): Promise<AnalysisJob> {
+export type AnalysisPeriodRequest =
+  | { allTime: true }
+  | { periodStart: string; periodEnd: string; allTime?: false };
+
+export async function createAnalysis(repositoryId: string, period: AnalysisPeriodRequest): Promise<AnalysisJob> {
   return apiJson(`/api/repositories/${repositoryId}/analyses`, {
     method: "POST",
-    body: JSON.stringify({
-      periodStart,
-      periodEnd,
-      ...(branch ? { branch } : {}),
-    }),
+    body: JSON.stringify(period),
   });
 }
 
