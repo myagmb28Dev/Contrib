@@ -404,11 +404,6 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
         </section>
       )}
 
-      {/* Canonical Payload Viewer */}
-      <details className="full-width card">
-        <summary>Canonical Payload (JSON)</summary>
-        <pre>{JSON.stringify(certificate.payload, null, 2)}</pre>
-      </details>
     </div>
   );
 }
