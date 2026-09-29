@@ -69,6 +69,11 @@ test("nested certificate payload shows only the frozen comparison publicly", asy
   await page.goto("/certificates/certificate");
   await expect(page.locator(".preview-score")).toHaveCount(0);
   await expect(page.locator(".certificate-repository strong")).toHaveText("owner/demo");
+  await expect(page.getByRole("region", { name: "인증서 미리보기" })).toBeVisible();
+  await expect(page.locator(".certificate-document-percentile strong")).toHaveText("80.0");
+  await expect(page.getByRole("region", { name: "상대 활동 수준" })).toBeHidden();
+  await page.getByText("산정 근거 확인", { exact: true }).click();
+  await expect(page.getByRole("region", { name: "상대 활동 수준" })).toBeVisible();
   await page.getByRole("link", { name: "공개 검증 화면 열기", exact: true }).click();
   await expect(page.locator(".comparison-percentile")).toHaveText("80.0");
 });
@@ -77,6 +82,8 @@ test("legacy certificate with no recorded score never falls back to 80", async (
   await fixtures(page, null, null);
   await page.goto("/certificates/certificate");
   await expect(page.locator(".preview-score")).toHaveCount(0);
+  await expect(page.locator(".certificate-document-percentile")).toHaveCount(0);
+  await page.getByText("산정 근거 확인", { exact: true }).click();
   await expect(page.getByText(/이전 분석에는 비교 데이터가 없습니다/)).toBeVisible();
   await expect(page.locator(".comparison-percentile")).toHaveCount(0);
 });
