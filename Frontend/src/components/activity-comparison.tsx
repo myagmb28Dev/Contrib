@@ -25,7 +25,7 @@ export function ActivityComparisonCard({ comparison }: { comparison?: ActivityCo
     </div> : <strong>백분위 산정 보류</strong>}
     <p>{comparison.reason}</p>
     {available && (comparison.singleActivitySensitivity ?? 0) >= 20 && <p role="note" className="comparison-caution">
-      순위 변동 주의: 이 비교 집단에서는 커밋·PR·리뷰 중 한 항목이 1건 증가해도
+      참고: 이 비교 집단에서는 커밋·PR·리뷰 중 한 항목이 1건 증가해도
       최대 {comparison.singleActivitySensitivity!.toFixed(1)}백분위 포인트가 달라질 수 있습니다.
       표본과 동점의 영향을 크게 받으므로 작은 수치 차이를 과해석하지 마세요.
     </p>}
