@@ -58,8 +58,13 @@ public class CertificatePayloadFactory {
                 "summary", analysis.getAiSummary());
 
         Instant issuedAt = job.getCompletedAt();
+        String schemaVersion = analysis.getActivityComparison() == null ? SCHEMA_VERSION : "1.1";
+        if (analysis.getActivityComparison() != null) {
+            result.put("activityComparison", jsonValue(analysis.getActivityComparison()));
+            result.put("scoreMeaning", "experimental observed activity score; not developer ability or quality");
+        }
         Map<String, Object> payload = ordered(
-                "schemaVersion", SCHEMA_VERSION,
+                "schemaVersion", schemaVersion,
                 "subject", subject,
                 "repository", repositoryPayload,
                 "period", period,

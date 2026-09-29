@@ -88,7 +88,7 @@ export default function HomePage() {
               <TypewriterText text={"공개 저장소 활동을 스냅샷으로 고정하고, 일관된 기준으로 분석해\n누구나 확인할 수 있는 Contribution Certificate를 생성합니다."} />
             </p>
             <p className="privacy-note">
-              <span aria-hidden="true">●</span> 공개 저장소만 안전하게 분석하며, 객관적인 기여 점수와 AI 요약 리포트를 함께 제공합니다.
+              <span aria-hidden="true">●</span> 공개 저장소만 안전하게 분석하며, 산정 기준을 공개한 활동 지표와 AI 요약 리포트를 함께 제공합니다.
             </p>
           </div>
 

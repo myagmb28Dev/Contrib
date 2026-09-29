@@ -11,5 +11,10 @@ public record GitHubRepositoryDto(
         @JsonProperty("private") boolean privateRepository,
         @JsonProperty("default_branch") String defaultBranch,
         String language,
-        boolean archived) {
+        boolean archived,
+        boolean fork) {
+    public GitHubRepositoryDto(long id, GitHubUserDto owner, String name, String fullName,
+            String htmlUrl, boolean privateRepository, String defaultBranch, String language, boolean archived) {
+        this(id, owner, name, fullName, htmlUrl, privateRepository, defaultBranch, language, archived, false);
+    }
 }

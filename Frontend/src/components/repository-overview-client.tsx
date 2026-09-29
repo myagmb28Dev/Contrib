@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ComparisonSummary } from "./activity-comparison";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -14,11 +15,7 @@ import {
   type Repository,
 } from "@/lib/api";
 
-function getScoreTier(score: number) {
-  if (score >= 80) return { label: "Excellent", className: "tier-high" };
-  if (score >= 60) return { label: "Good", className: "tier-mid" };
-  return { label: "Developing", className: "tier-low" };
-}
+function getScoreTier() { return { label: "실험적 활동 점수 v1", className: "tier-mid" }; }
 
 export function RepositoryOverviewClient({ repositoryId }: { repositoryId: string }) {
   const router = useRouter();
@@ -170,7 +167,7 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
         ) : (
           <div className="analyses-grid">
             {analyses.map((analysis) => {
-              const tier = getScoreTier(analysis.score);
+              const tier = getScoreTier();
               return (
                 <article className="analysis-card" key={analysis.id}>
                   <div className="analysis-card-header">
@@ -186,6 +183,7 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
                     <span className="version-tag">{analysis.scoreVersion}</span>
                   </div>
 
+                  <p className="muted"><ComparisonSummary comparison={analysis.activityComparison} /></p>
                   <div className="analysis-period-box">
                     <span className="period-text">
                       기간: {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}

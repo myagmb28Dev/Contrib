@@ -12,6 +12,8 @@ import {
   getRepository,
   getRepositoryAnalyses,
   getRepositoryBranches,
+  getBenchmarks,
+  type BenchmarkSummary,
   type AnalysisJob,
   type Repository,
 } from "@/lib/api";
@@ -33,6 +35,8 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
   const [analysisId, setAnalysisId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [benchmarks, setBenchmarks] = useState<BenchmarkSummary[]>([]);
+  useEffect(() => { getBenchmarks().then(setBenchmarks).catch(() => setBenchmarks([])); }, []);
 
   useEffect(() => {
     Promise.all([
@@ -100,7 +104,7 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
       const created = await createAnalysis(
         repositoryId,
         new Date(`${start}T00:00:00Z`).toISOString(),
-        new Date(`${end}T23:59:59.999Z`).toISOString(),
+        new Date(Date.parse(`${end}T00:00:00Z`) + 86400000).toISOString(),
         selectedBranch || undefined
       );
       setJob(created);
@@ -144,6 +148,24 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
         </div>
 
         {/* Preset Range Buttons */}
+        <div className="stack">
+          <p>백분위는 공개 저장소의 기본 브랜치를 분석하고, 같은 기간·언어·활동 규모의 비교 집단이 있을 때 제공됩니다.
+            비교 표본이 부족하면 원시 지표와 실험적 활동 점수만 표시합니다.</p>
+          {benchmarks.length > 0 && <label>공개 비교 데이터가 있는 기간
+            <select aria-label="공개 비교 기간" value={benchmarks.find(b => b.periodStart.slice(0, 10) === start
+              && new Date(Date.parse(b.periodEnd) - 86400000).toISOString().slice(0, 10) === end)?.id ?? ""} onChange={(event) => {
+              const selected = benchmarks.find(b => b.id === event.target.value);
+              if (!selected) return;
+              setStart(selected.periodStart.slice(0, 10));
+              setEnd(new Date(Date.parse(selected.periodEnd) - 86400000).toISOString().slice(0, 10));
+            }}>
+              <option value="">직접 기간 선택</option>
+              {benchmarks.map(b => <option key={b.id} value={b.id}>
+                {b.periodStart.slice(0, 10)} ~ {new Date(Date.parse(b.periodEnd) - 86400000).toISOString().slice(0, 10)} · {b.languages.join(", ")} · {b.repositoryCount}개 저장소
+              </option>)}
+            </select>
+          </label>}
+        </div>
         <div className="preset-row">
           <span className="preset-label">빠른 기간 선택:</span>
           <button type="button" className="preset-btn" onClick={() => setPreset(1)}>

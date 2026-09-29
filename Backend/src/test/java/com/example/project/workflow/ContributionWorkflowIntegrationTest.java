@@ -77,6 +77,9 @@ class ContributionWorkflowIntegrationTest {
                 List.of(new SimpleGrantedAuthority("ROLE_USER")));
         when(accessTokenService.getValidAccessToken(principal.getUserId())).thenReturn("token");
         GitHubUserDto owner = new GitHubUserDto(1001L, "octocat");
+        when(gitHubApiClient.getRepository("token", "octocat", "demo")).thenReturn(
+                new GitHubRepositoryDto(2001L, owner, "demo", "octocat/demo",
+                        "https://github.com/octocat/demo", false, "main", "Java", false));
         when(gitHubApiClient.getPublicRepositories("token")).thenReturn(List.of(
                 new GitHubRepositoryDto(2001L, owner, "demo", "octocat/demo",
                         "https://github.com/octocat/demo", false, "main", "Java", false)));
@@ -91,8 +94,12 @@ class ContributionWorkflowIntegrationTest {
         waitForCompletion(created.id());
         var analysis = analysisService.listForRepository(principal.getUserId(), repository.id()).get(0);
         assertThat(analysis.scoreVersion()).isEqualTo("score-v1");
+        assertThat(analysis.activityComparison().path("status").asText()).isEqualTo("NO_ACTIVITY");
 
         var certificate = certificateService.create(principal.getUserId(), analysis.id(), SUBJECT);
+        assertThat(certificate.schemaVersion()).isEqualTo("1.1");
+        assertThat(certificate.payload().path("result").path("activityComparison").path("modelVersion").asText())
+                .isEqualTo("activity-percentile-v1");
         assertThat(verificationService.verify(certificate.publicId()).status())
                 .isEqualTo(VerificationStatus.NOT_REGISTERED);
         var intent = blockchainService.intent(principal.getUserId(), certificate.id());
@@ -138,6 +145,41 @@ class ContributionWorkflowIntegrationTest {
         when(gitHubApiClient.getPublicRepositories("private-token")).thenReturn(List.of(publicRepo));
         assertThat(repositoryService.synchronize(userId))
                 .extracting(repo -> repo.visibility()).containsExactlyInAnyOrder("PRIVATE", "PUBLIC");
+    }
+
+    @Test
+    void persistsPublishedComparisonIntoANewCertificate() throws Exception {
+        var principal = accountConnectionService.connect(new GitHubProfile(22001L, "comparison-user", null),
+                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        when(accessTokenService.getValidAccessToken(principal.getUserId())).thenReturn("comparison-token");
+        var owner = new GitHubUserDto(22001L, "comparison-user", "User");
+        var repoDto = new GitHubRepositoryDto(22002L, owner, "comparison", "comparison-user/comparison",
+                "https://github.com/comparison-user/comparison", false, "main", "C#", false);
+        when(gitHubApiClient.getPublicRepositories("comparison-token")).thenReturn(List.of(repoDto));
+        when(gitHubApiClient.getRepository("comparison-token", "comparison-user", "comparison")).thenReturn(repoDto);
+        var start = Instant.parse("2026-06-01T00:00:00Z");
+        var end = Instant.parse("2026-09-01T00:00:00Z");
+        var commits = new java.util.ArrayList<com.example.project.github.dto.GitHubCommitDto>();
+        for (int i = 0; i < 14; i++) {
+            var author = new GitHubUserDto(22001L + i, "person-" + i, "User");
+            commits.add(new com.example.project.github.dto.GitHubCommitDto("commit-" + i, author,
+                    new com.example.project.github.dto.GitHubCommitDto.CommitData(
+                            new com.example.project.github.dto.GitHubCommitDto.CommitAuthor(start.plusSeconds(1)), "activity"), List.of()));
+        }
+        when(gitHubApiClient.getCommits("comparison-token", "comparison-user", "comparison", "main", start, end)).thenReturn(commits);
+        when(gitHubApiClient.getCommit("comparison-token", "comparison-user", "comparison", "commit-0"))
+                .thenReturn(new com.example.project.github.dto.GitHubCommitDetailDto("commit-0",
+                        new com.example.project.github.dto.GitHubCommitDetailDto.Stats(1, 0, 1), List.of()));
+        var repository = repositoryService.synchronize(principal.getUserId()).get(0);
+        var created = analysisService.create(principal.getUserId(), repository.id(), start, end);
+        waitForCompletion(created.id());
+        var analysis = analysisService.listForRepository(principal.getUserId(), repository.id()).get(0);
+        assertThat(analysis.activityComparison().path("status").asText()).isEqualTo("AVAILABLE");
+        assertThat(analysis.activityComparison().path("contributorCount").asInt()).isGreaterThanOrEqualTo(20);
+        assertThat(analysisService.create(principal.getUserId(), repository.id(), start, end).id()).isEqualTo(created.id());
+        var certificate = certificateService.create(principal.getUserId(), analysis.id(), null);
+        assertThat(certificate.payload().path("result").path("activityComparison")).isEqualTo(analysis.activityComparison());
+        assertThat(certificateService.create(principal.getUserId(), analysis.id(), null).hash()).isEqualTo(certificate.hash());
     }
 
     private void waitForCompletion(java.util.UUID jobId) throws InterruptedException {

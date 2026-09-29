@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 
 import { getPublicCertificate, verifyCertificate, type Certificate, type Verification } from "@/lib/api";
 import { verificationStatusLabel } from "@/lib/verification-status";
+import { ActivityComparisonCard } from "./activity-comparison";
+import { certificateResult } from "@/lib/certificate-result";
 
 export function VerificationClient({ publicId }: { publicId: string }) {
   const [certificate, setCertificate] = useState<Certificate | null>(null);
@@ -94,6 +96,7 @@ export function VerificationClient({ publicId }: { publicId: string }) {
       </section>
 
       {/* Hash Verification Breakdown */}
+      {certificate && <ActivityComparisonCard comparison={certificateResult(certificate).comparison} />}
       <section className="card full-width">
         <div className="card-header-simple">
           <h3>암호학적 해시 무결성 검증</h3>

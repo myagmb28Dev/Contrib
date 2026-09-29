@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { createWalletClient, custom, type EIP1193Provider } from "viem";
 
 import { Breadcrumb } from "./breadcrumb";
+import { ActivityComparisonCard } from "./activity-comparison";
+import { certificateResult } from "@/lib/certificate-result";
 import { verificationStatusLabel } from "@/lib/verification-status";
 import {
   ApiRequestError,
@@ -221,9 +223,9 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
     );
   }
 
-  const payload = certificate.payload as Record<string, unknown> | undefined;
-  const score = payload?.score ? String(payload.score) : "80";
-  const repoName = payload?.repository ? String(payload.repository) : "GitHub Repository";
+  const result = certificateResult(certificate);
+  const score = result.score == null ? "—" : String(result.score);
+  const repoName = result.repository;
 
   return (
     <div className="stack full-width">
@@ -260,7 +262,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
 
           <div className="certificate-score-row">
             <div className="preview-score">
-              <span>Contribution score</span>
+              <span>실험적 활동 점수 v1</span>
               <strong>{score}</strong>
               <small>/ 100</small>
             </div>
@@ -286,6 +288,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       </section>
 
       {/* Attestation Details & Action Section */}
+      <ActivityComparisonCard comparison={result.comparison} />
       <section className="card full-width">
         <div className="card-header-simple">
           <h3>인증서 상세 메타데이터</h3>

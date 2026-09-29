@@ -36,6 +36,19 @@ class AuthSecurityIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private com.example.project.analysis.benchmark.BenchmarkCatalog benchmarkCatalog;
+
+    @Test
+    void publicReferenceDownloadMatchesItsPublishedContentHash() throws Exception {
+        var entry = benchmarkCatalog.entries().get(0);
+        String body = mockMvc.perform(get("/api/public/benchmarks/" + entry.id()))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        org.assertj.core.api.Assertions.assertThat(com.example.project.analysis.collector.GitHubActivityCollector.sha256(body))
+                .isEqualTo(entry.id());
+        mockMvc.perform(get("/api/public/benchmarks/missing")).andExpect(status().isNotFound());
+    }
+
     @Test
     void redirectsGitHubLoginToSpringAuthorizationEndpoint() throws Exception {
         mockMvc.perform(get("/api/auth/github"))

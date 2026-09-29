@@ -1,16 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { ComparisonSummary } from "./activity-comparison";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { ApiRequestError, getAnalyses, type Analysis } from "@/lib/api";
 
-function getScoreTier(score: number) {
-  if (score >= 80) return { label: "Excellent", className: "tier-high" };
-  if (score >= 60) return { label: "Good", className: "tier-mid" };
-  return { label: "Developing", className: "tier-low" };
-}
+function getScoreTier() { return { label: "실험적 활동 점수 v1", className: "tier-mid" }; }
 
 export function AnalysesClient() {
   const router = useRouter();
@@ -110,7 +107,7 @@ export function AnalysesClient() {
                 aria-label="정렬 기준"
               >
                 <option value="latest">최신 분석순</option>
-                <option value="score">높은 점수순 (Highest Score)</option>
+                <option value="score">기존 활동 점수순</option>
               </select>
             </div>
 
@@ -140,7 +137,7 @@ export function AnalysesClient() {
             /* Card Grid View */
             <div className="analyses-grid">
               {filteredAndSorted.map((analysis) => {
-                const tier = getScoreTier(analysis.score);
+                const tier = getScoreTier();
                 return (
                   <article className="analysis-card" key={analysis.id}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
@@ -162,6 +159,7 @@ export function AnalysesClient() {
                       </div>
                     </div>
 
+                    <p className="muted"><ComparisonSummary comparison={analysis.activityComparison} /></p>
                     <div className="analysis-period-box">
                       <span className="period-text">
                         기간: {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}
@@ -201,7 +199,7 @@ export function AnalysesClient() {
                 <thead>
                   <tr>
                     <th>저장소</th>
-                    <th>기여 점수</th>
+                    <th>실험적 활동 점수</th>
                     <th>분석 기간</th>
                     <th>AI 요약 & 기술 영역</th>
                     <th style={{ textAlign: "right" }}>작업</th>
@@ -209,7 +207,7 @@ export function AnalysesClient() {
                 </thead>
                 <tbody>
                   {filteredAndSorted.map((analysis) => {
-                    const tier = getScoreTier(analysis.score);
+                    const tier = getScoreTier();
                     return (
                       <tr key={analysis.id}>
                         <td>
@@ -222,6 +220,7 @@ export function AnalysesClient() {
                             {analysis.score}점
                             <small style={{ opacity: 0.8, fontSize: "0.74rem" }}>({tier.label})</small>
                           </span>
+                          <div className="muted"><ComparisonSummary comparison={analysis.activityComparison} /></div>
                         </td>
                         <td>
                           <span className="table-period">

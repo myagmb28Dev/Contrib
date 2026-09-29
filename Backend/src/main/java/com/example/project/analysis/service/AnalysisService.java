@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.UUID;
 
 import com.example.project.analysis.domain.AnalysisJob;
+import com.example.project.analysis.benchmark.BenchmarkCatalog;
+import com.example.project.analysis.benchmark.PercentileCalculator;
+import com.example.project.analysis.collector.GitHubActivityCollector;
 import com.example.project.analysis.dto.AnalysisJobResponse;
 import com.example.project.analysis.dto.AnalysisResponse;
 import com.example.project.analysis.repository.AnalysisJobRepository;
@@ -27,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AnalysisService {
 
-    public static final String COLLECTOR_VERSION = "github-v1";
+    public static final String COLLECTOR_VERSION = "github-v2";
 
     private final AnalysisJobRepository jobRepository;
     private final ContributionAnalysisRepository analysisRepository;
@@ -38,12 +41,13 @@ public class AnalysisService {
     private final AiSummaryService aiSummaryService;
     private final RepositorySnapshotRepository snapshotRepository;
     private final ActivityEventRepository eventRepository;
+    private final BenchmarkCatalog benchmarkCatalog;
 
     public AnalysisService(AnalysisJobRepository jobRepository,
             ContributionAnalysisRepository analysisRepository, UserRepository userRepository,
             RepositoryService repositoryService, ApplicationEventPublisher eventPublisher, ObjectMapper objectMapper,
             AiSummaryService aiSummaryService, RepositorySnapshotRepository snapshotRepository,
-            ActivityEventRepository eventRepository) {
+            ActivityEventRepository eventRepository, BenchmarkCatalog benchmarkCatalog) {
         this.jobRepository = jobRepository;
         this.analysisRepository = analysisRepository;
         this.userRepository = userRepository;
@@ -53,6 +57,7 @@ public class AnalysisService {
         this.aiSummaryService = aiSummaryService;
         this.snapshotRepository = snapshotRepository;
         this.eventRepository = eventRepository;
+        this.benchmarkCatalog = benchmarkCatalog;
     }
 
     @Transactional
@@ -63,14 +68,20 @@ public class AnalysisService {
         String targetBranch = (branch != null && !branch.isBlank())
                 ? branch.trim()
                 : (repository.getDefaultBranch() != null ? repository.getDefaultBranch() : "main");
+        var reference = benchmarkCatalog.forPeriod(periodStart, periodEnd);
+        String pipelineVersion = pipelineVersion(reference == null ? "none" : reference.id());
         var existing = jobRepository.findByUserIdAndRepositoryIdAndPeriodStartAndPeriodEndAndCollectorVersionAndTargetBranch(
-                userId, repositoryId, periodStart, periodEnd, COLLECTOR_VERSION, targetBranch);
+                userId, repositoryId, periodStart, periodEnd, pipelineVersion, targetBranch);
         if (existing.isPresent()) {
             return AnalysisJobResponse.from(existing.get());
         }
-        AnalysisJob job = jobRepository.save(AnalysisJob.create(user, repository, periodStart, periodEnd, COLLECTOR_VERSION, targetBranch));
+        AnalysisJob job = jobRepository.save(AnalysisJob.create(user, repository, periodStart, periodEnd, pipelineVersion, targetBranch));
         eventPublisher.publishEvent(new AnalysisJobCreatedEvent(job.getId()));
         return AnalysisJobResponse.from(job);
+    }
+
+    public static String pipelineVersion(String datasetId) {
+        return COLLECTOR_VERSION + "-" + GitHubActivityCollector.sha256(PercentileCalculator.VERSION + ":" + datasetId).substring(2, 34);
     }
 
     @Transactional

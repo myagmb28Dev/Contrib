@@ -64,7 +64,39 @@ export type Analysis = {
   summary: string | null;
   aiModel: string | null;
   aiPromptVersion: string | null;
+  activityComparison?: ActivityComparison | null;
 };
+
+export type ActivityComparison = {
+  status: string;
+  modelVersion: string;
+  percentile: number | null;
+  metricPercentiles: Record<string, number>;
+  metricWeights: Record<string, number>;
+  datasetId: string | null;
+  cohortId: string | null;
+  referenceCollectedAt: string | null;
+  periodStart: string;
+  periodEnd: string;
+  language: string | null;
+  sizeBand: string;
+  sampleCount: number;
+  contributorCount: number;
+  repositories: string[];
+  scope: string;
+  calculationRules: string;
+  reason: string;
+  singleActivitySensitivity?: number | null;
+};
+
+export type BenchmarkSummary = {
+  id: string; periodStart: string; periodEnd: string; collectedAt: string;
+  repositoryCount: number; languages: string[];
+};
+
+export async function getBenchmarks(): Promise<BenchmarkSummary[]> {
+  return apiJson("/api/public/benchmarks");
+}
 
 export type Certificate = {
   id: string;

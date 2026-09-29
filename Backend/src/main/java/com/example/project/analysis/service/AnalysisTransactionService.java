@@ -10,6 +10,7 @@ import com.example.project.analysis.ai.AiSummaryInput;
 import com.example.project.analysis.ai.AiSummaryResult;
 import com.example.project.analysis.calculator.ContributionScoreCalculator;
 import com.example.project.analysis.calculator.ScoreResult;
+import com.example.project.analysis.benchmark.BenchmarkService;
 import com.example.project.analysis.collector.CollectedActivity;
 import com.example.project.analysis.collector.CollectedSnapshot;
 import com.example.project.analysis.domain.ActivityEvent;
@@ -38,12 +39,13 @@ public class AnalysisTransactionService {
     private final ContributionAnalysisRepository analysisRepository;
     private final ContributionScoreCalculator scoreCalculator;
     private final ObjectMapper objectMapper;
+    private final BenchmarkService benchmarkService;
     private final Duration leaseDuration;
 
     public AnalysisTransactionService(AnalysisJobRepository jobRepository,
             RepositorySnapshotRepository snapshotRepository, ActivityEventRepository eventRepository,
             ContributionAnalysisRepository analysisRepository, ContributionScoreCalculator scoreCalculator,
-            ObjectMapper objectMapper,
+            ObjectMapper objectMapper, BenchmarkService benchmarkService,
             @Value("${app.analysis.job-lease:PT5M}") Duration leaseDuration) {
         this.jobRepository = jobRepository;
         this.snapshotRepository = snapshotRepository;
@@ -51,6 +53,7 @@ public class AnalysisTransactionService {
         this.analysisRepository = analysisRepository;
         this.scoreCalculator = scoreCalculator;
         this.objectMapper = objectMapper;
+        this.benchmarkService = benchmarkService;
         this.leaseDuration = leaseDuration;
     }
 
@@ -87,6 +90,7 @@ public class AnalysisTransactionService {
         ScoreResult result = scoreCalculator.calculate(events);
         ContributionAnalysis analysis = ContributionAnalysis.create(snapshot, json(result.metrics()), result.score(),
                 result.scoreVersion(), result.calculationRules(), "[]");
+        analysis.setActivityComparison(json(benchmarkService.compare(snapshot, result.metrics())));
         analysisRepository.save(analysis);
         AiSummaryInput input = new AiSummaryInput(job.getRepository().getFullName(),
                 job.getRepository().getLanguage(), result.metrics(), result.score());

@@ -5,10 +5,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Breadcrumb } from "./breadcrumb";
+import { ActivityComparisonCard } from "./activity-comparison";
 import { ApiRequestError, createCertificate, getAnalysis, type Analysis } from "@/lib/api";
 
 const metricLabels: Record<string, { label: string; unit?: string }> = {
   commits: { label: "총 커밋 수", unit: "회" },
+  pullRequestsOpened: { label: "생성한 PR", unit: "개" },
+  reviews: { label: "코드 리뷰", unit: "건" },
+  changedFiles: { label: "변경 파일 수 합계", unit: "개" },
+  additions: { label: "추가된 라인", unit: "줄" },
+  deletions: { label: "삭제된 라인", unit: "줄" },
   pullRequestsCreated: { label: "생성한 PR", unit: "개" },
   pullRequestsMerged: { label: "병합된 PR", unit: "개" },
   pullRequestReviews: { label: "코드 리뷰", unit: "건" },
@@ -18,11 +24,6 @@ const metricLabels: Record<string, { label: string; unit?: string }> = {
   comments: { label: "이슈/PR 댓글", unit: "개" },
 };
 
-function getScoreTier(score: number) {
-  if (score >= 80) return { label: "Excellent Contribution", className: "tier-high" };
-  if (score >= 60) return { label: "Good Contribution", className: "tier-mid" };
-  return { label: "Developing Contribution", className: "tier-low" };
-}
 
 export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
   const router = useRouter();
@@ -81,7 +82,6 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
     );
   }
 
-  const tier = getScoreTier(analysis.score);
 
   return (
     <div className="stack full-width">
@@ -94,17 +94,21 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
       />
 
       {/* Hero Score & AI Summary Card */}
+      <ActivityComparisonCard comparison={analysis.activityComparison} />
       <section className="card analysis-hero-card">
         <div className="analysis-score-block">
-          <span className="score-hero-label">CONTRIBUTION SCORE</span>
+          <span className="score-hero-label">실험적 활동 점수 v1</span>
           <div className="score-hero-val-row">
             <strong className="score-hero-num">{analysis.score}</strong>
             <div className="score-hero-meta">
               <span>/ 100</span>
-              <span className={`tier-badge ${tier.className}`}>{tier.label}</span>
+              <span className="tier-badge">활동량 요약 · 실력 평가 아님</span>
             </div>
           </div>
           <span className="version-info muted">규칙 버전: {analysis.scoreVersion}</span>
+          <details><summary>기존 점수 산정 기준</summary><p>커밋 최대 25점, PR 생성·병합 최대 30점,
+            리뷰 최대 20점, 활동 일수 최대 15점, 변경 파일 수 최대 10점입니다. 100점은 각 항목의 상한을 채웠다는 뜻입니다.</p>
+            <p>{analysis.calculationRules}</p></details>
         </div>
 
         <div className="analysis-ai-block">
@@ -161,9 +165,9 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
       {/* Certificate Issuance Section */}
       <section className="card certificate-issue-card full-width">
         <div className="issue-card-header">
-          <h3>공식 기여 인증서 발급</h3>
+          <h3>기여 활동 인증서 발급</h3>
           <p className="muted">
-            이 분석 결과를 바탕으로 공개 검증이 가능한 공식 기여 인증서를 발급합니다. (온체인 발행 및 관리는 인증서 상세에서 진행할 수 있습니다)
+            분석 결과와 비교 기준을 고정한 인증서를 발급합니다. 해시 검증은 기록의 무결성을 확인하며, 점수의 객관성이나 개발 실력을 공인하지 않습니다.
           </p>
         </div>
 

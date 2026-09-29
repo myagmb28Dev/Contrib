@@ -56,7 +56,7 @@ public class CertificateService {
         ContributionAnalysis analysis = ownedAnalysis(userId, analysisId);
         CanonicalCertificate canonical = canonical(userId, analysis, walletAddress);
         Certificate certificate = Certificate.issue(analysis, analysis.getSnapshot().getAnalysisJob().getUser(),
-                CertificatePayloadFactory.SCHEMA_VERSION, canonical.json(), canonical.hash(),
+                String.valueOf(canonical.payload().get("schemaVersion")), canonical.json(), canonical.hash(),
                 payloadFactory.normalizeAddress(walletAddress), canonical.issuedAt());
         return CertificateResponse.from(certificateRepository.save(certificate), objectMapper);
     }

@@ -51,6 +51,7 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     });
 
     if (path === "/api/auth/csrf") return json({ headerName: "X-XSRF-TOKEN", parameterName: "_csrf", token: "test" });
+    if (path === "/api/public/benchmarks") return json([]);
     if (path === "/api/auth/me") {
       if (!authenticated) return json({ message: "unauthenticated" }, 401);
       return json({ userId: "user-1", githubUserId: 1001, githubUsername: "octocat", email: "octocat@example.com" });
@@ -61,7 +62,10 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     if (path === "/api/repositories" && method === "GET") return json(repositorySynced ? [repository()] : []);
     if (path === "/api/repositories/sync" && method === "POST") { repositorySynced = true; return json([repository()]); }
     if (path === `/api/repositories/${repositoryId}`) return json(repository());
-    if (path === `/api/repositories/${repositoryId}/analyses` && method === "POST") return json(job("PENDING", 0));
+    if (path === `/api/repositories/${repositoryId}/analyses` && method === "POST") {
+      expect(request.postDataJSON().periodEnd).toMatch(/T00:00:00\.000Z$/);
+      return json(job("PENDING", 0));
+    }
     if (path === `/api/analysis-jobs/${jobId}`) return json(job(++jobPolls > 1 ? "COMPLETED" : "ANALYZING", jobPolls > 1 ? 100 : 60));
     if (path === `/api/repositories/${repositoryId}/analyses` && method === "GET") return json(jobPolls > 1 ? [analysis()] : []);
     if (path === `/api/analyses/${analysisId}`) return json(analysis());

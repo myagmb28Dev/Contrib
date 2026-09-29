@@ -26,9 +26,9 @@ public class RuleBasedAiSummaryProvider implements AiSummaryProvider {
         if (input.metrics().commits() > 0) {
             areas.add("implementation");
         }
-        String summary = "%s에서 커밋 %d개, PR %d개, 리뷰 %d개의 활동이 확인되었습니다. 기여 점수는 %d점입니다."
+        String summary = "%s에서 커밋 %d개, PR %d개, 리뷰 %d개의 활동이 확인되었습니다. 실험적 활동 점수는 %d점이며 개발 실력이나 품질을 평가하지 않습니다."
                 .formatted(input.repository(), input.metrics().commits(), input.metrics().pullRequestsOpened(),
                         input.metrics().reviews(), input.score());
-        return new AiSummaryResult(summary, List.copyOf(areas), "rule-based-stub", "stub-v2");
+        return new AiSummaryResult(summary, List.copyOf(areas), "rule-based-stub", "stub-v3");
     }
 }
