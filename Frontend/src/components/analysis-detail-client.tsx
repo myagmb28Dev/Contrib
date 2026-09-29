@@ -89,28 +89,13 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
         items={[
           { label: "대시보드", href: "/dashboard" },
           { label: "기여 분석 목록", href: "/dashboard/analyses" },
-          { label: `분석 결과 (${analysis.score}점)` },
+          { label: "분석 결과" },
         ]}
       />
 
       {/* Hero Score & AI Summary Card */}
       <ActivityComparisonCard comparison={analysis.activityComparison} />
-      <section className="card analysis-hero-card">
-        <div className="analysis-score-block">
-          <span className="score-hero-label">실험적 활동 점수 v1</span>
-          <div className="score-hero-val-row">
-            <strong className="score-hero-num">{analysis.score}</strong>
-            <div className="score-hero-meta">
-              <span>/ 100</span>
-              <span className="tier-badge">활동량 요약 · 실력 평가 아님</span>
-            </div>
-          </div>
-          <span className="version-info muted">규칙 버전: {analysis.scoreVersion}</span>
-          <details><summary>기존 점수 산정 기준</summary><p>커밋 최대 25점, PR 생성·병합 최대 30점,
-            리뷰 최대 20점, 활동 일수 최대 15점, 변경 파일 수 최대 10점입니다. 100점은 각 항목의 상한을 채웠다는 뜻입니다.</p>
-            <p>{analysis.calculationRules}</p></details>
-        </div>
-
+      <section className="card full-width">
         <div className="analysis-ai-block">
           <div className="ai-block-header">
             <span className="ai-badge">AI 분석</span>

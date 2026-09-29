@@ -15,7 +15,6 @@ import {
   type Repository,
 } from "@/lib/api";
 
-function getScoreTier() { return { label: "실험적 활동 점수 v1", className: "tier-mid" }; }
 
 export function RepositoryOverviewClient({ repositoryId }: { repositoryId: string }) {
   const router = useRouter();
@@ -167,21 +166,10 @@ export function RepositoryOverviewClient({ repositoryId }: { repositoryId: strin
         ) : (
           <div className="analyses-grid">
             {analyses.map((analysis) => {
-              const tier = getScoreTier();
+
               return (
                 <article className="analysis-card" key={analysis.id}>
-                  <div className="analysis-card-header">
-                    <div className="score-badge-box">
-                      <span className={`score-badge ${tier.className}`}>
-                        {analysis.score}
-                      </span>
-                      <div className="score-sub">
-                        <strong>/ 100</strong>
-                        <span className="tier-label">{tier.label}</span>
-                      </div>
-                    </div>
-                    <span className="version-tag">{analysis.scoreVersion}</span>
-                  </div>
+
 
                   <p className="muted"><ComparisonSummary comparison={analysis.activityComparison} /></p>
                   <div className="analysis-period-box">

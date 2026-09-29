@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { createWalletClient, custom, type EIP1193Provider } from "viem";
 
 import { Breadcrumb } from "./breadcrumb";
-import { ActivityComparisonCard } from "./activity-comparison";
+import { ActivityComparisonCard, ComparisonSummary } from "./activity-comparison";
 import { certificateResult } from "@/lib/certificate-result";
 import { verificationStatusLabel } from "@/lib/verification-status";
 import {
@@ -224,7 +224,6 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
   }
 
   const result = certificateResult(certificate);
-  const score = result.score == null ? "—" : String(result.score);
   const repoName = result.repository;
 
   return (
@@ -261,10 +260,9 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
           </div>
 
           <div className="certificate-score-row">
-            <div className="preview-score">
-              <span>실험적 활동 점수 v1</span>
-              <strong>{score}</strong>
-              <small>/ 100</small>
+            <div className="stack">
+              <span>실험적 백분위</span>
+              <ComparisonSummary comparison={result.comparison} />
             </div>
             <div className="chain-badge-box">
               {attestation && <span className="network-pill">Base Sepolia</span>}

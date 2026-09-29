@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState } from "react";
 
 import { ApiRequestError, getAnalyses, type Analysis } from "@/lib/api";
 
-function getScoreTier() { return { label: "실험적 활동 점수 v1", className: "tier-mid" }; }
 
 export function AnalysesClient() {
   const router = useRouter();
@@ -17,7 +16,7 @@ export function AnalysesClient() {
 
   const [viewMode, setViewMode] = useState<"grid" | "compact">("grid");
   const [selectedRepo, setSelectedRepo] = useState<string>("ALL");
-  const [sortBy, setSortBy] = useState<"latest" | "score">("latest");
+
 
   useEffect(() => {
     getAnalyses()
@@ -52,14 +51,11 @@ export function AnalysesClient() {
     }
 
     result.sort((a, b) => {
-      if (sortBy === "score") {
-        return b.score - a.score;
-      }
       return new Date(b.periodEnd).getTime() - new Date(a.periodEnd).getTime();
     });
 
     return result;
-  }, [items, selectedRepo, sortBy]);
+  }, [items, selectedRepo]);
 
   return (
     <div className="stack full-width">
@@ -99,16 +95,6 @@ export function AnalysesClient() {
                   </option>
                 ))}
               </select>
-
-              <select
-                className="filter-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as "latest" | "score")}
-                aria-label="정렬 기준"
-              >
-                <option value="latest">최신 분석순</option>
-                <option value="score">기존 활동 점수순</option>
-              </select>
             </div>
 
             <div className="view-toggle-group">
@@ -137,27 +123,16 @@ export function AnalysesClient() {
             /* Card Grid View */
             <div className="analyses-grid">
               {filteredAndSorted.map((analysis) => {
-                const tier = getScoreTier();
+
                 return (
                   <article className="analysis-card" key={analysis.id}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
                       <strong style={{ fontSize: "1.05rem", color: "var(--foreground)" }}>
                         {analysis.repositoryName || analysis.repositoryFullName || "저장소"}
                       </strong>
-                      <span className="version-tag">{analysis.scoreVersion}</span>
+                      <span className="version-tag">{analysis.activityComparison?.modelVersion ?? "이전 분석"}</span>
                     </div>
 
-                    <div className="analysis-card-header">
-                      <div className="score-badge-box">
-                        <span className={`score-badge ${tier.className}`}>
-                          {analysis.score}
-                        </span>
-                        <div className="score-sub">
-                          <strong>/ 100</strong>
-                          <span className="tier-label">{tier.label}</span>
-                        </div>
-                      </div>
-                    </div>
 
                     <p className="muted"><ComparisonSummary comparison={analysis.activityComparison} /></p>
                     <div className="analysis-period-box">
@@ -199,7 +174,7 @@ export function AnalysesClient() {
                 <thead>
                   <tr>
                     <th>저장소</th>
-                    <th>실험적 활동 점수</th>
+                    <th>실험적 백분위</th>
                     <th>분석 기간</th>
                     <th>AI 요약 & 기술 영역</th>
                     <th style={{ textAlign: "right" }}>작업</th>
@@ -207,7 +182,7 @@ export function AnalysesClient() {
                 </thead>
                 <tbody>
                   {filteredAndSorted.map((analysis) => {
-                    const tier = getScoreTier();
+
                     return (
                       <tr key={analysis.id}>
                         <td>
@@ -216,10 +191,6 @@ export function AnalysesClient() {
                           </span>
                         </td>
                         <td>
-                          <span className="table-score-badge">
-                            {analysis.score}점
-                            <small style={{ opacity: 0.8, fontSize: "0.74rem" }}>({tier.label})</small>
-                          </span>
                           <div className="muted"><ComparisonSummary comparison={analysis.activityComparison} /></div>
                         </td>
                         <td>

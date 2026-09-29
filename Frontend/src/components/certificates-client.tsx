@@ -34,7 +34,7 @@ export function CertificatesClient() {
 
   const [viewMode, setViewMode] = useState<"grid" | "compact">("grid");
   const [selectedRepo, setSelectedRepo] = useState<string>("ALL");
-  const [sortBy, setSortBy] = useState<"latest" | "score">("latest");
+
 
   useEffect(() => {
     getCertificates()
@@ -85,16 +85,11 @@ export function CertificatesClient() {
     }
 
     result.sort((a, b) => {
-      if (sortBy === "score") {
-        const scoreA = certificateResult(a).score ?? -1;
-        const scoreB = certificateResult(b).score ?? -1;
-        return scoreB - scoreA;
-      }
       return new Date(b.issuedAt).getTime() - new Date(a.issuedAt).getTime();
     });
 
     return result;
-  }, [items, selectedRepo, sortBy]);
+  }, [items, selectedRepo]);
 
   return (
     <div className="stack full-width">
@@ -133,16 +128,6 @@ export function CertificatesClient() {
                     {repo}
                   </option>
                 ))}
-              </select>
-
-              <select
-                className="filter-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as "latest" | "score")}
-                aria-label="정렬 기준"
-              >
-                <option value="latest">최신 발급순</option>
-                <option value="score">기존 활동 점수순</option>
               </select>
             </div>
 
@@ -183,11 +168,6 @@ export function CertificatesClient() {
                         </strong>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-                        {certificateResult(cert).score !== null && (
-                          <span className="score-pill" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--primary)", background: "var(--primary-light)", padding: "3px 8px", borderRadius: "9999px" }}>
-                            {certificateResult(cert).score}점 · 실험적 활동
-                          </span>
-                        )}
                         <span className={`verified-badge ${statusInfo.className}`}>
                           {statusInfo.label}
                         </span>
@@ -254,7 +234,7 @@ export function CertificatesClient() {
                 <thead>
                   <tr>
                     <th>저장소</th>
-                    <th>실험적 활동 점수</th>
+                    <th>실험적 백분위</th>
                     <th>증명서 상태</th>
                     <th>공개 검증 ID (복사)</th>
                     <th>발급 일시</th>
@@ -272,13 +252,6 @@ export function CertificatesClient() {
                           </span>
                         </td>
                         <td>
-                          {certificateResult(cert).score !== null ? (
-                            <span className="table-score-badge">
-                              {certificateResult(cert).score}점 · 실험적 활동
-                            </span>
-                          ) : (
-                            <span className="muted">-</span>
-                          )}
                           <div className="muted"><ComparisonSummary comparison={certificateResult(cert).comparison} /></div>
                         </td>
                         <td>

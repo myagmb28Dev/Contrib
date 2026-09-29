@@ -9,7 +9,6 @@ export function certificateResult(certificate: Certificate) {
   const result = record(payload.result) ?? payload; // Historical flat fixtures and old exports remain readable.
   const repo = record(payload.repository);
   return {
-    score: typeof result.score === "number" && Number.isFinite(result.score) ? result.score : null,
     repository: certificate.repositoryName || certificate.repositoryFullName ||
       (typeof repo?.fullName === "string" ? repo.fullName : typeof payload.repository === "string" ? payload.repository : "GitHub Repository"),
     comparison: record(result.activityComparison) as ActivityComparison | null,

@@ -11,6 +11,17 @@ const comparison = {
   reason: "선택된 비교 집단의 활동 수준입니다.", singleActivitySensitivity: 30,
 };
 
+test("isolated preview shows only a clearly labelled percentile sample", async ({ page }) => {
+  await page.route("**/api/**", route => route.fulfill({ status: 401, json: { message: "preview has no session" } }));
+  await page.goto("/preview/percentile");
+  await expect(page.getByRole("heading", { name: "실험적 백분위 미리보기", exact: true })).toBeVisible();
+  await expect(page.locator(".comparison-percentile")).toHaveText("80.0");
+  await expect(page.getByText("미리보기용 샘플입니다. 실제 GitHub 기여 분석 결과가 아닙니다.", { exact: true })).toBeVisible();
+  await expect(page.getByText("실험적 활동 점수 v1", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "기여 인증서 발급하기" })).toHaveCount(0);
+});
+
+
 async function fixtures(page: Page, result: unknown, certificateScore: number | null = 0) {
   await page.route("**/api/**", async route => {
     const path = new URL(route.request().url()).pathname;
@@ -31,7 +42,7 @@ async function fixtures(page: Page, result: unknown, certificateScore: number | 
   });
 }
 
-test("explains percentile, cohort, sensitivity and reference data alongside the legacy activity score", async ({ page }) => {
+test("explains percentile, cohort, sensitivity and reference data without the legacy activity score", async ({ page }) => {
   await fixtures(page, comparison);
   await page.goto("/repositories/repo/analysis/analysis");
   const card = page.getByRole("region", { name: "상대 활동 수준", exact: true });
@@ -40,7 +51,8 @@ test("explains percentile, cohort, sensitivity and reference data alongside the 
   await expect(card.getByRole("note")).toContainText("30.0백분위");
   await card.getByText("산정 기준과 비교 데이터 확인", { exact: true }).click();
   await expect(card.getByRole("link", { name: /사용된 공개 비교 데이터/ })).toHaveAttribute("href", "/api/public/benchmarks/0xreference");
-  await expect(page.getByText("실험적 활동 점수 v1", { exact: true })).toBeVisible();
+  await expect(page.getByText("실험적 활동 점수 v1", { exact: true })).toHaveCount(0);
+  await expect(page.locator(".analysis-score-block")).toHaveCount(0);
   await expect(page.getByText("Excellent Contribution", { exact: true })).toHaveCount(0);
 });
 
@@ -52,10 +64,10 @@ test("insufficient reference data has a reason and no fabricated percentile", as
   await expect(page.locator(".comparison-percentile")).toHaveCount(0);
 });
 
-test("nested certificate payload preserves zero score and shows frozen comparison publicly", async ({ page }) => {
+test("nested certificate payload shows only the frozen comparison publicly", async ({ page }) => {
   await fixtures(page, comparison, 0);
   await page.goto("/certificates/certificate");
-  await expect(page.locator(".preview-score strong")).toHaveText("0");
+  await expect(page.locator(".preview-score")).toHaveCount(0);
   await expect(page.locator(".certificate-repository strong")).toHaveText("owner/demo");
   await page.getByRole("link", { name: "공개 검증 화면 열기", exact: true }).click();
   await expect(page.locator(".comparison-percentile")).toHaveText("80.0");
@@ -64,7 +76,7 @@ test("nested certificate payload preserves zero score and shows frozen compariso
 test("legacy certificate with no recorded score never falls back to 80", async ({ page }) => {
   await fixtures(page, null, null);
   await page.goto("/certificates/certificate");
-  await expect(page.locator(".preview-score strong")).toHaveText("—");
+  await expect(page.locator(".preview-score")).toHaveCount(0);
   await expect(page.getByText(/이전 분석에는 비교 데이터가 없습니다/)).toBeVisible();
   await expect(page.locator(".comparison-percentile")).toHaveCount(0);
 });

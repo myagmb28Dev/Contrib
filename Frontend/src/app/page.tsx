@@ -117,7 +117,7 @@ export default function HomePage() {
                     </div>
                     <div className="cert-header-badges">
                       <span className="score-pill" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--primary)", background: "var(--primary-light)", padding: "3px 8px", borderRadius: "9999px" }}>
-                        94점
+                        94백분위 · 예시
                       </span>
                       <span className="verified-badge valid">VALID</span>
                       <span className="network-tag">Base Sepolia</span>
@@ -252,7 +252,7 @@ export default function HomePage() {
           <article>
             <span className="benefit-icon">02</span>
             <div>
-              <h2>설명 가능한 점수</h2>
+              <h2>설명 가능한 활동 지표</h2>
               <p>공개된 규칙과 버전으로 일관된 결과를 산출합니다.</p>
             </div>
           </article>
@@ -284,7 +284,7 @@ export default function HomePage() {
             <li>
               <span>3</span>
               <strong>인증서 생성</strong>
-              <p>점수와 요약이 포함된 Certificate를 생성합니다.</p>
+              <p>백분위와 요약이 포함된 Certificate를 생성합니다.</p>
             </li>
             <li>
               <span>4</span>

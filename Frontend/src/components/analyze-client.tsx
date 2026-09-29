@@ -140,7 +140,7 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
         {/* Preset Range Buttons */}
         <div className="stack">
           <p>백분위는 main이 기본 브랜치인 공개 저장소를 분석하고, 같은 기간·언어·활동 규모의 비교 집단이 있을 때 제공됩니다.
-            비교 표본이 부족하면 원시 지표와 실험적 활동 점수만 표시합니다.</p>
+            비교 표본이 부족하면 원시 활동 지표만 표시합니다.</p>
           {benchmarks.length > 0 && <label>공개 비교 데이터가 있는 기간
             <select aria-label="공개 비교 기간" disabled={isWorking} value={allTime ? "" : benchmarks.find(b => b.periodStart.slice(0, 10) === start
               && new Date(Date.parse(b.periodEnd) - 86400000).toISOString().slice(0, 10) === end)?.id ?? ""} onChange={(event) => {

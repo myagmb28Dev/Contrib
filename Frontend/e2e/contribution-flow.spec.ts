@@ -110,7 +110,9 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
   await page.getByRole("link", { name: "새 기여 분석 시작" }).click();
   await page.getByRole("button", { name: "기여 분석 시작하기" }).click();
   await page.getByRole("link", { name: "분석 결과 확인하기" }).click();
-  await expect(page.locator(".score-hero-num")).toContainText("42");
+  await expect(page.locator(".score-hero-num")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "상대 활동 수준", exact: true }))
+    .toContainText("이전 분석에는 비교 데이터가 없습니다.");
   await page.getByRole("button", { name: "기여 인증서 발급하기" }).click();
   await page.getByRole("link", { name: /발급된 인증서 상세/ }).click();
 
