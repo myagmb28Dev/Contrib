@@ -98,7 +98,7 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
       <section className="card full-width">
         <div className="analysis-ai-block">
           <div className="ai-block-header">
-            <span className="ai-badge">AI 분석</span>
+            <h3 className="analysis-summary-heading">AI 분석</h3>
             <span className="analysis-period-tag">
               {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}
               {new Date(analysis.periodEnd).toLocaleDateString()}
@@ -110,11 +110,7 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
           </p>
 
           {analysis.technicalAreas && analysis.technicalAreas.length > 0 && (
-            <div className="area-tags">
-              {analysis.technicalAreas.map((area, idx) => (
-                <span key={idx}>{area}</span>
-              ))}
-            </div>
+            <p className="analysis-summary-areas">기술 영역: {analysis.technicalAreas.join(" · ")}</p>
           )}
         </div>
       </section>
