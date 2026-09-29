@@ -1401,10 +1401,16 @@ a {
   overflow-wrap: anywhere;
 }
 
-.certificate-comparison-details > summary {
-  cursor: pointer;
+.certificate-comparison-link {
+  align-self: flex-start;
   color: var(--muted);
   padding: 12px 0;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+#activity-comparison {
+  scroll-margin-top: 120px;
 }
 
 .certificate-stage {

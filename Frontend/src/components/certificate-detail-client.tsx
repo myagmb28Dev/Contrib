@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { createWalletClient, custom, type EIP1193Provider } from "viem";
 
 import { Breadcrumb } from "./breadcrumb";
-import { ActivityComparisonCard, ComparisonSummary } from "./activity-comparison";
+import { ComparisonSummary } from "./activity-comparison";
 import { certificateResult } from "@/lib/certificate-result";
 import { verificationStatusLabel } from "@/lib/verification-status";
 import {
@@ -304,10 +304,9 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       </section>
 
       {/* Attestation Details & Action Section */}
-      <details className="certificate-comparison-details">
-        <summary>산정 근거 확인</summary>
-        <ActivityComparisonCard comparison={result.comparison} />
-      </details>
+      <Link className="certificate-comparison-link" href={`/verify/${certificate.publicId}#activity-comparison`}>
+        산정 근거 확인
+      </Link>
       <section className="card full-width">
         <div className="card-header-simple">
           <h3>인증서 상세 메타데이터</h3>

@@ -11,13 +11,13 @@ export function ComparisonSummary({ comparison }: { comparison?: ActivityCompari
 }
 
 export function ActivityComparisonCard({ comparison }: { comparison?: ActivityComparison | null }) {
-  if (!comparison) return <section className="card stack" aria-label="상대 활동 수준">
+  if (!comparison) return <section id="activity-comparison" className="card stack" aria-label="상대 활동 수준">
     <h3>상대 활동 수준 · 실험적 백분위</h3>
     <p>이전 분석에는 비교 데이터가 없습니다. 새 분석을 실행하면 비교 가능 여부를 확인할 수 있습니다.</p>
     <p className="muted">이전 분석과 발급된 인증서 기록은 그대로 보존됩니다.</p>
   </section>;
   const available = comparison.status === "AVAILABLE" && comparison.percentile != null;
-  return <section className="card stack" aria-label="상대 활동 수준">
+  return <section id="activity-comparison" className="card stack" aria-label="상대 활동 수준">
     <h3>상대 활동 수준 · 실험적 백분위</h3>
     {available ? <div>
       <strong className="comparison-percentile">{comparison.percentile!.toFixed(1)}</strong> 백분위
