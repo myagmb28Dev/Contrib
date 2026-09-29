@@ -11,7 +11,6 @@ import com.example.project.github.client.GitHubApiClient;
 import com.example.project.github.dto.GitHubRepositoryDto;
 import com.example.project.github.dto.GitHubUserDto;
 import com.example.project.repository.domain.GitHubRepository;
-import com.example.project.analysis.dto.CreateAnalysisRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
@@ -65,13 +64,9 @@ class AnalysisPeriodResolverTest {
         assertThatThrownBy(() -> resolver.resolve(userId, repo, NOW, CREATED, false)).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test void jsonReadsGitHubCreatedAtAndFullHistoryRequestDoesNotRequireClientDates() throws Exception {
+    @Test void jsonReadsGitHubCreatedAt() throws Exception {
         var mapper = new ObjectMapper().findAndRegisterModules();
         var metadata = mapper.readValue("{\"id\":42,\"created_at\":\"2011-04-12T13:45:27Z\"}", GitHubRepositoryDto.class);
         assertThat(metadata.createdAt()).isEqualTo(CREATED);
-        var request = mapper.readValue("{\"allTime\":true}", CreateAnalysisRequest.class);
-        assertThat(request.isPeriodValid()).isTrue();
-        assertThat(new CreateAnalysisRequest(null, NOW).isPeriodValid()).isFalse();
-        assertThat(new CreateAnalysisRequest(NOW, CREATED).isPeriodValid()).isFalse();
     }
 }

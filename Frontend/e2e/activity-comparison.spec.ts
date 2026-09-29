@@ -81,20 +81,21 @@ test("legacy certificate with no recorded score never falls back to 80", async (
   await expect(page.locator(".comparison-percentile")).toHaveCount(0);
 });
 
-test("published period selection submits exact exclusive UTC boundaries", async ({ page }) => {
+test("published reference periods do not change the full-history-only form", async ({ page }) => {
   await fixtures(page, comparison);
   await page.route("**/api/public/benchmarks", route => route.fulfill({ json: [{ id: "summer", periodStart: "2026-06-01T00:00:00Z",
     periodEnd: "2026-09-01T00:00:00Z", collectedAt: "2026-09-29T00:00:00Z", repositoryCount: 12, languages: ["C#"] }] }));
   await page.route("**/api/repositories/repo", route => route.fulfill({ json: { id: "repo", name: "demo", defaultBranch: "main" } }));
   await page.route("**/api/repositories/repo/branches", route => route.fulfill({ json: ["main"] }));
-  let submitted: { periodStart: string; periodEnd: string } | null = null;
+  let submitted: Record<string, unknown> | null = null;
   await page.route("**/api/repositories/repo/analyses", route => {
     if (route.request().method() !== "POST") return route.fulfill({ json: [] });
     submitted = route.request().postDataJSON();
-    return route.fulfill({ json: { id: "job", status: "COMPLETED", progress: 100 } });
+    return route.fulfill({ json: { id: "job", status: "COMPLETED", progress: 100, periodStart: "2011-04-12T13:45:27Z", periodEnd: "2026-09-29T02:00:00Z" } });
   });
   await page.goto("/repositories/repo/analyze");
-  await page.getByRole("combobox", { name: "공개 비교 기간", exact: true }).selectOption("summer");
+  await expect(page.getByRole("combobox")).toHaveCount(0);
+  await expect(page.locator('input[type="date"]')).toHaveCount(0);
   await page.getByRole("button", { name: "기여 분석 시작하기", exact: true }).click();
-  await expect.poll(() => submitted).toMatchObject({ periodStart: "2026-06-01T00:00:00.000Z", periodEnd: "2026-09-01T00:00:00.000Z" });
+  await expect.poll(() => submitted).toEqual({ allTime: true });
 });

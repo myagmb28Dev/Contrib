@@ -63,7 +63,7 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     if (path === "/api/repositories/sync" && method === "POST") { repositorySynced = true; return json([repository()]); }
     if (path === `/api/repositories/${repositoryId}`) return json(repository());
     if (path === `/api/repositories/${repositoryId}/analyses` && method === "POST") {
-      expect(request.postDataJSON().periodEnd).toMatch(/T00:00:00\.000Z$/);
+      expect(request.postDataJSON()).toEqual({ allTime: true });
       return json(job("PENDING", 0));
     }
     if (path === `/api/analysis-jobs/${jobId}`) return json(job(++jobPolls > 1 ? "COMPLETED" : "ANALYZING", jobPolls > 1 ? 100 : 60));

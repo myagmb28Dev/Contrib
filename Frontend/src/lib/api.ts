@@ -232,14 +232,10 @@ export async function getAnalyses(): Promise<Analysis[]> {
   return apiJson("/api/analyses");
 }
 
-export type AnalysisPeriodRequest =
-  | { allTime: true }
-  | { periodStart: string; periodEnd: string; allTime?: false };
-
-export async function createAnalysis(repositoryId: string, period: AnalysisPeriodRequest): Promise<AnalysisJob> {
+export async function createAnalysis(repositoryId: string): Promise<AnalysisJob> {
   return apiJson(`/api/repositories/${repositoryId}/analyses`, {
     method: "POST",
-    body: JSON.stringify(period),
+    body: JSON.stringify({ allTime: true }),
   });
 }
 
