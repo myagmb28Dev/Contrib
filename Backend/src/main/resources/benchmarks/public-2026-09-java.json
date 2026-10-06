@@ -1,0 +1,1443 @@
+{
+  "schemaVersion" : "benchmark-v1",
+  "collectorVersion" : "github-v2",
+  "periodStart" : "2026-09-01T00:00:00Z",
+  "periodEnd" : "2026-10-01T00:00:00Z",
+  "collectedAt" : "2026-10-06T01:04:39.949517700Z",
+  "scope" : "Non-merge branch commits by author timestamp; PRs created in [start,end); merged is a subset of those PRs merged before end; submitted non-self reviews on those PRs only; UTC days; GitHub Bot type and [bot] suffix excluded; unique type/externalId; unknown authors excluded",
+  "repositories" : [ {
+    "fullName" : "FasterXML/jackson-core",
+    "language" : "Java",
+    "defaultBranch" : "3.x",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x1389b435fd8087ecd423cc7c474e881a0f9ab38a9e8762646a081807636ff3f4",
+    "contributors" : [ {
+      "githubId" : 55065,
+      "metrics" : {
+        "commits" : 64,
+        "pullRequestsOpened" : 8,
+        "reviews" : 19,
+        "activeDays" : 17
+      }
+    }, {
+      "githubId" : 129097,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 2645794,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 5340827,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 11783444,
+      "metrics" : {
+        "commits" : 13,
+        "pullRequestsOpened" : 14,
+        "reviews" : 3,
+        "activeDays" : 10
+      }
+    }, {
+      "githubId" : 13125299,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 28924511,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 61664693,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 3,
+        "reviews" : 0,
+        "activeDays" : 4
+      }
+    }, {
+      "githubId" : 121621378,
+      "metrics" : {
+        "commits" : 6,
+        "pullRequestsOpened" : 7,
+        "reviews" : 0,
+        "activeDays" : 9
+      }
+    }, {
+      "githubId" : 169331997,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "FasterXML/jackson-databind",
+    "language" : "Java",
+    "defaultBranch" : "3.x",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x16cbc906859d0bcfb6bcb4e4d41a65fe50bf97dd2e9b3142091ec97567d31a86",
+    "contributors" : [ {
+      "githubId" : 55065,
+      "metrics" : {
+        "commits" : 76,
+        "pullRequestsOpened" : 11,
+        "reviews" : 28,
+        "activeDays" : 23
+      }
+    }, {
+      "githubId" : 129097,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 2645794,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 11783444,
+      "metrics" : {
+        "commits" : 15,
+        "pullRequestsOpened" : 18,
+        "reviews" : 1,
+        "activeDays" : 17
+      }
+    }, {
+      "githubId" : 13125299,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 14319020,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 43563245,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 59840433,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 61615301,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 5,
+        "activeDays" : 4
+      }
+    }, {
+      "githubId" : 61664693,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 4,
+        "reviews" : 0,
+        "activeDays" : 5
+      }
+    }, {
+      "githubId" : 98083809,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 108627530,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 121621378,
+      "metrics" : {
+        "commits" : 4,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 4
+      }
+    }, {
+      "githubId" : 133275400,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 218341304,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 300032808,
+      "metrics" : {
+        "commits" : 8,
+        "pullRequestsOpened" : 4,
+        "reviews" : 0,
+        "activeDays" : 9
+      }
+    } ]
+  }, {
+    "fullName" : "apache/commons-codec",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x755b5dfa74d097f5701691e87bc213bae06e048196004d7b46fd34c47e0b7483",
+    "contributors" : [ {
+      "githubId" : 1187639,
+      "metrics" : {
+        "commits" : 43,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 11
+      }
+    }, {
+      "githubId" : 16929288,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 72094408,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 85593689,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    } ]
+  }, {
+    "fullName" : "apache/commons-collections",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x1a16fdaf4ffa5c90f626d0d3769d7ca1b85155219fb7fac9612557c3b2e69833",
+    "contributors" : [ {
+      "githubId" : 1187639,
+      "metrics" : {
+        "commits" : 12,
+        "pullRequestsOpened" : 1,
+        "reviews" : 1,
+        "activeDays" : 6
+      }
+    }, {
+      "githubId" : 16929288,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 85593689,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 164054284,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 6,
+        "reviews" : 0,
+        "activeDays" : 6
+      }
+    } ]
+  }, {
+    "fullName" : "apache/commons-compress",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xec8765ce5f8bfba0c9a6655c8aa0da9f22b10cd656b43a200b66d222a593a575",
+    "contributors" : [ {
+      "githubId" : 1098563,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 1187639,
+      "metrics" : {
+        "commits" : 10,
+        "pullRequestsOpened" : 1,
+        "reviews" : 3,
+        "activeDays" : 8
+      }
+    }, {
+      "githubId" : 1991279,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 85593689,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 91586446,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 291731786,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    } ]
+  }, {
+    "fullName" : "apache/commons-csv",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xdefe39d5661cd96949ba99d3682dfc14ae42ff86ce9c416678774fa1cad34a11",
+    "contributors" : [ {
+      "githubId" : 1187639,
+      "metrics" : {
+        "commits" : 9,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 5
+      }
+    }, {
+      "githubId" : 85593689,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 221401595,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 1,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "apache/commons-io",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xff660a4df954fbef1c5bfdb5ade614deafc0ccce8d8fc4871f1d8d62067e2bab",
+    "contributors" : [ {
+      "githubId" : 1187639,
+      "metrics" : {
+        "commits" : 12,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 6
+      }
+    }, {
+      "githubId" : 2645794,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 43563245,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 72094408,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 85593689,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 3,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 241067893,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "apache/commons-lang",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x3efe3e83a8d7211bd4cf211a315fef22064574b53210b95a0c8dc5183d8bd3b4",
+    "contributors" : [ {
+      "githubId" : 1187639,
+      "metrics" : {
+        "commits" : 271,
+        "pullRequestsOpened" : 3,
+        "reviews" : 6,
+        "activeDays" : 19
+      }
+    }, {
+      "githubId" : 12533274,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 1,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 25210161,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 3,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 44335787,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 50839256,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 5,
+        "reviews" : 0,
+        "activeDays" : 6
+      }
+    }, {
+      "githubId" : 72094408,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 85593689,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 3,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 102255512,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 109909013,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 134488140,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 173074125,
+      "metrics" : {
+        "commits" : 5,
+        "pullRequestsOpened" : 5,
+        "reviews" : 0,
+        "activeDays" : 9
+      }
+    }, {
+      "githubId" : 175680264,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 205395372,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 238150157,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 308988582,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "apache/commons-text",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x30238166433a1535af83a3f6a3f49c8f01b439e8486d12a114b32c7fdca52d9d",
+    "contributors" : [ {
+      "githubId" : 1187639,
+      "metrics" : {
+        "commits" : 13,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 7
+      }
+    }, {
+      "githubId" : 11318335,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 12533274,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 16929288,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 85593689,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 3,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 152949293,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 188135055,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 285137472,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "checkstyle/checkstyle",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xe2fe46b776efd58e30323a163e68a86d7f700dc4c268f16c577aeac538adab61",
+    "contributors" : [ {
+      "githubId" : 513280,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 812984,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 287,
+        "activeDays" : 30
+      }
+    }, {
+      "githubId" : 2093023,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 3242828,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 10319606,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 12560035,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 23459549,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 4,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 60572517,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 2,
+        "activeDays" : 4
+      }
+    }, {
+      "githubId" : 61664693,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 62730021,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 69793926,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 84632330,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 86732242,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 97340777,
+      "metrics" : {
+        "commits" : 68,
+        "pullRequestsOpened" : 72,
+        "reviews" : 1,
+        "activeDays" : 20
+      }
+    }, {
+      "githubId" : 98531258,
+      "metrics" : {
+        "commits" : 6,
+        "pullRequestsOpened" : 5,
+        "reviews" : 1,
+        "activeDays" : 7
+      }
+    }, {
+      "githubId" : 98732490,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 108231307,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 110641719,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 120978249,
+      "metrics" : {
+        "commits" : 4,
+        "pullRequestsOpened" : 8,
+        "reviews" : 0,
+        "activeDays" : 5
+      }
+    }, {
+      "githubId" : 121760872,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 122873385,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 129817147,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 6,
+        "reviews" : 2,
+        "activeDays" : 8
+      }
+    }, {
+      "githubId" : 133275400,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 133696105,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 4,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 134440439,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 3,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 137520241,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 5,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 145776561,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 4,
+        "reviews" : 22,
+        "activeDays" : 8
+      }
+    }, {
+      "githubId" : 163771854,
+      "metrics" : {
+        "commits" : 12,
+        "pullRequestsOpened" : 14,
+        "reviews" : 0,
+        "activeDays" : 11
+      }
+    }, {
+      "githubId" : 165323707,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 174347974,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 3,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 177908686,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 178012652,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 178699438,
+      "metrics" : {
+        "commits" : 8,
+        "pullRequestsOpened" : 11,
+        "reviews" : 0,
+        "activeDays" : 12
+      }
+    }, {
+      "githubId" : 179311294,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 180004567,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 4,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 180424460,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 180719143,
+      "metrics" : {
+        "commits" : 21,
+        "pullRequestsOpened" : 18,
+        "reviews" : 4,
+        "activeDays" : 13
+      }
+    }, {
+      "githubId" : 184631396,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 4,
+        "activeDays" : 4
+      }
+    }, {
+      "githubId" : 184720669,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 185678965,
+      "metrics" : {
+        "commits" : 6,
+        "pullRequestsOpened" : 6,
+        "reviews" : 0,
+        "activeDays" : 6
+      }
+    }, {
+      "githubId" : 193730213,
+      "metrics" : {
+        "commits" : 6,
+        "pullRequestsOpened" : 7,
+        "reviews" : 0,
+        "activeDays" : 9
+      }
+    }, {
+      "githubId" : 195946957,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 4,
+        "reviews" : 1,
+        "activeDays" : 5
+      }
+    }, {
+      "githubId" : 213936784,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 2,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 221589867,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 222474436,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 230964507,
+      "metrics" : {
+        "commits" : 24,
+        "pullRequestsOpened" : 31,
+        "reviews" : 1,
+        "activeDays" : 12
+      }
+    }, {
+      "githubId" : 234345224,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 235147412,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 258577714,
+      "metrics" : {
+        "commits" : 9,
+        "pullRequestsOpened" : 11,
+        "reviews" : 0,
+        "activeDays" : 8
+      }
+    }, {
+      "githubId" : 273722803,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 278294222,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 280904921,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 6,
+        "reviews" : 0,
+        "activeDays" : 5
+      }
+    }, {
+      "githubId" : 295502513,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "google/google-java-format",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xc2deb5a3504498859ffa97cf3136106f33d7c85dbbd99312ab23bce7ec4e6348",
+    "contributors" : [ {
+      "githubId" : 984737,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 1307726,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 5246810,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 67022294,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 192965994,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 221446036,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "mockito/mockito",
+    "language" : "Java",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xf4e7a6a68fe115f5271b97d3c2385c9a786c9bb7406b7fb6315c9150ac8c4d4f",
+    "contributors" : [ {
+      "githubId" : 2013015,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 2121139,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 4175097,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 38503900,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 98877942,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 142774891,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "spotbugs/spotbugs",
+    "language" : "Java",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x792aef84ff595be76a0a966d8aec9c8cb041ee8b392aeb2e87ff0dbec5729ba2",
+    "contributors" : [ {
+      "githubId" : 803621,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 975267,
+      "metrics" : {
+        "commits" : 11,
+        "pullRequestsOpened" : 13,
+        "reviews" : 29,
+        "activeDays" : 13
+      }
+    }, {
+      "githubId" : 1573684,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 3080440,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 23,
+        "activeDays" : 10
+      }
+    }, {
+      "githubId" : 3242828,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 6949813,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 8383373,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 1,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 9577484,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 19286898,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 38391992,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 38503900,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 40510713,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 41498538,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 42279106,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 46843689,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 57435526,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 61664693,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 63867979,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 74539005,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 84632330,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 86775455,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 123470644,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 4,
+        "reviews" : 30,
+        "activeDays" : 17
+      }
+    }, {
+      "githubId" : 177599791,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 186836938,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 217034332,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 221589867,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 3,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    } ]
+  } ]
+}

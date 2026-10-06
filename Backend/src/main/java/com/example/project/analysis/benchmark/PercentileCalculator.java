@@ -15,11 +15,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PercentileCalculator {
-    public static final String VERSION = "activity-percentile-v1";
+    public static final String VERSION = "activity-percentile-v2";
     public static final int MIN_CONTRIBUTORS = 20;
     public static final int MIN_REPOSITORIES = 3;
     public static final List<String> METRICS = List.of("commits", "pullRequestsOpened", "reviews", "activeDays");
-    public static final String RULES = "Exact UTC [start,end), same primary language and active-contributor band (1-9/10-49/50+); "
+    public static final String RULES = "Full-history collection; percentile uses a fully covered closed UTC reference [start,end) "
+            + "and subject activity and active-contributor band from only that period; same primary language and band (1-9/10-49/50+); "
             + "public non-fork non-archived default branches only; exclude subject across all reference repositories; "
             + "one contributor has total weight 1 divided across their repository observations; "
             + "metric midrank=100*(weighted below+0.5*weighted equal)/total weight; "
@@ -37,7 +38,7 @@ public class PercentileCalculator {
         if (!context.comparable()) return unavailable("UNSUPPORTED_SCOPE", context, dataset, datasetId, context.unavailableReason());
         if (!subject.hasActivity()) return unavailable("NO_ACTIVITY", context, dataset, datasetId, "분석 기간에 확인된 활동이 없어 백분위를 계산하지 않습니다.");
         if (dataset == null || !dataset.periodStart().equals(context.start()) || !dataset.periodEnd().equals(context.end()))
-            return unavailable("NO_REFERENCE_PERIOD", context, null, null, "분석 기간과 정확히 일치하는 공개 비교 데이터가 없습니다.");
+            return unavailable("NO_REFERENCE_PERIOD", context, null, null, "전체 분석 기간에 포함되는 공개 비교 데이터가 없습니다.");
         String band = BenchmarkDataset.sizeBand(context.activeContributors());
         var matching = dataset.repositories().stream().filter(r -> r.complete() && r.publicRepository() && !r.fork() && !r.archived()
                 && context.language() != null && context.language().equals(r.language())
