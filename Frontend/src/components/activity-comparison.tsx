@@ -10,13 +10,18 @@ export function ComparisonSummary({ comparison }: { comparison?: ActivityCompari
     : comparison ? "백분위 산정 보류" : "이전 분석 · 백분위 없음"}</span>;
 }
 
-export function ActivityComparisonCard({ comparison }: { comparison?: ActivityComparison | null }) {
+type AnalysisPeriod = { start: string; end: string };
+
+export function ActivityComparisonCard({ comparison, analysisPeriod }: {
+  comparison?: ActivityComparison | null; analysisPeriod?: AnalysisPeriod | null;
+}) {
   if (!comparison) return <section id="activity-comparison" className="card stack" aria-label="상대 활동 수준">
     <h3>상대 활동 수준 · 백분위</h3>
     <p>이전 분석에는 비교 데이터가 없습니다. 새 분석을 실행하면 비교 가능 여부를 확인할 수 있습니다.</p>
     <p className="muted">이전 분석과 발급된 인증서 기록은 그대로 보존됩니다.</p>
   </section>;
   const available = comparison.status === "AVAILABLE" && comparison.percentile != null;
+  const distinctPeriods = analysisPeriod && (analysisPeriod.start !== comparison.periodStart || analysisPeriod.end !== comparison.periodEnd);
   return <section id="activity-comparison" className="card stack" aria-label="상대 활동 수준">
     <h3>상대 활동 수준 · 백분위</h3>
     {!available && <strong>백분위 산정 보류</strong>}
@@ -25,7 +30,8 @@ export function ActivityComparisonCard({ comparison }: { comparison?: ActivityCo
       유의: 비교 표본에 따라 작은 활동 차이에도 백분위가 달라질 수 있습니다.
     </p>}
     <dl className="identity-list">
-      <div><dt>분석 기간 (UTC · 종료 제외)</dt><dd>{comparison.periodStart} ~ {comparison.periodEnd}</dd></div>
+      {distinctPeriods && <div><dt>전체 분석 기간 (UTC)</dt><dd>{analysisPeriod.start} ~ {analysisPeriod.end}</dd></div>}
+      <div><dt>백분위 비교 기간 (UTC · 종료 제외)</dt><dd>{comparison.periodStart} ~ {comparison.periodEnd}</dd></div>
       <div><dt>비교 조건</dt><dd>{comparison.language ?? "언어 미확인"} · 활동 기여자 {comparison.sizeBand}명 규모의 공개 저장소</dd></div>
       <div><dt>비교 표본</dt><dd>{comparison.repositories.length}개 저장소 · {comparison.contributorCount}명 · 기여자와 저장소 조합 {comparison.sampleCount}건</dd></div>
     </dl>

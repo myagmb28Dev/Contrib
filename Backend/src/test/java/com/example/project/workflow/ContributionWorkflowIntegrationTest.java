@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -99,7 +100,7 @@ class ContributionWorkflowIntegrationTest {
         var certificate = certificateService.create(principal.getUserId(), analysis.id(), SUBJECT);
         assertThat(certificate.schemaVersion()).isEqualTo("1.1");
         assertThat(certificate.payload().path("result").path("activityComparison").path("modelVersion").asText())
-                .isEqualTo("activity-percentile-v1");
+                .isEqualTo("activity-percentile-v2");
         assertThat(verificationService.verify(certificate.publicId()).status())
                 .isEqualTo(VerificationStatus.NOT_REGISTERED);
         var intent = blockchainService.intent(principal.getUserId(), certificate.id());
@@ -207,6 +208,46 @@ class ContributionWorkflowIntegrationTest {
         waitForCompletion(job.id());
         org.mockito.Mockito.verify(gitHubApiClient).getCommits("history-token", "history-user", "history", "main", createdAt, job.periodEnd());
         assertThat(repositoryService.get(principal.getUserId(), repo.id()).githubCreatedAt()).isEqualTo(createdAt);
+    }
+
+    @Test
+    void fullHistoryJavaAnalysisUsesAClosedReferenceWindowAndFreezesBothPeriodsInCertificate() throws Exception {
+        var principal = accountConnectionService.connect(new GitHubProfile(44001L, "reference-user", null),
+                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        when(accessTokenService.getValidAccessToken(principal.getUserId())).thenReturn("reference-token");
+        var owner = new GitHubUserDto(44001L, "reference-user", "User");
+        var createdAt = Instant.parse("2026-08-14T01:02:31Z");
+        var referenceStart = Instant.parse("2026-09-01T00:00:00Z");
+        var referenceEnd = Instant.parse("2026-10-01T00:00:00Z");
+        var repoDto = new GitHubRepositoryDto(44002L, owner, "reference", "reference-user/reference",
+                "https://github.com/reference-user/reference", false, "main", "Java", false, false, createdAt);
+        when(gitHubApiClient.getPublicRepositories("reference-token")).thenReturn(List.of(repoDto));
+        when(gitHubApiClient.getRepository("reference-token", "reference-user", "reference")).thenReturn(repoDto);
+        var before = new com.example.project.github.dto.GitHubCommitDto("before", owner,
+                new com.example.project.github.dto.GitHubCommitDto.CommitData(
+                        new com.example.project.github.dto.GitHubCommitDto.CommitAuthor(createdAt.plusSeconds(1)), "before"), List.of());
+        var inside = new com.example.project.github.dto.GitHubCommitDto("inside", owner,
+                new com.example.project.github.dto.GitHubCommitDto.CommitData(
+                        new com.example.project.github.dto.GitHubCommitDto.CommitAuthor(referenceStart.plusSeconds(1)), "inside"), List.of());
+        when(gitHubApiClient.getCommits(eq("reference-token"), eq("reference-user"), eq("reference"), eq("main"),
+                eq(createdAt), any())).thenReturn(List.of(before, inside));
+        when(gitHubApiClient.getCommits("reference-token", "reference-user", "reference", "main", referenceStart, referenceEnd))
+                .thenReturn(List.of(inside));
+        when(gitHubApiClient.getCommit(eq("reference-token"), eq("reference-user"), eq("reference"), anyString()))
+                .thenReturn(new com.example.project.github.dto.GitHubCommitDetailDto("detail", null, List.of()));
+        var repository = repositoryService.synchronize(principal.getUserId()).get(0);
+        var job = analysisService.create(principal.getUserId(), repository.id(), null, null, true);
+        waitForCompletion(job.id());
+        var analysis = analysisService.listForRepository(principal.getUserId(), repository.id()).get(0);
+        assertThat(analysis.periodStart()).isEqualTo(createdAt);
+        assertThat(analysis.metrics().path("commits").asInt()).isEqualTo(2);
+        assertThat(analysis.activityComparison().path("status").asText()).isEqualTo("AVAILABLE");
+        assertThat(analysis.activityComparison().path("periodStart").asText()).isEqualTo(referenceStart.toString());
+        assertThat(analysis.activityComparison().path("periodEnd").asText()).isEqualTo(referenceEnd.toString());
+        assertThat(analysis.activityComparison().path("modelVersion").asText()).isEqualTo("activity-percentile-v2");
+        var certificate = certificateService.create(principal.getUserId(), analysis.id(), null);
+        assertThat(certificate.payload().path("period").path("start").asText()).isEqualTo(createdAt.toString());
+        assertThat(certificate.payload().path("result").path("activityComparison")).isEqualTo(analysis.activityComparison());
     }
 
     private void waitForCompletion(java.util.UUID jobId) throws InterruptedException {

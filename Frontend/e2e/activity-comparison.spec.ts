@@ -29,13 +29,14 @@ async function fixtures(page: Page, result: unknown, certificateScore: number | 
     if (path === "/api/auth/me") return json({ userId: "user", githubUserId: 1, githubUsername: "person", email: null });
     if (path === "/api/auth/csrf") return json({ headerName: "X-XSRF-TOKEN", token: "test" });
     if (path === "/api/analyses/analysis") return json({ id: "analysis", jobId: "job", repositoryId: "repo",
-      periodStart: comparison.periodStart, periodEnd: comparison.periodEnd,
+      periodStart: "2026-07-01T00:00:00Z", periodEnd: "2026-10-01T00:00:00Z",
       metrics: { commits: 4, pullRequestsOpened: 2, reviews: 1, activeDays: 3 }, score: 42,
       scoreVersion: "score-v1", calculationRules: "v1", technicalAreas: [], summary: null, activityComparison: result });
     if (path.endsWith("/verification")) return json({ status: "NOT_REGISTERED", publicId: "public", storedHash: "0xabc", calculatedHash: "0xabc" });
     if (path.endsWith("/attestation")) return json({}, 404);
     if (path.includes("/certificates/")) return json({ id: "certificate", publicId: "public", analysisId: "analysis",
-      schemaVersion: "1.1", payload: { repository: { fullName: "owner/demo" }, result: {
+      schemaVersion: "1.1", payload: { repository: { fullName: "owner/demo" },
+        period: { start: "2026-07-01T00:00:00Z", end: "2026-10-01T00:00:00Z" }, result: {
         ...(certificateScore === null ? {} : { score: certificateScore }), activityComparison: result,
       } }, hash: "0xabc", status: "ISSUED", issuedAt: "2026-09-02T00:00:00Z", subjectWalletAddress: null });
     return json({}, 404);
@@ -48,6 +49,8 @@ test("explains percentile, cohort, sensitivity and reference data without the le
   const card = page.getByRole("region", { name: "상대 활동 수준", exact: true });
   await expect(card.getByRole("row", { name: "종합 활동 80.0 종합 결과" })).toBeVisible();
   await expect(card.getByRole("row", { name: "커밋 75.0 25%" })).toBeVisible();
+  await expect(card.getByText("전체 분석 기간 (UTC)")).toBeVisible();
+  await expect(card.getByText("백분위 비교 기간 (UTC · 종료 제외)")).toBeVisible();
   await expect(card).toContainText("30명");
   await expect(card.getByRole("note")).toHaveText("유의: 비교 표본에 따라 작은 활동 차이에도 백분위가 달라질 수 있습니다.");
   await expect(page.getByRole("button", { name: "사용자 메뉴 열기" })).toHaveCount(0);
@@ -73,6 +76,7 @@ test("nested certificate payload shows only the frozen comparison publicly", asy
   await expect(page.locator(".certificate-repository strong")).toHaveText("owner/demo");
   await expect(page.getByRole("region", { name: "인증서 미리보기" })).toBeVisible();
   await expect(page.locator(".certificate-document-percentile strong")).toHaveText("80.0");
+  await expect(page.getByRole("region", { name: "인증서 미리보기" }).getByText("전체 분석 기간 (UTC)")).toBeVisible();
   await expect(page.getByRole("region", { name: "상대 활동 수준" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "산정 근거 확인", exact: true })).toHaveCount(0);
   await page.getByRole("link", { name: "공개 검증 화면 열기", exact: true }).click();

@@ -47,6 +47,14 @@ public class BenchmarkCatalog {
         return entries.stream().filter(e -> e.dataset().periodStart().equals(start)
                 && e.dataset().periodEnd().equals(end)).findFirst().orElse(null);
     }
+    public Entry latestCovered(Instant start, Instant end, String language) {
+        if (language == null || language.isBlank()) return null;
+        return entries.stream().filter(e -> !e.dataset().periodStart().isBefore(start)
+                        && !e.dataset().periodEnd().isAfter(end)
+                        && e.dataset().repositories().stream().anyMatch(r -> language.equals(r.language())))
+                .max(Comparator.comparing((Entry e) -> e.dataset().periodEnd())
+                        .thenComparing(e -> e.dataset().periodStart(), Comparator.reverseOrder())).orElse(null);
+    }
     public static void validate(BenchmarkDataset dataset) {
         if (!"benchmark-v1".equals(dataset.schemaVersion()) || !RepositoryActivityCollector.VERSION.equals(dataset.collectorVersion())
                 || !RepositoryActivityCollector.SCOPE.equals(dataset.scope()) || dataset.periodStart() == null

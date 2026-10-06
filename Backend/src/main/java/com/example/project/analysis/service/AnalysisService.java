@@ -72,7 +72,7 @@ public class AnalysisService {
         periodStart = period.start();
         periodEnd = period.end();
         String targetBranch = ANALYSIS_BRANCH;
-        var reference = benchmarkCatalog.forPeriod(periodStart, periodEnd);
+        var reference = benchmarkCatalog.latestCovered(periodStart, periodEnd, repository.getLanguage());
         String pipelineVersion = pipelineVersion(reference == null ? "none" : reference.id());
         var existing = jobRepository.findByUserIdAndRepositoryIdAndPeriodStartAndPeriodEndAndCollectorVersionAndTargetBranch(
                 userId, repositoryId, periodStart, periodEnd, pipelineVersion, targetBranch);

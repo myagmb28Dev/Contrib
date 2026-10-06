@@ -96,7 +96,8 @@ export function VerificationClient({ publicId }: { publicId: string }) {
       </section>
 
       {/* Hash Verification Breakdown */}
-      {certificate && <ActivityComparisonCard comparison={certificateResult(certificate).comparison} />}
+      {certificate && <ActivityComparisonCard comparison={certificateResult(certificate).comparison}
+        analysisPeriod={certificateResult(certificate).analysisPeriod} />}
       <section className="card full-width">
         <div className="card-header-simple">
           <h3>암호학적 해시 무결성 검증</h3>

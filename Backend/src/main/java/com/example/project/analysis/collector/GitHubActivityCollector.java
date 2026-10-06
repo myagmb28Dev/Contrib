@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.example.project.analysis.domain.AnalysisJob;
+import com.example.project.analysis.benchmark.BenchmarkCatalog;
+import com.example.project.analysis.benchmark.ActivityVector;
 import com.example.project.auth.service.GitHubAccessTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
@@ -16,17 +18,20 @@ public class GitHubActivityCollector {
     private final RepositoryActivityCollector collector;
     private final GitHubAccessTokenService tokens;
     private final ObjectMapper mapper;
+    private final BenchmarkCatalog benchmarkCatalog;
 
     public GitHubActivityCollector(RepositoryActivityCollector collector, GitHubAccessTokenService tokens,
-            ObjectMapper mapper) {
+            ObjectMapper mapper, BenchmarkCatalog benchmarkCatalog) {
         this.collector = collector;
         this.tokens = tokens;
         this.mapper = mapper;
+        this.benchmarkCatalog = benchmarkCatalog;
     }
 
     public CollectedSnapshot collect(AnalysisJob job, long subjectGithubId) {
         var requested = job.getRepository();
-        var collected = collector.collect(tokens.getValidAccessToken(job.getUser().getId()),
+        String token = tokens.getValidAccessToken(job.getUser().getId());
+        var collected = collector.collect(token,
                 requested.getOwnerLogin(), requested.getName(), job.getTargetBranch(),
                 job.getPeriodStart(), job.getPeriodEnd(), subjectGithubId);
         var repo = collected.repository();
@@ -41,6 +46,21 @@ public class GitHubActivityCollector {
         metadata.put("fork", repo.fork());
         metadata.put("archived", repo.archived());
         metadata.put("activeContributors", collected.activities().stream().map(CollectedActivity::authorGithubId).distinct().count());
+        var reference = benchmarkCatalog.latestCovered(job.getPeriodStart(), job.getPeriodEnd(), repo.language());
+        if (reference != null && !repo.privateRepository() && !repo.fork() && !repo.archived()
+                && collected.branch().equals(repo.defaultBranch())) {
+            var referenceStart = reference.dataset().periodStart();
+            var referenceEnd = reference.dataset().periodEnd();
+            // Collect the reference window separately: reviews on PRs opened before this window
+            // belong to the full-history snapshot but not to the published reference scope.
+            var referenceCollection = collector.collect(token, requested.getOwnerLogin(), requested.getName(),
+                    collected.branch(), referenceStart, referenceEnd, null);
+            metadata.put("referenceDatasetId", reference.id());
+            metadata.put("referenceActiveContributors", referenceCollection.activities().stream()
+                    .map(CollectedActivity::authorGithubId).distinct().count());
+            metadata.put("referenceMetrics", ActivityVector.from(referenceCollection.activities().stream()
+                    .filter(a -> a.authorGithubId() == subjectGithubId).toList()));
+        }
         metadata.put("scope", RepositoryActivityCollector.SCOPE);
         metadata.put("subjectGithubId", subjectGithubId);
         metadata.put("periodStart", job.getPeriodStart().toString());

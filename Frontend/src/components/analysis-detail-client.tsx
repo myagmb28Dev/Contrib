@@ -94,7 +94,8 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
       />
 
       {/* Hero Score & AI Summary Card */}
-      <ActivityComparisonCard comparison={analysis.activityComparison} />
+      <ActivityComparisonCard comparison={analysis.activityComparison}
+        analysisPeriod={{ start: analysis.periodStart, end: analysis.periodEnd }} />
       <section className="card full-width">
         <div className="analysis-ai-block">
           <div className="ai-block-header">

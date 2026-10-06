@@ -275,8 +275,15 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
 
           {result.comparison && (
             <dl className="certificate-document-facts">
+              {result.analysisPeriod && (result.analysisPeriod.start !== result.comparison.periodStart
+                || result.analysisPeriod.end !== result.comparison.periodEnd) && (
+                <div>
+                  <dt>전체 분석 기간 (UTC)</dt>
+                  <dd>{result.analysisPeriod.start} ~ {result.analysisPeriod.end}</dd>
+                </div>
+              )}
               <div>
-                <dt>분석 기간 (UTC · 종료 제외)</dt>
+                <dt>백분위 비교 기간 (UTC · 종료 제외)</dt>
                 <dd>{result.comparison.periodStart} ~ {result.comparison.periodEnd}</dd>
               </div>
               <div>
