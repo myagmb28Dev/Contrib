@@ -174,7 +174,7 @@ export function AnalysesClient() {
                 <thead>
                   <tr>
                     <th>저장소</th>
-                    <th>실험적 백분위</th>
+                    <th>백분위</th>
                     <th>분석 기간</th>
                     <th>AI 요약 & 기술 영역</th>
                     <th style={{ textAlign: "right" }}>작업</th>

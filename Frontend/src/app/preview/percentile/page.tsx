@@ -31,7 +31,7 @@ export default function PercentilePreviewPage() {
   return <main className="shell narrow-shell stack" style={{ paddingTop: 32, paddingBottom: 32 }}>
     <header>
       <p className="eyebrow">SAMPLE PREVIEW</p>
-      <h1>실험적 백분위 미리보기</h1>
+      <h1>백분위 미리보기</h1>
       <p className="muted">아래 숫자는 화면 확인용 샘플입니다. 실제 분석이나 인증서 발급은 실행하지 않습니다.</p>
     </header>
     <ActivityComparisonCard comparison={sample} />

@@ -261,7 +261,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
 
           <div className="certificate-score-row">
             <div className="stack">
-              <span>실험적 백분위</span>
+              <span>백분위</span>
               {result.comparison?.status === "AVAILABLE" && result.comparison.percentile !== null ? (
                 <p className="certificate-document-percentile">
                   <strong>{result.comparison.percentile.toFixed(1)}</strong> 백분위

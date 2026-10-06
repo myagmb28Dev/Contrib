@@ -234,7 +234,7 @@ export function CertificatesClient() {
                 <thead>
                   <tr>
                     <th>저장소</th>
-                    <th>실험적 백분위</th>
+                    <th>백분위</th>
                     <th>증명서 상태</th>
                     <th>공개 검증 ID (복사)</th>
                     <th>발급 일시</th>

@@ -14,7 +14,7 @@ const comparison = {
 test("isolated preview shows only a clearly labelled percentile sample", async ({ page }) => {
   await page.route("**/api/**", route => route.fulfill({ status: 401, json: { message: "preview has no session" } }));
   await page.goto("/preview/percentile");
-  await expect(page.getByRole("heading", { name: "실험적 백분위 미리보기", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "백분위 미리보기", exact: true })).toBeVisible();
   await expect(page.getByRole("row", { name: "종합 활동 80.0 종합 결과" })).toBeVisible();
   await expect(page.getByText("미리보기용 샘플입니다. 실제 GitHub 기여 분석 결과가 아닙니다.", { exact: true })).toBeVisible();
   await expect(page.getByText("실험적 활동 점수 v1", { exact: true })).toHaveCount(0);
@@ -49,7 +49,8 @@ test("explains percentile, cohort, sensitivity and reference data without the le
   await expect(card.getByRole("row", { name: "종합 활동 80.0 종합 결과" })).toBeVisible();
   await expect(card.getByRole("row", { name: "커밋 75.0 25%" })).toBeVisible();
   await expect(card).toContainText("30명");
-  await expect(card.getByRole("note")).toContainText("30.0백분위");
+  await expect(card.getByRole("note")).toHaveText("유의: 비교 표본에 따라 작은 활동 차이에도 백분위가 달라질 수 있습니다.");
+  await expect(page.getByRole("button", { name: "사용자 메뉴 열기" })).toHaveCount(0);
   await card.getByText("산정 기준과 비교 데이터 확인", { exact: true }).click();
   await expect(card.getByRole("link", { name: /사용된 공개 비교 데이터/ })).toHaveAttribute("href", "/api/public/benchmarks/0xreference");
   await expect(page.getByText("실험적 활동 점수 v1", { exact: true })).toHaveCount(0);
