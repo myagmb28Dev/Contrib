@@ -1,0 +1,849 @@
+{
+  "schemaVersion" : "benchmark-v1",
+  "collectorVersion" : "github-v2",
+  "periodStart" : "2026-06-01T00:00:00Z",
+  "periodEnd" : "2026-09-01T00:00:00Z",
+  "collectedAt" : "2026-09-29T00:12:11.692103100Z",
+  "scope" : "Non-merge branch commits by author timestamp; PRs created in [start,end); merged is a subset of those PRs merged before end; submitted non-self reviews on those PRs only; UTC days; GitHub Bot type and [bot] suffix excluded; unique type/externalId; unknown authors excluded",
+  "repositories" : [ {
+    "fullName" : "CommunityToolkit/Maui",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x4921d69cf166d421b8d28a505eaaa14e17bfb52f6d59cacec9c70b9da8482c36",
+    "contributors" : [ {
+      "githubId" : 939291,
+      "metrics" : {
+        "commits" : 5,
+        "pullRequestsOpened" : 5,
+        "reviews" : 0,
+        "activeDays" : 7
+      }
+    }, {
+      "githubId" : 4167863,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 4,
+        "reviews" : 1,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 5613809,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 1,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 13558917,
+      "metrics" : {
+        "commits" : 12,
+        "pullRequestsOpened" : 3,
+        "reviews" : 20,
+        "activeDays" : 21
+      }
+    }, {
+      "githubId" : 17139988,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 2,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 20712372,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 9,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 33021114,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 8,
+        "activeDays" : 7
+      }
+    }, {
+      "githubId" : 34342210,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 42434498,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 1,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 59129932,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 6,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 96324819,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 125977679,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 148586208,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 1,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "CommunityToolkit/dotnet",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xd28c30e7880292c9cc69cf249fc5649fb5cb360162ade3f1c2e40b9abc81b823",
+    "contributors" : [ {
+      "githubId" : 17328,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 5876745,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 10291845,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 50116371,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 172600104,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "Cysharp/MemoryPack",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x3c90a32453fa5a507fc5cf9a926073dbcaefad937b0c508077d95c7764ee5ef9",
+    "contributors" : [ {
+      "githubId" : 3856350,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 12390182,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 13633343,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 54728594,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 87885053,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 97292941,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 116878849,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "Cysharp/UniTask",
+    "language" : "C#",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x7cbda779a0fb48241ea65fecc231fbdc2454338e376307257f262849cb3aa42b",
+    "contributors" : [ {
+      "githubId" : 3856350,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 10895811,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 17642311,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 1,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 136226278,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "DapperLib/Dapper",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xc63b5481152d9a4c9d4843eb0f55adbe2fbfe20b91d496cde10bcfdaaf7fcab3",
+    "contributors" : [ {
+      "githubId" : 17328,
+      "metrics" : {
+        "commits" : 6,
+        "pullRequestsOpened" : 5,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 677513,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 1437816,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 1935022,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 8040367,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 38680988,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 117615053,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 287222957,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "FluentValidation/FluentValidation",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x7d21d6ead88a1455fa830fabba7fe0080afc1b0644bdc2208df3ee587c592c7c",
+    "contributors" : [ {
+      "githubId" : 1642826,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 4380288,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 4691741,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 6628095,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 17673549,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 116044216,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 152016945,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 227137604,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 263379426,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "Tyrrrz/CliWrap",
+    "language" : "C#",
+    "defaultBranch" : "prime",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xc1bfbca6945325d6f2a9170233fb6011377cc9fcbf2a49c1356686157d92ed91",
+    "contributors" : [ {
+      "githubId" : 1446221,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 1935960,
+      "metrics" : {
+        "commits" : 15,
+        "pullRequestsOpened" : 3,
+        "reviews" : 18,
+        "activeDays" : 11
+      }
+    }, {
+      "githubId" : 18749772,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "dotnet/command-line-api",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x58b6277c5b1aa33faccf63da225660f55e6e0e8e904b672cc2a0b16ec50f01e7",
+    "contributors" : [ {
+      "githubId" : 547415,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 8,
+        "activeDays" : 8
+      }
+    }, {
+      "githubId" : 573979,
+      "metrics" : {
+        "commits" : 9,
+        "pullRequestsOpened" : 3,
+        "reviews" : 9,
+        "activeDays" : 5
+      }
+    }, {
+      "githubId" : 785212,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 1341446,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 1376924,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 4,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 6011991,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 3,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 7412651,
+      "metrics" : {
+        "commits" : 6,
+        "pullRequestsOpened" : 2,
+        "reviews" : 3,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 8184940,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 1,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 16466038,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 23152278,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 2,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 29818212,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 42353747,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 73706465,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 96879250,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 4,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    } ]
+  }, {
+    "fullName" : "reactiveui/ReactiveUI",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x25238ddd5b3e106cdd3751ed17fda8c8106bf4ab3ee168e5844d9391b25c582c",
+    "contributors" : [ {
+      "githubId" : 4910015,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 2,
+        "reviews" : 36,
+        "activeDays" : 22
+      }
+    }, {
+      "githubId" : 5834289,
+      "metrics" : {
+        "commits" : 25,
+        "pullRequestsOpened" : 23,
+        "reviews" : 7,
+        "activeDays" : 23
+      }
+    }, {
+      "githubId" : 11876551,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 49695985,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 306426718,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    } ]
+  }, {
+    "fullName" : "restsharp/RestSharp",
+    "language" : "C#",
+    "defaultBranch" : "dev",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x36e78ef81fd35cf98b20442c2871344c7fa715fee55d8a374b4aeecbb23b62cf",
+    "contributors" : [ {
+      "githubId" : 739582,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 2821205,
+      "metrics" : {
+        "commits" : 3,
+        "pullRequestsOpened" : 0,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 17673549,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 17741539,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 122815445,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 287222957,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "serilog/serilog",
+    "language" : "C#",
+    "defaultBranch" : "dev",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xa69222a89337759d1c4d320fff6126da1317eb565b1754a62f3db45461ef52d8",
+    "contributors" : [ {
+      "githubId" : 342712,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 129399053,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "spectreconsole/spectre.console",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xcbc7a53e015d3cbe38bb8f7d4e1e2fb568906b2897b4fe0e514d35ce7ed3c0c3",
+    "contributors" : [ {
+      "githubId" : 357872,
+      "metrics" : {
+        "commits" : 5,
+        "pullRequestsOpened" : 4,
+        "reviews" : 19,
+        "activeDays" : 12
+      }
+    }, {
+      "githubId" : 1647294,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 2447331,
+      "metrics" : {
+        "commits" : 2,
+        "pullRequestsOpened" : 2,
+        "reviews" : 1,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 6652765,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 31562317,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 2,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 71354894,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 73691558,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 4,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 77762120,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 96879250,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 3,
+        "reviews" : 0,
+        "activeDays" : 3
+      }
+    }, {
+      "githubId" : 100377859,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 107929009,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 3,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 116160714,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 2,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 184682305,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 187064005,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  } ]
+}

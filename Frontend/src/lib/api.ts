@@ -34,6 +34,7 @@ export type Repository = {
   archived: boolean;
   lastSyncedAt: string;
   createdAt?: string;
+  githubCreatedAt?: string | null;
 };
 
 export type AnalysisJob = {
@@ -64,7 +65,39 @@ export type Analysis = {
   summary: string | null;
   aiModel: string | null;
   aiPromptVersion: string | null;
+  activityComparison?: ActivityComparison | null;
 };
+
+export type ActivityComparison = {
+  status: string;
+  modelVersion: string;
+  percentile: number | null;
+  metricPercentiles: Record<string, number>;
+  metricWeights: Record<string, number>;
+  datasetId: string | null;
+  cohortId: string | null;
+  referenceCollectedAt: string | null;
+  periodStart: string;
+  periodEnd: string;
+  language: string | null;
+  sizeBand: string;
+  sampleCount: number;
+  contributorCount: number;
+  repositories: string[];
+  scope: string;
+  calculationRules: string;
+  reason: string;
+  singleActivitySensitivity?: number | null;
+};
+
+export type BenchmarkSummary = {
+  id: string; periodStart: string; periodEnd: string; collectedAt: string;
+  repositoryCount: number; languages: string[];
+};
+
+export async function getBenchmarks(): Promise<BenchmarkSummary[]> {
+  return apiJson("/api/public/benchmarks");
+}
 
 export type Certificate = {
   id: string;
@@ -184,10 +217,6 @@ export async function getRepository(id: string): Promise<Repository> {
   return apiJson(`/api/repositories/${id}`);
 }
 
-export async function getRepositoryBranches(id: string): Promise<string[]> {
-  return apiJson(`/api/repositories/${id}/branches`);
-}
-
 export async function deleteRepository(id: string): Promise<void> {
   const response = await apiFetch(`/api/repositories/${id}`, { method: "DELETE" });
   if (!response.ok) {
@@ -203,19 +232,10 @@ export async function getAnalyses(): Promise<Analysis[]> {
   return apiJson("/api/analyses");
 }
 
-export async function createAnalysis(
-  repositoryId: string,
-  periodStart: string,
-  periodEnd: string,
-  branch?: string,
-): Promise<AnalysisJob> {
+export async function createAnalysis(repositoryId: string): Promise<AnalysisJob> {
   return apiJson(`/api/repositories/${repositoryId}/analyses`, {
     method: "POST",
-    body: JSON.stringify({
-      periodStart,
-      periodEnd,
-      ...(branch ? { branch } : {}),
-    }),
+    body: JSON.stringify({ allTime: true }),
   });
 }
 

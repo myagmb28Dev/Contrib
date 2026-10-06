@@ -35,6 +35,9 @@ public class ContributionAnalysis extends BaseTimeEntity {
     @Column(name = "calculation_rules", nullable = false, columnDefinition = "TEXT")
     private String calculationRules;
 
+    @Column(name = "activity_comparison", columnDefinition = "TEXT")
+    private String activityComparison;
+
     @Column(name = "technical_areas", nullable = false, columnDefinition = "TEXT")
     private String technicalAreas;
 
@@ -86,4 +89,9 @@ public class ContributionAnalysis extends BaseTimeEntity {
     public String getAiModel() { return aiModel; }
     public String getAiPromptVersion() { return aiPromptVersion; }
     public int getAiRegenerationCount() { return aiRegenerationCount; }
+    public String getActivityComparison() { return activityComparison; }
+    public void setActivityComparison(String value) {
+        if (activityComparison != null) throw new IllegalStateException("Comparison snapshots are immutable");
+        activityComparison = value;
+    }
 }

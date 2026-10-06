@@ -1,0 +1,133 @@
+{
+  "schemaVersion" : "benchmark-v1",
+  "collectorVersion" : "github-v2",
+  "periodStart" : "2026-08-01T00:00:00Z",
+  "periodEnd" : "2026-09-01T00:00:00Z",
+  "collectedAt" : "2026-09-29T00:06:19.556974400Z",
+  "scope" : "Non-merge branch commits by author timestamp; PRs created in [start,end); merged is a subset of those PRs merged before end; submitted non-self reviews on those PRs only; UTC days; GitHub Bot type and [bot] suffix excluded; unique type/externalId; unknown authors excluded",
+  "repositories" : [ {
+    "fullName" : "CommunityToolkit/dotnet",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x19f708ebdff14a89abe5b994d7f7832995e046161a6f735f6ea5be05a8cab409",
+    "contributors" : [ {
+      "githubId" : 17328,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 10291845,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "Cysharp/MemoryPack",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "contributors" : [ ]
+  }, {
+    "fullName" : "Cysharp/UniTask",
+    "language" : "C#",
+    "defaultBranch" : "master",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "contributors" : [ ]
+  }, {
+    "fullName" : "DapperLib/Dapper",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0xd0b0469c263b41b899fc6bbd031c1723ced1b4b71add9f7c1dee272fdd911a47",
+    "contributors" : [ {
+      "githubId" : 17328,
+      "metrics" : {
+        "commits" : 6,
+        "pullRequestsOpened" : 5,
+        "reviews" : 0,
+        "activeDays" : 2
+      }
+    }, {
+      "githubId" : 8040367,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 117615053,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    }, {
+      "githubId" : 287222957,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 1,
+        "reviews" : 0,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "Tyrrrz/CliWrap",
+    "language" : "C#",
+    "defaultBranch" : "prime",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x9a484f0e51447b0130d9aaaa9adf21d773248750b0ec0d37f1635325c25950c5",
+    "contributors" : [ {
+      "githubId" : 1935960,
+      "metrics" : {
+        "commits" : 1,
+        "pullRequestsOpened" : 0,
+        "reviews" : 2,
+        "activeDays" : 1
+      }
+    } ]
+  }, {
+    "fullName" : "spectreconsole/spectre.console",
+    "language" : "C#",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x98cbcd8ad125b350109a88f5284aeef10e17b9f5555644b9e720e4387ca105e9",
+    "contributors" : [ {
+      "githubId" : 357872,
+      "metrics" : {
+        "commits" : 0,
+        "pullRequestsOpened" : 0,
+        "reviews" : 6,
+        "activeDays" : 2
+      }
+    } ]
+  } ]
+}

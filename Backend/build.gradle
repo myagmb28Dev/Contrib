@@ -39,3 +39,19 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.register('exportBenchmark', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.example.project.analysis.benchmark.BenchmarkExport'
+    if (project.hasProperty('benchmarkArgs')) {
+        args project.property('benchmarkArgs').split(',')
+    }
+}
+
+tasks.register('validateBenchmark', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.example.project.analysis.benchmark.BenchmarkValidation'
+    if (project.hasProperty('benchmarkArgs')) {
+        args project.property('benchmarkArgs').split(',')
+    }
+}

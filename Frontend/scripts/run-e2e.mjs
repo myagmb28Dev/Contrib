@@ -6,7 +6,7 @@ import { createServer } from "node:http";
 const projectRoot = resolve(import.meta.dirname, "..");
 const nextCli = resolve(projectRoot, "node_modules", "next", "dist", "bin", "next");
 const playwrightCli = resolve(projectRoot, "node_modules", "@playwright", "test", "cli.js");
-const testEnv = { ...process.env, NEXT_PUBLIC_API_BASE_URL: "/", API_PROXY_TARGET: "http://127.0.0.1:3101" };
+const testEnv = { ...process.env, NEXT_PUBLIC_API_BASE_URL: "/", API_PROXY_TARGET: "http://127.0.0.1:3101", ENABLE_PERCENTILE_PREVIEW: "true" };
 let server;
 const upstream = createServer(async (request, response) => {
   if (request.url === "/oauth2/authorization/github") {

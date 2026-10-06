@@ -61,7 +61,7 @@ class OpenRouterAiSummaryProviderTest {
         assertThat(result.summary()).contains("구현과 협업");
         assertThat(result.technicalAreas()).containsExactly("Java", "협업");
         assertThat(result.model()).isEqualTo("google/gemini-2.0-flash-001");
-        assertThat(result.promptVersion()).isEqualTo("openrouter-gemini-v1");
+        assertThat(result.promptVersion()).isEqualTo("openrouter-gemini-v2");
         server.verify();
     }
 

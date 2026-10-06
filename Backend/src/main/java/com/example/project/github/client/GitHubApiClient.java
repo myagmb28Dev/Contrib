@@ -60,6 +60,31 @@ public class GitHubApiClient {
                 new ParameterizedTypeReference<>() {});
     }
 
+    public GitHubRepositoryDto getRepository(String token, String owner, String repository) {
+        return get(token, URI.create("https://api.github.com/repos/%s/%s".formatted(owner, repository)),
+                GitHubRepositoryDto.class);
+    }
+
+    /** PR creation is the v2 review sampling frame; stop once descending creation times leave the window. */
+    public List<GitHubPullRequestDto> getPullRequestsCreatedInPeriod(String token, String owner,
+            String repository, Instant start, Instant end) {
+        List<GitHubPullRequestDto> result = new ArrayList<>();
+        for (int page = 1; page <= 100; page++) {
+            List<GitHubPullRequestDto> items = exchangeList(token,
+                    URI.create("https://api.github.com/repos/%s/%s/pulls?state=all&sort=created&direction=desc&per_page=%d&page=%d"
+                            .formatted(owner, repository, PAGE_SIZE, page)), new ParameterizedTypeReference<>() {});
+            if (items.stream().anyMatch(pull -> pull.createdAt() == null)) {
+                throw new IllegalStateException("GitHub PR creation timestamps are missing");
+            }
+            result.addAll(items.stream().filter(pull -> !pull.createdAt().isBefore(start)
+                    && pull.createdAt().isBefore(end)).toList());
+            if (items.size() < PAGE_SIZE || items.stream().anyMatch(pull -> pull.createdAt().isBefore(start))) {
+                return result;
+            }
+        }
+        throw new IllegalStateException("GitHub pagination limit reached; collection is incomplete");
+    }
+
     public List<GitHubRepositoryDto> getAccessibleRepositories(String token) {
         return getAllPages(token,
                 page -> URI.create("https://api.github.com/user/repos?visibility=all&affiliation=owner,collaborator&sort=full_name&per_page="
@@ -113,10 +138,10 @@ public class GitHubApiClient {
             List<T> items = exchangeList(token, uriFactory.create(page), responseType);
             result.addAll(items);
             if (items.size() < PAGE_SIZE) {
-                break;
+                return result;
             }
         }
-        return result;
+        throw new IllegalStateException("GitHub pagination limit reached; collection is incomplete");
     }
 
     private <T> List<T> exchangeList(String token, URI uri, ParameterizedTypeReference<List<T>> responseType) {
@@ -124,7 +149,8 @@ public class GitHubApiClient {
                 .exchange((request, response) -> {
                     ensureSuccess(response.getStatusCode(), response.getHeaders());
                     List<T> decoded = response.bodyTo(responseType);
-                    return decoded == null ? List.of() : decoded;
+                    if (decoded == null) throw new IllegalStateException("GitHub returned a missing list response");
+                    return decoded;
                 }));
         return body == null ? List.of() : body;
     }

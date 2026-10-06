@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClient;
 @Component
 public class OpenRouterAiSummaryProvider implements AiSummaryProvider {
 
-    static final String PROMPT_VERSION = "openrouter-gemini-v1";
+    static final String PROMPT_VERSION = "openrouter-gemini-v2";
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
@@ -85,6 +85,7 @@ public class OpenRouterAiSummaryProvider implements AiSummaryProvider {
         messages.addObject()
                 .put("role", "system")
                 .put("content", "GitHub 기여 지표를 사실에 근거하여 요약합니다. "
+                        + "score는 실험적 활동 점수이며 개발자의 실력, 생산성, 품질, 우수성으로 해석하지 않습니다. 백분위를 추측하지 않습니다. "
                         + "과장하거나 입력에 없는 활동을 추측하지 말고, summary는 정중한 서술형 한국어 문체로 2~3문장을 작성합니다. "
                         + "technicalAreas는 입력 언어와 지표로 확인 가능한 영역만 짧은 문자열로 최대 6개 반환합니다.");
         messages.addObject()

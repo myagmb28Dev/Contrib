@@ -50,6 +50,7 @@ public class RepositoryService {
                     .orElseGet(() -> GitHubRepository.create(user, source.id()));
             target.synchronize(source.owner().id(), source.owner().login(), source.name(), source.fullName(),
                     source.htmlUrl(), source.defaultBranch(), source.language(), source.archived(), now);
+            target.updateGithubCreatedAt(source.createdAt());
             repository.save(target);
         }
 
@@ -81,6 +82,7 @@ public class RepositoryService {
             target.synchronize(source.owner().id(), source.owner().login(), source.name(), source.fullName(),
                     source.htmlUrl(), source.defaultBranch(), source.language(), source.archived(), now);
             target.updateVisibility(source.privateRepository());
+            target.updateGithubCreatedAt(source.createdAt());
             repository.save(target);
         }
         return list(userId);

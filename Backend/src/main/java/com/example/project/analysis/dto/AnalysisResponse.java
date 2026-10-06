@@ -22,7 +22,8 @@ public record AnalysisResponse(
         JsonNode technicalAreas,
         String summary,
         String aiModel,
-        String aiPromptVersion) {
+        String aiPromptVersion,
+        JsonNode activityComparison) {
 
     public static AnalysisResponse from(ContributionAnalysis analysis, ObjectMapper objectMapper) {
         var snapshot = analysis.getSnapshot();
@@ -32,7 +33,8 @@ public record AnalysisResponse(
                 snapshot.getPeriodStart(), snapshot.getPeriodEnd(),
                 read(objectMapper, analysis.getMetrics()), analysis.getScore(), analysis.getScoreVersion(),
                 analysis.getCalculationRules(), read(objectMapper, analysis.getTechnicalAreas()),
-                analysis.getAiSummary(), analysis.getAiModel(), analysis.getAiPromptVersion());
+                analysis.getAiSummary(), analysis.getAiModel(), analysis.getAiPromptVersion(),
+                analysis.getActivityComparison() == null ? null : read(objectMapper, analysis.getActivityComparison()));
     }
 
     private static JsonNode read(ObjectMapper objectMapper, String value) {

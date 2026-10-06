@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { ProfileDropdown } from "./profile-dropdown";
 import { useAuth } from "@/lib/auth-context";
 
 export function AppHeader() {
@@ -46,9 +45,7 @@ export function AppHeader() {
           <Link href="/#verify" className="header-link">
             공개 검증
           </Link>
-          {user ? (
-            <ProfileDropdown />
-          ) : (
+          {!user && (
             <Link href="/" className="button primary sm">
               로그인
             </Link>

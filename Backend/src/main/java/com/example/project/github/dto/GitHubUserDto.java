@@ -1,7 +1,10 @@
 package com.example.project.github.dto;
 
-public record GitHubUserDto(long id, String login) {
+public record GitHubUserDto(long id, String login, String type) {
+    public GitHubUserDto(long id, String login) { this(id, login, null); }
+
     public boolean isBot() {
-        return login != null && (login.endsWith("[bot]") || login.toLowerCase().contains("bot"));
+        return "Bot".equalsIgnoreCase(type)
+                || login != null && login.toLowerCase(java.util.Locale.ROOT).endsWith("[bot]");
     }
 }

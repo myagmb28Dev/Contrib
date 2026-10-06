@@ -51,6 +51,7 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     });
 
     if (path === "/api/auth/csrf") return json({ headerName: "X-XSRF-TOKEN", parameterName: "_csrf", token: "test" });
+    if (path === "/api/public/benchmarks") return json([]);
     if (path === "/api/auth/me") {
       if (!authenticated) return json({ message: "unauthenticated" }, 401);
       return json({ userId: "user-1", githubUserId: 1001, githubUsername: "octocat", email: "octocat@example.com" });
@@ -61,7 +62,10 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
     if (path === "/api/repositories" && method === "GET") return json(repositorySynced ? [repository()] : []);
     if (path === "/api/repositories/sync" && method === "POST") { repositorySynced = true; return json([repository()]); }
     if (path === `/api/repositories/${repositoryId}`) return json(repository());
-    if (path === `/api/repositories/${repositoryId}/analyses` && method === "POST") return json(job("PENDING", 0));
+    if (path === `/api/repositories/${repositoryId}/analyses` && method === "POST") {
+      expect(request.postDataJSON()).toEqual({ allTime: true });
+      return json(job("PENDING", 0));
+    }
     if (path === `/api/analysis-jobs/${jobId}`) return json(job(++jobPolls > 1 ? "COMPLETED" : "ANALYZING", jobPolls > 1 ? 100 : 60));
     if (path === `/api/repositories/${repositoryId}/analyses` && method === "GET") return json(jobPolls > 1 ? [analysis()] : []);
     if (path === `/api/analyses/${analysisId}`) return json(analysis());
@@ -106,7 +110,9 @@ test("GitHub account to public on-chain verification and revocation", async ({ p
   await page.getByRole("link", { name: "새 기여 분석 시작" }).click();
   await page.getByRole("button", { name: "기여 분석 시작하기" }).click();
   await page.getByRole("link", { name: "분석 결과 확인하기" }).click();
-  await expect(page.locator(".score-hero-num")).toContainText("42");
+  await expect(page.locator(".score-hero-num")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "상대 활동 수준", exact: true }))
+    .toContainText("이전 분석에는 비교 데이터가 없습니다.");
   await page.getByRole("button", { name: "기여 인증서 발급하기" }).click();
   await page.getByRole("link", { name: /발급된 인증서 상세/ }).click();
 

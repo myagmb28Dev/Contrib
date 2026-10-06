@@ -5,18 +5,15 @@ import java.util.UUID;
 
 import com.example.project.analysis.dto.AnalysisJobResponse;
 import com.example.project.analysis.dto.AnalysisResponse;
-import com.example.project.analysis.dto.CreateAnalysisRequest;
 import com.example.project.analysis.service.AnalysisService;
 import com.example.project.auth.service.GitHubPrincipal;
 
-import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,9 +29,9 @@ public class AnalysisController {
 
     @PostMapping("/repositories/{repositoryId}/analyses")
     public ResponseEntity<AnalysisJobResponse> create(@AuthenticationPrincipal GitHubPrincipal principal,
-            @PathVariable UUID repositoryId, @Valid @RequestBody CreateAnalysisRequest request) {
+            @PathVariable UUID repositoryId) {
         return ResponseEntity.accepted().body(analysisService.create(principal.getUserId(), repositoryId,
-                request.periodStart(), request.periodEnd(), request.branch()));
+                null, null, true));
     }
 
     @GetMapping("/analysis-jobs/{jobId}")

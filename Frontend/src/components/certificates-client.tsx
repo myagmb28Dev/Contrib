@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { certificateResult } from "@/lib/certificate-result";
+import { ComparisonSummary } from "./activity-comparison";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -32,7 +34,7 @@ export function CertificatesClient() {
 
   const [viewMode, setViewMode] = useState<"grid" | "compact">("grid");
   const [selectedRepo, setSelectedRepo] = useState<string>("ALL");
-  const [sortBy, setSortBy] = useState<"latest" | "score">("latest");
+
 
   useEffect(() => {
     getCertificates()
@@ -66,7 +68,7 @@ export function CertificatesClient() {
   const uniqueRepos = useMemo(() => {
     const set = new Set<string>();
     items.forEach((item) => {
-      const name = item.repositoryName || item.repositoryFullName || (item.payload?.repository as string);
+      const name = certificateResult(item).repository;
       if (name) set.add(name);
     });
     return Array.from(set);
@@ -77,22 +79,17 @@ export function CertificatesClient() {
 
     if (selectedRepo !== "ALL") {
       result = result.filter((item) => {
-        const name = item.repositoryName || item.repositoryFullName || (item.payload?.repository as string);
+        const name = certificateResult(item).repository;
         return name === selectedRepo;
       });
     }
 
     result.sort((a, b) => {
-      if (sortBy === "score") {
-        const scoreA = Number(a.payload?.score ?? 0);
-        const scoreB = Number(b.payload?.score ?? 0);
-        return scoreB - scoreA;
-      }
       return new Date(b.issuedAt).getTime() - new Date(a.issuedAt).getTime();
     });
 
     return result;
-  }, [items, selectedRepo, sortBy]);
+  }, [items, selectedRepo]);
 
   return (
     <div className="stack full-width">
@@ -132,16 +129,6 @@ export function CertificatesClient() {
                   </option>
                 ))}
               </select>
-
-              <select
-                className="filter-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as "latest" | "score")}
-                aria-label="정렬 기준"
-              >
-                <option value="latest">최신 발급순</option>
-                <option value="score">높은 점수순 (Highest Score)</option>
-              </select>
             </div>
 
             <div className="view-toggle-group">
@@ -177,21 +164,17 @@ export function CertificatesClient() {
                       <div style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: 0 }}>
                         <span className="cert-label" style={{ fontSize: "0.72rem" }}>Repository</span>
                         <strong style={{ fontSize: "1.05rem", color: "var(--foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {cert.repositoryName || cert.repositoryFullName || (cert.payload?.repository as string) || "저장소"}
+                          {certificateResult(cert).repository || "저장소"}
                         </strong>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-                        {cert.payload?.score !== undefined && (
-                          <span className="score-pill" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--primary)", background: "var(--primary-light)", padding: "3px 8px", borderRadius: "9999px" }}>
-                            {String(cert.payload.score)}점
-                          </span>
-                        )}
                         <span className={`verified-badge ${statusInfo.className}`}>
                           {statusInfo.label}
                         </span>
                       </div>
                     </div>
 
+                    <ComparisonSummary comparison={certificateResult(cert).comparison} />
                     <div className="cert-public-id-bar">
                       <span className="cert-id-tag">Public ID</span>
                       <code className="cert-id-val">{cert.publicId}</code>
@@ -251,7 +234,7 @@ export function CertificatesClient() {
                 <thead>
                   <tr>
                     <th>저장소</th>
-                    <th>기여 점수</th>
+                    <th>백분위</th>
                     <th>증명서 상태</th>
                     <th>공개 검증 ID (복사)</th>
                     <th>발급 일시</th>
@@ -265,17 +248,11 @@ export function CertificatesClient() {
                       <tr key={cert.id}>
                         <td>
                           <span className="table-repo-badge">
-                            {cert.repositoryName || cert.repositoryFullName || (cert.payload?.repository as string) || "저장소"}
+                            {certificateResult(cert).repository || "저장소"}
                           </span>
                         </td>
                         <td>
-                          {cert.payload?.score !== undefined ? (
-                            <span className="table-score-badge">
-                              {String(cert.payload.score)}점
-                            </span>
-                          ) : (
-                            <span className="muted">-</span>
-                          )}
+                          <div className="muted"><ComparisonSummary comparison={certificateResult(cert).comparison} /></div>
                         </td>
                         <td>
                           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>

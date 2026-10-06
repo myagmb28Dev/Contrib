@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { createWalletClient, custom, type EIP1193Provider } from "viem";
 
 import { Breadcrumb } from "./breadcrumb";
+import { ComparisonSummary } from "./activity-comparison";
+import { certificateResult } from "@/lib/certificate-result";
 import { verificationStatusLabel } from "@/lib/verification-status";
 import {
   ApiRequestError,
@@ -221,9 +223,8 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
     );
   }
 
-  const payload = certificate.payload as Record<string, unknown> | undefined;
-  const score = payload?.score ? String(payload.score) : "80";
-  const repoName = payload?.repository ? String(payload.repository) : "GitHub Repository";
+  const result = certificateResult(certificate);
+  const repoName = result.repository;
 
   return (
     <div className="stack full-width">
@@ -236,13 +237,13 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
       />
 
       {/* Web3 Certificate Showcase Card */}
-      <section className="certificate-stage full-width" aria-label="Contribution Certificate">
+      <section className="certificate-stage certificate-document-stage full-width" aria-label="인증서 미리보기">
         <div className="certificate-glow" />
-        <article className="certificate-preview standalone">
+        <article className="certificate-preview standalone certificate-document-preview">
           <header className="certificate-heading">
             <div>
               <span className="preview-label">CONTRIBUTION CERTIFICATE</span>
-              <strong>GitHub Contribution</strong>
+              <h2>기여 활동 인증서</h2>
             </div>
             <span
               className={`verified-badge ${
@@ -254,20 +255,37 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
           </header>
 
           <div className="certificate-repository">
-            <span>Target Repository</span>
+            <span>대상 저장소</span>
             <strong>{repoName}</strong>
           </div>
 
           <div className="certificate-score-row">
-            <div className="preview-score">
-              <span>Contribution score</span>
-              <strong>{score}</strong>
-              <small>/ 100</small>
+            <div className="stack">
+              <span>백분위</span>
+              {result.comparison?.status === "AVAILABLE" && result.comparison.percentile !== null ? (
+                <p className="certificate-document-percentile">
+                  <strong>{result.comparison.percentile.toFixed(1)}</strong> 백분위
+                </p>
+              ) : <ComparisonSummary comparison={result.comparison} />}
             </div>
             <div className="chain-badge-box">
               {attestation && <span className="network-pill">Base Sepolia</span>}
             </div>
           </div>
+
+          {result.comparison && (
+            <dl className="certificate-document-facts">
+              <div>
+                <dt>분석 기간 (UTC · 종료 제외)</dt>
+                <dd>{result.comparison.periodStart} ~ {result.comparison.periodEnd}</dd>
+              </div>
+              <div>
+                <dt>비교 집단</dt>
+                <dd>{result.comparison.repositories.length}개 저장소 · {result.comparison.contributorCount}명</dd>
+              </div>
+            </dl>
+          )}
+          <p className="certificate-document-note">저장소에서 확인된 상대적인 기여 활동을 기록합니다. 개발자의 실력이나 능력을 평가하는 수치는 아닙니다.</p>
 
           <footer className="certificate-footer">
             <div className="hash-box">
@@ -386,11 +404,6 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
         </section>
       )}
 
-      {/* Canonical Payload Viewer */}
-      <details className="full-width card">
-        <summary>Canonical Payload (JSON)</summary>
-        <pre>{JSON.stringify(certificate.payload, null, 2)}</pre>
-      </details>
     </div>
   );
 }
