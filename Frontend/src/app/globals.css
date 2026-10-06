@@ -800,7 +800,7 @@ a {
   justify-content: space-between;
 }
 
-.comparison-percentile { font-size: 2.5rem; font-variant-numeric: tabular-nums; }
+.comparison-total-row { background: var(--primary-light); font-weight: 700; font-variant-numeric: tabular-nums; }
 .comparison-hash { overflow-wrap: anywhere; }
 .comparison-caution {
   margin: 0;

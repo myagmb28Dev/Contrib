@@ -19,10 +19,7 @@ export function ActivityComparisonCard({ comparison }: { comparison?: ActivityCo
   const available = comparison.status === "AVAILABLE" && comparison.percentile != null;
   return <section id="activity-comparison" className="card stack" aria-label="상대 활동 수준">
     <h3>상대 활동 수준 · 실험적 백분위</h3>
-    {available ? <div>
-      <strong className="comparison-percentile">{comparison.percentile!.toFixed(1)}</strong> 백분위
-      <p>선택한 비교 집단에서 상위 약 {(100 - comparison.percentile!).toFixed(1)}%에 해당하는 활동 수준입니다.</p>
-    </div> : <strong>백분위 산정 보류</strong>}
+    {!available && <strong>백분위 산정 보류</strong>}
     <p>{comparison.reason}</p>
     {available && (comparison.singleActivitySensitivity ?? 0) >= 20 && <p role="note" className="comparison-caution">
       참고: 이 비교 집단에서는 커밋·PR·리뷰 중 한 항목이 1건 증가해도
@@ -36,11 +33,19 @@ export function ActivityComparisonCard({ comparison }: { comparison?: ActivityCo
     </dl>
     {available && <div className="compact-table-container"><table className="compact-table">
       <thead><tr><th>활동 항목</th><th>백분위</th><th>종합 반영 비중</th></tr></thead>
-      <tbody>{Object.entries(comparison.metricPercentiles).map(([key, value]) => <tr key={key}>
+      <tbody>
+        <tr className="comparison-total-row">
+          <th scope="row">종합 활동</th>
+          <td>{comparison.percentile!.toFixed(1)}</td>
+          <td>종합 결과</td>
+        </tr>
+        {Object.entries(comparison.metricPercentiles).map(([key, value]) => <tr key={key}>
         <td>{labels[key] ?? key}</td><td>{value.toFixed(1)}</td>
         <td>{((comparison.metricWeights[key] ?? 0) * 100).toFixed(0)}%</td>
-      </tr>)}</tbody>
+        </tr>)}
+      </tbody>
     </table></div>}
+    {available && <p className="muted">종합 활동 {comparison.percentile!.toFixed(1)}백분위는 이 비교 집단에서 상위 약 {(100 - comparison.percentile!).toFixed(1)}%에 해당합니다.</p>}
     <p className="muted">개발 실력·품질·생산성의 평가가 아닙니다. 100백분위도 완벽한 기여를 뜻하지 않습니다.
       동일 인물의 여러 저장소 활동은 합계 가중치 1로 처리하며, 동점은 중간 순위를 사용합니다.</p>
     <p className="muted">리뷰는 이 기간에 생성된 PR에 제출한 타인 리뷰만 포함합니다. 기간 이전에 생성된 PR의 리뷰는 이 모델의 수집 범위에 포함되지 않습니다.</p>
