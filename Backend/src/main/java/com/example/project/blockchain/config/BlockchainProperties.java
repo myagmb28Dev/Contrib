@@ -1,5 +1,8 @@
 package com.example.project.blockchain.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +13,7 @@ public class BlockchainProperties {
     private String network;
     private String contractAddress;
     private String rpcUrl;
+    private List<String> fallbackRpcUrls = new ArrayList<>();
 
     public long getChainId() { return chainId; }
     public void setChainId(long chainId) { this.chainId = chainId; }
@@ -19,6 +23,10 @@ public class BlockchainProperties {
     public void setContractAddress(String contractAddress) { this.contractAddress = contractAddress; }
     public String getRpcUrl() { return rpcUrl; }
     public void setRpcUrl(String rpcUrl) { this.rpcUrl = rpcUrl; }
+    public List<String> getFallbackRpcUrls() { return fallbackRpcUrls; }
+    public void setFallbackRpcUrls(List<String> fallbackRpcUrls) {
+        this.fallbackRpcUrls = fallbackRpcUrls != null ? fallbackRpcUrls : new ArrayList<>();
+    }
 
     public boolean isConfigured() {
         return contractAddress != null && contractAddress.matches("(?i)0x[0-9a-f]{40}")

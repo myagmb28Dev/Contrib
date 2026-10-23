@@ -63,11 +63,18 @@ app:
       max-backoff: ${GITHUB_RATE_LIMIT_MAX_BACKOFF:PT30S}
   security:
     token-encryption-key: ${TOKEN_ENCRYPTION_KEY}
+  api-rate-limit:
+    enabled: ${API_RATE_LIMIT_ENABLED:true}
+    public-limit: ${API_RATE_LIMIT_PUBLIC_LIMIT:60}
+    analysis-limit: ${API_RATE_LIMIT_ANALYSIS_LIMIT:10}
+    ai-summary-limit: ${API_RATE_LIMIT_AI_SUMMARY_LIMIT:5}
+    window-seconds: ${API_RATE_LIMIT_WINDOW_SECONDS:60}
   blockchain:
     chain-id: ${BLOCKCHAIN_CHAIN_ID:84532}
     network: ${BLOCKCHAIN_NETWORK:base-sepolia}
     contract-address: ${ATTESTATION_CONTRACT_ADDRESS:}
     rpc-url: ${BASE_SEPOLIA_RPC_URL:https://base-sepolia-rpc.publicnode.com}
+    fallback-rpc-urls: ${BASE_SEPOLIA_FALLBACK_RPC_URLS:https://sepolia.base.org,https://base-sepolia.blockpi.network/v1/rpc/public}
     receipt-poll-interval-ms: ${BLOCKCHAIN_RECEIPT_POLL_INTERVAL_MS:3000}
     receipt-poll-enabled: ${BLOCKCHAIN_RECEIPT_POLL_ENABLED:true}
   analysis:

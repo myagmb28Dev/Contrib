@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.example.project.auth.service.GitHubOAuth2UserService;
 import com.example.project.common.config.RequestCorrelationFilter;
+import com.example.project.common.ratelimit.RateLimitFilter;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
@@ -27,6 +29,7 @@ public class SecurityConfig {
     private final GitHubOAuth2UserService gitHubOAuth2UserService;
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final OAuth2AuthorizedClientService authorizedClientService;
+    private final RateLimitFilter rateLimitFilter;
     private final String frontendUrl;
     private final List<String> allowedOrigins;
     private final boolean secureCookie;
@@ -36,6 +39,7 @@ public class SecurityConfig {
             GitHubOAuth2UserService gitHubOAuth2UserService,
             RestAuthenticationEntryPoint authenticationEntryPoint,
             OAuth2AuthorizedClientService authorizedClientService,
+            RateLimitFilter rateLimitFilter,
             @Value("${app.frontend-url}") String frontendUrl,
             @Value("${app.cors.allowed-origins:${app.frontend-url}}") String allowedOrigins,
             @Value("${server.servlet.session.cookie.secure:false}") boolean secureCookie,
@@ -43,6 +47,7 @@ public class SecurityConfig {
         this.gitHubOAuth2UserService = gitHubOAuth2UserService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.authorizedClientService = authorizedClientService;
+        this.rateLimitFilter = rateLimitFilter;
         this.frontendUrl = frontendUrl;
         this.allowedOrigins = Arrays.stream(StringUtils.commaDelimitedListToStringArray(allowedOrigins))
                 .map(String::trim)
@@ -102,7 +107,8 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                         .logoutSuccessHandler((request, response, authentication) -> response
-                                .setStatus(HttpStatus.NO_CONTENT.value())));
+                                .setStatus(HttpStatus.NO_CONTENT.value())))
+                .addFilterAfter(rateLimitFilter, AuthorizationFilter.class);
 
         return http.build();
     }
