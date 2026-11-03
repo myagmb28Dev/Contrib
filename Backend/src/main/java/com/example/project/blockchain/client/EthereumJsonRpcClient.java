@@ -1,5 +1,6 @@
 package com.example.project.blockchain.client;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,53 +47,80 @@ public class EthereumJsonRpcClient {
     }
 
     private JsonNode rpc(String method, List<?> params) {
-        if (properties.getRpcUrl() == null || properties.getRpcUrl().isBlank()) {
+        List<String> urls = resolveRpcUrls();
+        if (urls.isEmpty()) {
             throw new BlockchainRpcException("Blockchain RPC URL is not configured");
         }
-        try {
-            JsonNode response = restClient.post().uri(properties.getRpcUrl())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("jsonrpc", "2.0", "id", 1, "method", method, "params", params))
-                    .retrieve().body(JsonNode.class);
-            if (response == null || response.hasNonNull("error") || !response.has("result")) {
-                throw new BlockchainRpcException("Blockchain RPC returned an error");
+        Exception lastException = null;
+        for (String url : urls) {
+            try {
+                JsonNode response = restClient.post().uri(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Map.of("jsonrpc", "2.0", "id", 1, "method", method, "params", params))
+                        .retrieve().body(JsonNode.class);
+                if (response == null || response.hasNonNull("error") || !response.has("result")) {
+                    throw new BlockchainRpcException("Blockchain RPC returned an error from " + url);
+                }
+                return response.get("result");
+            } catch (Exception exception) {
+                lastException = exception;
             }
-            return response.get("result");
-        } catch (BlockchainRpcException exception) {
-            throw exception;
-        } catch (Exception exception) {
-            throw new BlockchainRpcException("Could not reach blockchain RPC", exception);
         }
+        if (lastException instanceof BlockchainRpcException rpcException) {
+            throw rpcException;
+        }
+        throw new BlockchainRpcException("Could not reach any blockchain RPC endpoints", lastException);
     }
 
     public TransactionReceiptData getTransactionReceipt(String transactionHash) {
-        if (properties.getRpcUrl() == null || properties.getRpcUrl().isBlank()) {
+        List<String> urls = resolveRpcUrls();
+        if (urls.isEmpty()) {
             throw new BlockchainRpcException("Blockchain RPC URL is not configured");
         }
-        try {
-            JsonNode response = restClient.post().uri(properties.getRpcUrl())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("jsonrpc", "2.0", "id", 1, "method", "eth_getTransactionReceipt",
-                            "params", List.of(transactionHash)))
-                    .retrieve().body(JsonNode.class);
-            if (response == null || response.hasNonNull("error")) {
-                throw new BlockchainRpcException("Blockchain RPC returned an error");
+        Exception lastException = null;
+        for (String url : urls) {
+            try {
+                JsonNode response = restClient.post().uri(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Map.of("jsonrpc", "2.0", "id", 1, "method", "eth_getTransactionReceipt",
+                                "params", List.of(transactionHash)))
+                        .retrieve().body(JsonNode.class);
+                if (response == null || response.hasNonNull("error")) {
+                    throw new BlockchainRpcException("Blockchain RPC returned an error from " + url);
+                }
+                JsonNode result = response.get("result");
+                if (result == null || result.isNull()) {
+                    return null;
+                }
+                return new TransactionReceiptData(
+                        result.path("transactionHash").asText(),
+                        result.path("to").asText(),
+                        "0x1".equals(result.path("status").asText()),
+                        parseHexLong(result.path("blockNumber").asText()),
+                        result.path("logs"));
+            } catch (Exception exception) {
+                lastException = exception;
             }
-            JsonNode result = response.get("result");
-            if (result == null || result.isNull()) {
-                return null;
-            }
-            return new TransactionReceiptData(
-                    result.path("transactionHash").asText(),
-                    result.path("to").asText(),
-                    "0x1".equals(result.path("status").asText()),
-                    parseHexLong(result.path("blockNumber").asText()),
-                    result.path("logs"));
-        } catch (BlockchainRpcException exception) {
-            throw exception;
-        } catch (Exception exception) {
-            throw new BlockchainRpcException("Could not reach blockchain RPC", exception);
         }
+        if (lastException instanceof BlockchainRpcException rpcException) {
+            throw rpcException;
+        }
+        throw new BlockchainRpcException("Could not reach any blockchain RPC endpoints", lastException);
+    }
+
+    private List<String> resolveRpcUrls() {
+        List<String> urls = new ArrayList<>();
+        if (properties.getRpcUrl() != null && !properties.getRpcUrl().isBlank()) {
+            urls.add(properties.getRpcUrl().trim());
+        }
+        if (properties.getFallbackRpcUrls() != null) {
+            for (String fallback : properties.getFallbackRpcUrls()) {
+                if (fallback != null && !fallback.isBlank() && !urls.contains(fallback.trim())) {
+                    urls.add(fallback.trim());
+                }
+            }
+        }
+        return urls;
     }
 
     private long parseHexLong(String value) {
