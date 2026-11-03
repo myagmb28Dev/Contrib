@@ -6,7 +6,7 @@ import { ComparisonSummary } from "./activity-comparison";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-import { ApiRequestError, getAppOrigin, getCertificates, type Certificate } from "@/lib/api";
+import { ApiRequestError, deleteCertificate, getAppOrigin, getCertificates, type Certificate } from "@/lib/api";
 
 function formatStatus(status: string) {
   switch (status.toUpperCase()) {
@@ -34,6 +34,26 @@ export function CertificatesClient() {
 
   const [viewMode, setViewMode] = useState<"grid" | "compact">("grid");
   const [selectedRepo, setSelectedRepo] = useState<string>("ALL");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function handleDelete(certId: string, repoName: string) {
+    if (!window.confirm(`'${repoName}'의 기여 인증서를 삭제하시겠습니까?`)) {
+      return;
+    }
+    setDeletingId(certId);
+    try {
+      await deleteCertificate(certId);
+      setItems((prev) => prev.filter((item) => item.id !== certId));
+    } catch (err: unknown) {
+      if (err instanceof ApiRequestError && err.status === 401) {
+        router.replace("/");
+        return;
+      }
+      setError(err instanceof Error ? err.message : "인증서 삭제에 실패했습니다.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
 
   useEffect(() => {
@@ -215,7 +235,15 @@ export function CertificatesClient() {
                       </div>
                     </div>
 
-                    <div className="cert-card-actions">
+                    <div className="cert-card-actions" style={{ display: "flex", gap: "8px", justifyContent: "flex-end", alignItems: "center" }}>
+                      <button
+                        type="button"
+                        className="button danger-outline sm"
+                        onClick={() => handleDelete(cert.id, certificateResult(cert).repository || "인증서")}
+                        disabled={deletingId === cert.id}
+                      >
+                        {deletingId === cert.id ? "삭제 중..." : "삭제"}
+                      </button>
                       <Link
                         className="button primary sm"
                         href={`/certificates/${cert.id}`}
@@ -290,13 +318,24 @@ export function CertificatesClient() {
                           </span>
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <Link
-                            className="button primary sm"
-                            href={`/certificates/${cert.id}`}
-                            style={{ padding: "4px 10px", fontSize: "0.78rem" }}
-                          >
-                            상세 &rarr;
-                          </Link>
+                          <div style={{ display: "flex", gap: "6px", justifyContent: "flex-end", alignItems: "center" }}>
+                            <button
+                              type="button"
+                              className="button danger-outline sm"
+                              onClick={() => handleDelete(cert.id, certificateResult(cert).repository || "인증서")}
+                              disabled={deletingId === cert.id}
+                              style={{ padding: "4px 8px", fontSize: "0.78rem" }}
+                            >
+                              {deletingId === cert.id ? "..." : "삭제"}
+                            </button>
+                            <Link
+                              className="button primary sm"
+                              href={`/certificates/${cert.id}`}
+                              style={{ padding: "4px 10px", fontSize: "0.78rem" }}
+                            >
+                              상세 &rarr;
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     );

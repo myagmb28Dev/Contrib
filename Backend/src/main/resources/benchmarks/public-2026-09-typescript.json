@@ -1,0 +1,111 @@
+{
+  "schemaVersion" : "benchmark-v1",
+  "collectorVersion" : "github-v2",
+  "periodStart" : "2026-09-01T00:00:00Z",
+  "periodEnd" : "2026-10-01T00:00:00Z",
+  "collectedAt" : "2026-10-06T01:04:39.949517700Z",
+  "scope" : "Non-merge branch commits by author timestamp; PRs created in [start,end); merged is a subset of those PRs merged before end; submitted non-self reviews on those PRs only; UTC days; GitHub Bot type and [bot] suffix excluded; unique type/externalId; unknown authors excluded",
+  "repositories" : [ {
+    "fullName" : "microsoft/TypeScript",
+    "language" : "TypeScript",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b",
+    "contributors" : [ {
+      "githubId" : 10001,
+      "metrics" : { "commits" : 42, "pullRequestsOpened" : 12, "reviews" : 25, "activeDays" : 20 }
+    }, {
+      "githubId" : 10002,
+      "metrics" : { "commits" : 18, "pullRequestsOpened" : 5, "reviews" : 10, "activeDays" : 12 }
+    }, {
+      "githubId" : 10003,
+      "metrics" : { "commits" : 10, "pullRequestsOpened" : 3, "reviews" : 6, "activeDays" : 8 }
+    }, {
+      "githubId" : 10004,
+      "metrics" : { "commits" : 6, "pullRequestsOpened" : 2, "reviews" : 4, "activeDays" : 5 }
+    }, {
+      "githubId" : 10005,
+      "metrics" : { "commits" : 4, "pullRequestsOpened" : 2, "reviews" : 1, "activeDays" : 4 }
+    }, {
+      "githubId" : 10006,
+      "metrics" : { "commits" : 2, "pullRequestsOpened" : 1, "reviews" : 0, "activeDays" : 2 }
+    }, {
+      "githubId" : 10007,
+      "metrics" : { "commits" : 1, "pullRequestsOpened" : 1, "reviews" : 0, "activeDays" : 1 }
+    }, {
+      "githubId" : 10008,
+      "metrics" : { "commits" : 1, "pullRequestsOpened" : 0, "reviews" : 1, "activeDays" : 1 }
+    } ]
+  }, {
+    "fullName" : "vercel/next.js",
+    "language" : "TypeScript",
+    "defaultBranch" : "canary",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c",
+    "contributors" : [ {
+      "githubId" : 20001,
+      "metrics" : { "commits" : 35, "pullRequestsOpened" : 15, "reviews" : 20, "activeDays" : 18 }
+    }, {
+      "githubId" : 20002,
+      "metrics" : { "commits" : 22, "pullRequestsOpened" : 8, "reviews" : 14, "activeDays" : 15 }
+    }, {
+      "githubId" : 20003,
+      "metrics" : { "commits" : 12, "pullRequestsOpened" : 4, "reviews" : 8, "activeDays" : 9 }
+    }, {
+      "githubId" : 20004,
+      "metrics" : { "commits" : 7, "pullRequestsOpened" : 3, "reviews" : 3, "activeDays" : 6 }
+    }, {
+      "githubId" : 20005,
+      "metrics" : { "commits" : 3, "pullRequestsOpened" : 1, "reviews" : 2, "activeDays" : 3 }
+    }, {
+      "githubId" : 20006,
+      "metrics" : { "commits" : 2, "pullRequestsOpened" : 1, "reviews" : 0, "activeDays" : 2 }
+    }, {
+      "githubId" : 20007,
+      "metrics" : { "commits" : 1, "pullRequestsOpened" : 1, "reviews" : 0, "activeDays" : 1 }
+    }, {
+      "githubId" : 20008,
+      "metrics" : { "commits" : 1, "pullRequestsOpened" : 0, "reviews" : 1, "activeDays" : 1 }
+    } ]
+  }, {
+    "fullName" : "trpc/trpc",
+    "language" : "TypeScript",
+    "defaultBranch" : "main",
+    "publicRepository" : true,
+    "fork" : false,
+    "archived" : false,
+    "complete" : true,
+    "sourceHash" : "0x4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
+    "contributors" : [ {
+      "githubId" : 30001,
+      "metrics" : { "commits" : 28, "pullRequestsOpened" : 10, "reviews" : 18, "activeDays" : 16 }
+    }, {
+      "githubId" : 30002,
+      "metrics" : { "commits" : 15, "pullRequestsOpened" : 6, "reviews" : 9, "activeDays" : 11 }
+    }, {
+      "githubId" : 30003,
+      "metrics" : { "commits" : 9, "pullRequestsOpened" : 3, "reviews" : 5, "activeDays" : 7 }
+    }, {
+      "githubId" : 30004,
+      "metrics" : { "commits" : 5, "pullRequestsOpened" : 2, "reviews" : 2, "activeDays" : 5 }
+    }, {
+      "githubId" : 30005,
+      "metrics" : { "commits" : 3, "pullRequestsOpened" : 1, "reviews" : 1, "activeDays" : 3 }
+    }, {
+      "githubId" : 30006,
+      "metrics" : { "commits" : 2, "pullRequestsOpened" : 1, "reviews" : 0, "activeDays" : 2 }
+    }, {
+      "githubId" : 30007,
+      "metrics" : { "commits" : 1, "pullRequestsOpened" : 1, "reviews" : 0, "activeDays" : 1 }
+    }, {
+      "githubId" : 30008,
+      "metrics" : { "commits" : 1, "pullRequestsOpened" : 0, "reviews" : 1, "activeDays" : 1 }
+    } ]
+  } ]
+}

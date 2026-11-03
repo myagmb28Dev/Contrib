@@ -7,7 +7,7 @@ const labels: Record<string, string> = {
 export function ComparisonSummary({ comparison }: { comparison?: ActivityComparison | null }) {
   return <span>{comparison?.status === "AVAILABLE" && comparison.percentile != null
     ? `상대 활동 ${comparison.percentile.toFixed(1)}백분위`
-    : comparison ? "백분위 산정 보류" : "이전 분석 · 백분위 없음"}</span>;
+    : comparison ? "백분위 산정 보류 (기준 데이터 없음)" : "이전 분석 · 백분위 없음"}</span>;
 }
 
 type AnalysisPeriod = { start: string; end: string };
@@ -24,8 +24,14 @@ export function ActivityComparisonCard({ comparison, analysisPeriod }: {
   const distinctPeriods = analysisPeriod && (analysisPeriod.start !== comparison.periodStart || analysisPeriod.end !== comparison.periodEnd);
   return <section id="activity-comparison" className="card stack" aria-label="상대 활동 수준">
     <h3>상대 활동 수준 · 백분위</h3>
-    {!available && <strong>백분위 산정 보류</strong>}
-    <p>{comparison.reason}</p>
+    {!available ? (
+      <div style={{ background: "var(--background-secondary, #f8fafc)", borderLeft: "4px solid #f59e0b", padding: "12px 16px", borderRadius: "6px" }}>
+        <strong style={{ color: "#d97706", display: "block", marginBottom: "4px" }}>백분위 산정 보류</strong>
+        <p style={{ margin: 0, fontSize: "0.92rem" }}>{comparison.reason}</p>
+      </div>
+    ) : (
+      <p>{comparison.reason}</p>
+    )}
     {available && (comparison.singleActivitySensitivity ?? 0) >= 20 && <p role="note" className="comparison-caution">
       유의: 비교 표본에 따라 작은 활동 차이에도 백분위가 달라질 수 있습니다.
     </p>}
@@ -33,7 +39,14 @@ export function ActivityComparisonCard({ comparison, analysisPeriod }: {
       {distinctPeriods && <div><dt>전체 분석 기간 (UTC)</dt><dd>{analysisPeriod.start} ~ {analysisPeriod.end}</dd></div>}
       <div><dt>백분위 비교 기간 (UTC · 종료 제외)</dt><dd>{comparison.periodStart} ~ {comparison.periodEnd}</dd></div>
       <div><dt>비교 조건</dt><dd>{comparison.language ?? "언어 미확인"} · 활동 기여자 {comparison.sizeBand}명 규모의 공개 저장소</dd></div>
-      <div><dt>비교 표본</dt><dd>{comparison.repositories.length}개 저장소 · {comparison.contributorCount}명 · 기여자와 저장소 조합 {comparison.sampleCount}건</dd></div>
+      <div>
+        <dt>비교 표본</dt>
+        <dd>
+          {available || comparison.repositories.length > 0
+            ? `${comparison.repositories.length}개 저장소 · ${comparison.contributorCount}명 · 기여자와 저장소 조합 ${comparison.sampleCount}건`
+            : "일치하는 공개 기준 표본 없음 (해당 조건의 공개 벤치마크 데이터 미제공)"}
+        </dd>
+      </div>
     </dl>
     {available && <div className="compact-table-container"><table className="compact-table">
       <thead><tr><th>활동 항목</th><th>백분위</th><th>종합 반영 비중</th></tr></thead>

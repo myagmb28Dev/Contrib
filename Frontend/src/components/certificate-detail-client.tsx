@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import { certificateResult } from "@/lib/certificate-result";
 import { verificationStatusLabel } from "@/lib/verification-status";
 import {
   ApiRequestError,
+  deleteCertificate,
   getAttestationIntent,
   getCertificate,
   getCertificateAttestation,
@@ -56,9 +57,28 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
   const [attestation, setAttestation] = useState<Attestation | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
   const [revocationReason, setRevocationReason] = useState("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  async function handleDelete() {
+    if (!certificate || !window.confirm(`'${repoName}'의 기여 인증서를 삭제하시겠습니까?`)) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteCertificate(certificateId);
+      router.replace("/dashboard/certificates");
+    } catch (err: unknown) {
+      if (err instanceof ApiRequestError && err.status === 401) {
+        router.replace("/");
+        return;
+      }
+      setError(err instanceof Error ? err.message : "인증서 삭제에 실패했습니다.");
+      setDeleting(false);
+    }
+  }
 
   useEffect(() => {
     if (!certificate) return;
@@ -228,13 +248,23 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
 
   return (
     <div className="stack full-width">
-      <Breadcrumb
-        items={[
-          { label: "대시보드", href: "/dashboard" },
-          { label: "인증서 목록", href: "/dashboard/certificates" },
-          { label: "인증서 상세" },
-        ]}
-      />
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+        <Breadcrumb
+          items={[
+            { label: "대시보드", href: "/dashboard" },
+            { label: "인증서 목록", href: "/dashboard/certificates" },
+            { label: "인증서 상세" },
+          ]}
+        />
+        <button
+          type="button"
+          className="button danger-outline sm"
+          onClick={handleDelete}
+          disabled={deleting}
+        >
+          {deleting ? "삭제 중..." : "인증서 삭제"}
+        </button>
+      </div>
 
       {/* Web3 Certificate Showcase Card */}
       <section className="certificate-stage certificate-document-stage full-width" aria-label="인증서 미리보기">

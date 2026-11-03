@@ -5,7 +5,7 @@ import { ComparisonSummary } from "./activity-comparison";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-import { ApiRequestError, getAnalyses, type Analysis } from "@/lib/api";
+import { ApiRequestError, deleteAnalysis, getAnalyses, type Analysis } from "@/lib/api";
 
 
 export function AnalysesClient() {
@@ -16,6 +16,26 @@ export function AnalysesClient() {
 
   const [viewMode, setViewMode] = useState<"grid" | "compact">("grid");
   const [selectedRepo, setSelectedRepo] = useState<string>("ALL");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function handleDelete(analysisId: string, repoName: string) {
+    if (!window.confirm(`'${repoName}'의 기여 분석을 삭제하시겠습니까? 연결된 인증서가 있다면 함께 삭제됩니다.`)) {
+      return;
+    }
+    setDeletingId(analysisId);
+    try {
+      await deleteAnalysis(analysisId);
+      setItems((prev) => prev.filter((item) => item.id !== analysisId));
+    } catch (err: unknown) {
+      if (err instanceof ApiRequestError && err.status === 401) {
+        router.replace("/");
+        return;
+      }
+      setError(err instanceof Error ? err.message : "기여 분석 삭제에 실패했습니다.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
 
   useEffect(() => {
@@ -156,12 +176,22 @@ export function AnalysesClient() {
 
                     <div className="analysis-card-footer">
                       <span className="ai-model-tag">AI 분석</span>
-                      <Link
-                        className="button primary sm"
-                        href={`/repositories/${analysis.repositoryId}/analysis/${analysis.id}`}
-                      >
-                        결과 상세 &rarr;
-                      </Link>
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                        <button
+                          type="button"
+                          className="button danger-outline sm"
+                          onClick={() => handleDelete(analysis.id, analysis.repositoryName || analysis.repositoryFullName || "저장소")}
+                          disabled={deletingId === analysis.id}
+                        >
+                          {deletingId === analysis.id ? "삭제 중..." : "삭제"}
+                        </button>
+                        <Link
+                          className="button primary sm"
+                          href={`/repositories/${analysis.repositoryId}/analysis/${analysis.id}`}
+                        >
+                          결과 상세 &rarr;
+                        </Link>
+                      </div>
                     </div>
                   </article>
                 );
@@ -216,13 +246,24 @@ export function AnalysesClient() {
                           </div>
                         </td>
                         <td style={{ textAlign: "right" }}>
-                          <Link
-                            className="button primary sm"
-                            href={`/repositories/${analysis.repositoryId}/analysis/${analysis.id}`}
-                            style={{ padding: "4px 10px", fontSize: "0.78rem" }}
-                          >
-                            상세 &rarr;
-                          </Link>
+                          <div style={{ display: "flex", gap: "6px", justifyContent: "flex-end", alignItems: "center" }}>
+                            <button
+                              type="button"
+                              className="button danger-outline sm"
+                              onClick={() => handleDelete(analysis.id, analysis.repositoryName || analysis.repositoryFullName || "저장소")}
+                              disabled={deletingId === analysis.id}
+                              style={{ padding: "4px 8px", fontSize: "0.78rem" }}
+                            >
+                              {deletingId === analysis.id ? "..." : "삭제"}
+                            </button>
+                            <Link
+                              className="button primary sm"
+                              href={`/repositories/${analysis.repositoryId}/analysis/${analysis.id}`}
+                              style={{ padding: "4px 10px", fontSize: "0.78rem" }}
+                            >
+                              상세 &rarr;
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     );

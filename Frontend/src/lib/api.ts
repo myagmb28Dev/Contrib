@@ -247,6 +247,13 @@ export async function getAnalysis(analysisId: string): Promise<Analysis> {
   return apiJson(`/api/analyses/${analysisId}`);
 }
 
+export async function deleteAnalysis(analysisId: string): Promise<void> {
+  const response = await apiFetch(`/api/analyses/${analysisId}`, { method: "DELETE" });
+  if (!response.ok) {
+    throw new ApiRequestError(response.status, "기여 분석을 삭제하지 못했습니다.");
+  }
+}
+
 export async function createCertificate(
   analysisId: string,
   subjectWalletAddress: string | null,
@@ -263,6 +270,13 @@ export async function getCertificates(): Promise<Certificate[]> {
 
 export async function getCertificate(id: string): Promise<Certificate> {
   return apiJson(`/api/certificates/${id}`);
+}
+
+export async function deleteCertificate(id: string): Promise<void> {
+  const response = await apiFetch(`/api/certificates/${id}`, { method: "DELETE" });
+  if (!response.ok) {
+    throw new ApiRequestError(response.status, "인증서를 삭제하지 못했습니다.");
+  }
 }
 
 export async function getAttestationIntent(id: string): Promise<AttestationIntent> {

@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import com.example.project.analysis.collector.GitHubActivityCollector;
 import com.example.project.analysis.collector.RepositoryActivityCollector;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,8 +36,15 @@ public class BenchmarkCatalog {
                 loaded.add(new Entry(GitHubActivityCollector.sha256(json), dataset, json));
             }
             Set<String> periods = new HashSet<>();
-            for (var entry : loaded) if (!periods.add(entry.dataset().periodStart() + "/" + entry.dataset().periodEnd()))
-                throw new IllegalArgumentException("Multiple reference datasets for the same period");
+            for (var entry : loaded) {
+                String langs = entry.dataset().repositories().stream()
+                        .map(BenchmarkDataset.Repository::language)
+                        .filter(l -> l != null && !l.isBlank())
+                        .map(String::toLowerCase)
+                        .distinct().sorted().collect(Collectors.joining(","));
+                if (!periods.add(entry.dataset().periodStart() + "/" + entry.dataset().periodEnd() + "/" + langs))
+                    throw new IllegalArgumentException("Multiple reference datasets for the same period and language");
+            }
         } catch (Exception e) {
             throw new IllegalStateException("Cannot load validated public benchmarks", e);
         }
@@ -49,9 +57,10 @@ public class BenchmarkCatalog {
     }
     public Entry latestCovered(Instant start, Instant end, String language) {
         if (language == null || language.isBlank()) return null;
+        String normalizedLanguage = language.trim();
         return entries.stream().filter(e -> !e.dataset().periodStart().isBefore(start)
                         && !e.dataset().periodEnd().isAfter(end)
-                        && e.dataset().repositories().stream().anyMatch(r -> language.equals(r.language())))
+                        && e.dataset().repositories().stream().anyMatch(r -> normalizedLanguage.equalsIgnoreCase(r.language())))
                 .max(Comparator.comparing((Entry e) -> e.dataset().periodEnd())
                         .thenComparing(e -> e.dataset().periodStart(), Comparator.reverseOrder())).orElse(null);
     }
