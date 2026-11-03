@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import { Breadcrumb } from "./breadcrumb";
 import { ActivityComparisonCard } from "./activity-comparison";
-import { ApiRequestError, createCertificate, getAnalysis, type Analysis } from "@/lib/api";
+import { ApiRequestError, createCertificate, deleteAnalysis, getAnalysis, type Analysis } from "@/lib/api";
 
 const metricLabels: Record<string, { label: string; unit?: string }> = {
   commits: { label: "총 커밋 수", unit: "회" },
@@ -30,7 +30,26 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [certificateId, setCertificateId] = useState<string | null>(null);
   const [issuing, setIssuing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
+
+  async function handleDelete() {
+    if (!analysis || !window.confirm("이 기여 분석을 삭제하시겠습니까? 연결된 인증서가 있다면 함께 삭제됩니다.")) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteAnalysis(analysisId);
+      router.replace("/dashboard/analyses");
+    } catch (err: unknown) {
+      if (err instanceof ApiRequestError && err.status === 401) {
+        router.replace("/");
+        return;
+      }
+      setError(err instanceof Error ? err.message : "기여 분석 삭제에 실패했습니다.");
+      setDeleting(false);
+    }
+  }
 
   useEffect(() => {
     getAnalysis(analysisId)
@@ -85,13 +104,23 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
 
   return (
     <div className="stack full-width">
-      <Breadcrumb
-        items={[
-          { label: "대시보드", href: "/dashboard" },
-          { label: "기여 분석 목록", href: "/dashboard/analyses" },
-          { label: "분석 결과" },
-        ]}
-      />
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+        <Breadcrumb
+          items={[
+            { label: "대시보드", href: "/dashboard" },
+            { label: "기여 분석 목록", href: "/dashboard/analyses" },
+            { label: "분석 결과" },
+          ]}
+        />
+        <button
+          type="button"
+          className="button danger-outline sm"
+          onClick={handleDelete}
+          disabled={deleting}
+        >
+          {deleting ? "삭제 중..." : "분석 삭제"}
+        </button>
+      </div>
 
       {/* Hero Score & AI Summary Card */}
       <ActivityComparisonCard comparison={analysis.activityComparison}

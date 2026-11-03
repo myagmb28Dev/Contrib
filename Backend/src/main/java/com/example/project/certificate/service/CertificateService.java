@@ -81,6 +81,12 @@ public class CertificateService {
         return CertificateResponse.from(certificate, objectMapper);
     }
 
+    @Transactional
+    public void delete(UUID userId, UUID id) {
+        Certificate certificate = ownedCertificate(userId, id);
+        certificateRepository.delete(certificate);
+    }
+
     @Transactional(readOnly = true)
     public CertificateResponse getPublic(UUID publicId) {
         return CertificateResponse.from(publicCertificate(publicId), objectMapper);

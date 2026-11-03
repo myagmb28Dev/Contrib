@@ -18,4 +18,16 @@ class AnalysisControllerTest {
         assertThat(response.getStatusCode().value()).isEqualTo(202);
         verify(service).create(userId, repositoryId, null, null, true);
     }
+
+    @Test void delegatesDeletionToService() {
+        var service = mock(AnalysisService.class);
+        var principal = mock(GitHubPrincipal.class);
+        var userId = UUID.randomUUID();
+        var analysisId = UUID.randomUUID();
+        when(principal.getUserId()).thenReturn(userId);
+
+        new AnalysisController(service).delete(principal, analysisId);
+
+        verify(service).delete(userId, analysisId);
+    }
 }
