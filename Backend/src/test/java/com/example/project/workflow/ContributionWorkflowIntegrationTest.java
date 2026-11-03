@@ -100,7 +100,7 @@ class ContributionWorkflowIntegrationTest {
         var certificate = certificateService.create(principal.getUserId(), analysis.id(), SUBJECT);
         assertThat(certificate.schemaVersion()).isEqualTo("1.1");
         assertThat(certificate.payload().path("result").path("activityComparison").path("modelVersion").asText())
-                .isEqualTo("activity-percentile-v2");
+                .isEqualTo("activity-density-v1");
         assertThat(verificationService.verify(certificate.publicId()).status())
                 .isEqualTo(VerificationStatus.NOT_REGISTERED);
         var intent = blockchainService.intent(principal.getUserId(), certificate.id());
@@ -244,7 +244,7 @@ class ContributionWorkflowIntegrationTest {
         assertThat(analysis.activityComparison().path("status").asText()).isEqualTo("AVAILABLE");
         assertThat(analysis.activityComparison().path("periodStart").asText()).isEqualTo(referenceStart.toString());
         assertThat(analysis.activityComparison().path("periodEnd").asText()).isEqualTo(referenceEnd.toString());
-        assertThat(analysis.activityComparison().path("modelVersion").asText()).isEqualTo("activity-percentile-v2");
+        assertThat(analysis.activityComparison().path("modelVersion").asText()).isEqualTo("activity-density-v1");
         var certificate = certificateService.create(principal.getUserId(), analysis.id(), null);
         assertThat(certificate.payload().path("period").path("start").asText()).isEqualTo(createdAt.toString());
         assertThat(certificate.payload().path("result").path("activityComparison")).isEqualTo(analysis.activityComparison());

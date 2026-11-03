@@ -43,13 +43,19 @@ class PercentileCalculatorTest {
     }
     @Test void refusesMismatchedPeriodsSmallCohortsAndZeroActivity() {
         assertThat(calculator.calculate(context(999), vector(0), dataset(false), "data-1").status()).isEqualTo("NO_ACTIVITY");
-        var wrongPeriod = new PercentileCalculator.Context(999, START.plusSeconds(1), END, "C#", 15, true, "");
-        assertThat(calculator.calculate(wrongPeriod, vector(5), dataset(false), "data-1").status()).isEqualTo("NO_REFERENCE_PERIOD");
+        assertThat(calculator.calculate(context(999), vector(5), null, null).status()).isEqualTo("NO_REFERENCE_PERIOD");
+        assertThat(calculator.calculate(context(999), vector(5), null, null).reason()).isEqualTo("해당 언어의 공개 비교 데이터가 없습니다.");
         var insufficient = calculator.calculate(context(999), vector(5), data(dataset(false).repositories().subList(0, 2)), "data-1");
         assertThat(insufficient.status()).isEqualTo("INSUFFICIENT_COHORT");
         assertThat(insufficient.percentile()).isNull();
         var differentLanguage = new PercentileCalculator.Context(999, START, END, "Java", 15, true, "");
         assertThat(calculator.calculate(differentLanguage, vector(5), dataset(false), "data-1").status()).isEqualTo("INSUFFICIENT_COHORT");
+    }
+    @Test void normalizesActivityDensityAcrossDifferentDurations() {
+        var twoMonths = new PercentileCalculator.Context(999, START, START.plus(62, java.time.temporal.ChronoUnit.DAYS), "C#", 15, true, "");
+        var result = calculator.calculate(twoMonths, vector(10), dataset(false), "data-1");
+        assertThat(result.status()).isEqualTo("AVAILABLE");
+        assertThat(result.percentile()).isEqualTo(45.0);
     }
     @Test void excludesSubjectAndDoesNotOverweightRepeatedPeople() {
         var result = calculator.calculate(context(1), vector(5), dataset(false), "data-1");
