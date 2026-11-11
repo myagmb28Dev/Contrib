@@ -12,6 +12,17 @@ export function ComparisonSummary({ comparison }: { comparison?: ActivityCompari
 
 type AnalysisPeriod = { start: string; end: string };
 
+function formatPeriodDate(isoString: string): string {
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) {
+    return isoString;
+  }
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}.${month}.${day}`;
+}
+
 export function ActivityComparisonCard({ comparison, analysisPeriod }: {
   comparison?: ActivityComparison | null; analysisPeriod?: AnalysisPeriod | null;
 }) {
@@ -32,12 +43,48 @@ export function ActivityComparisonCard({ comparison, analysisPeriod }: {
     ) : (
       <p>{comparison.reason}</p>
     )}
+    {available && (
+      <div className="overall-percentile-hero">
+        <div className="overall-percentile-header">
+          <span className="overall-percentile-label">종합 활동 밀도 백분위</span>
+          <span className="overall-percentile-badge">
+            상위 약 {Math.max(0.1, 100 - comparison.percentile!).toFixed(1)}% 수준
+          </span>
+        </div>
+        <div className="overall-percentile-value-row">
+          <strong className="overall-percentile-number">{comparison.percentile!.toFixed(1)}</strong>
+          <span className="overall-percentile-unit">백분위</span>
+        </div>
+        <div className="overall-percentile-gauge-container">
+          <div
+            className="overall-percentile-gauge"
+            role="progressbar"
+            aria-valuenow={comparison.percentile!}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="종합 활동 백분위 게이지"
+          >
+            <div
+              className="overall-percentile-gauge-fill"
+              style={{ width: `${Math.min(100, Math.max(0, comparison.percentile!))}%` }}
+            />
+          </div>
+          <div className="overall-percentile-scale">
+            <span>0</span>
+            <span>25</span>
+            <span>50 (중간)</span>
+            <span>75</span>
+            <span>100</span>
+          </div>
+        </div>
+      </div>
+    )}
     {available && (comparison.singleActivitySensitivity ?? 0) >= 20 && <p role="note" className="comparison-caution">
       유의: 비교 표본에 따라 작은 활동 차이에도 백분위가 달라질 수 있습니다.
     </p>}
     <dl className="identity-list">
-      {distinctPeriods && <div><dt>전체 분석 기간 (UTC)</dt><dd>{analysisPeriod.start} ~ {analysisPeriod.end}</dd></div>}
-      <div><dt>백분위 비교 기간 (UTC · 종료 제외)</dt><dd>{comparison.periodStart} ~ {comparison.periodEnd}</dd></div>
+      {distinctPeriods && <div><dt>전체 분석 기간 (UTC)</dt><dd>{formatPeriodDate(analysisPeriod.start)} ~ {formatPeriodDate(analysisPeriod.end)}</dd></div>}
+      <div><dt>백분위 비교 기간 (UTC · 종료 제외)</dt><dd>{formatPeriodDate(comparison.periodStart)} ~ {formatPeriodDate(comparison.periodEnd)}</dd></div>
       <div><dt>비교 조건</dt><dd>{comparison.language ?? "언어 미확인"} · 활동 기여자 {comparison.sizeBand}명 규모의 공개 저장소</dd></div>
       <div>
         <dt>비교 표본</dt>

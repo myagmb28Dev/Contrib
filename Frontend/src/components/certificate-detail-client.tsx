@@ -9,6 +9,17 @@ import { Breadcrumb } from "./breadcrumb";
 import { ComparisonSummary } from "./activity-comparison";
 import { certificateResult } from "@/lib/certificate-result";
 import { verificationStatusLabel } from "@/lib/verification-status";
+
+function formatPeriodDate(isoString: string): string {
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) {
+    return isoString;
+  }
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}.${month}.${day}`;
+}
 import {
   ApiRequestError,
   deleteCertificate,
@@ -309,12 +320,12 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
                 || result.analysisPeriod.end !== result.comparison.periodEnd) && (
                 <div>
                   <dt>전체 분석 기간 (UTC)</dt>
-                  <dd>{result.analysisPeriod.start} ~ {result.analysisPeriod.end}</dd>
+                  <dd>{formatPeriodDate(result.analysisPeriod.start)} ~ {formatPeriodDate(result.analysisPeriod.end)}</dd>
                 </div>
               )}
               <div>
                 <dt>백분위 비교 기간 (UTC · 종료 제외)</dt>
-                <dd>{result.comparison.periodStart} ~ {result.comparison.periodEnd}</dd>
+                <dd>{formatPeriodDate(result.comparison.periodStart)} ~ {formatPeriodDate(result.comparison.periodEnd)}</dd>
               </div>
               <div>
                 <dt>비교 집단</dt>
