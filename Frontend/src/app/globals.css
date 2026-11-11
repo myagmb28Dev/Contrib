@@ -877,6 +877,46 @@ a {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
+.overall-percentile-hero.compact {
+  padding: 12px 14px;
+  margin: 8px 0 12px;
+  gap: 8px;
+}
+.overall-percentile-hero.compact .overall-percentile-label {
+  font-size: 0.84rem;
+}
+.overall-percentile-hero.compact .overall-percentile-badge {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+}
+.overall-percentile-hero.compact .overall-percentile-number {
+  font-size: 1.85rem;
+}
+.overall-percentile-hero.compact .overall-percentile-unit {
+  font-size: 0.95rem;
+}
+.overall-percentile-hero.compact .overall-percentile-gauge {
+  height: 8px;
+}
+.overall-percentile-hero.compact .overall-percentile-scale {
+  font-size: 0.68rem;
+}
+.overall-percentile-hero-empty {
+  background: var(--background-secondary, #f8fafc);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 6px 0 10px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+}
+.overall-percentile-hero-empty.compact {
+  padding: 8px 12px;
+  margin: 6px 0 8px;
+  font-size: 0.78rem;
+}
 .comparison-hash { overflow-wrap: anywhere; }
 .comparison-caution {
   margin: 0;

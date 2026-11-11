@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ComparisonSummary } from "./activity-comparison";
+import { ComparisonSummary, OverallPercentileHero } from "./activity-comparison";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -150,11 +150,9 @@ export function AnalysesClient() {
                       <strong style={{ fontSize: "1.05rem", color: "var(--foreground)" }}>
                         {analysis.repositoryName || analysis.repositoryFullName || "저장소"}
                       </strong>
-                      <span className="version-tag">{analysis.activityComparison?.modelVersion ?? "이전 분석"}</span>
                     </div>
 
-
-                    <p className="muted"><ComparisonSummary comparison={analysis.activityComparison} /></p>
+                    <OverallPercentileHero comparison={analysis.activityComparison} compact />
                     <div className="analysis-period-box">
                       <span className="period-text">
                         기간: {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}

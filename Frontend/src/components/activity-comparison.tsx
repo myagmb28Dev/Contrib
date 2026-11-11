@@ -23,6 +23,70 @@ function formatPeriodDate(isoString: string): string {
   return `${year}.${month}.${day}`;
 }
 
+export function OverallPercentileHero({
+  comparison,
+  compact = false,
+}: {
+  comparison?: ActivityComparison | null;
+  compact?: boolean;
+}) {
+  if (!comparison) {
+    return (
+      <div className={`overall-percentile-hero-empty ${compact ? "compact" : ""}`}>
+        <span>이전 분석 · 백분위 없음</span>
+      </div>
+    );
+  }
+
+  if (comparison.status !== "AVAILABLE" || comparison.percentile == null) {
+    return (
+      <div className={`overall-percentile-hero-empty ${compact ? "compact" : ""}`}>
+        <span>{comparison.reason || "백분위 산정 보류"}</span>
+      </div>
+    );
+  }
+
+  const percentile = comparison.percentile;
+  const topPercentile = Math.max(0.1, 100 - percentile).toFixed(1);
+
+  return (
+    <div className={`overall-percentile-hero ${compact ? "compact" : ""}`}>
+      <div className="overall-percentile-header">
+        <span className="overall-percentile-label">종합 활동 밀도 백분위</span>
+        <span className="overall-percentile-badge">
+          상위 약 {topPercentile}% 수준
+        </span>
+      </div>
+      <div className="overall-percentile-value-row">
+        <strong className="overall-percentile-number">{percentile.toFixed(1)}</strong>
+        <span className="overall-percentile-unit">백분위</span>
+      </div>
+      <div className="overall-percentile-gauge-container">
+        <div
+          className="overall-percentile-gauge"
+          role="progressbar"
+          aria-valuenow={percentile}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="종합 활동 백분위 게이지"
+        >
+          <div
+            className="overall-percentile-gauge-fill"
+            style={{ width: `${Math.min(100, Math.max(0, percentile))}%` }}
+          />
+        </div>
+        <div className="overall-percentile-scale">
+          <span>0</span>
+          <span>25</span>
+          <span>50 (중간)</span>
+          <span>75</span>
+          <span>100</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ActivityComparisonCard({ comparison, analysisPeriod }: {
   comparison?: ActivityComparison | null; analysisPeriod?: AnalysisPeriod | null;
 }) {
@@ -44,40 +108,7 @@ export function ActivityComparisonCard({ comparison, analysisPeriod }: {
       <p>{comparison.reason}</p>
     )}
     {available && (
-      <div className="overall-percentile-hero">
-        <div className="overall-percentile-header">
-          <span className="overall-percentile-label">종합 활동 밀도 백분위</span>
-          <span className="overall-percentile-badge">
-            상위 약 {Math.max(0.1, 100 - comparison.percentile!).toFixed(1)}% 수준
-          </span>
-        </div>
-        <div className="overall-percentile-value-row">
-          <strong className="overall-percentile-number">{comparison.percentile!.toFixed(1)}</strong>
-          <span className="overall-percentile-unit">백분위</span>
-        </div>
-        <div className="overall-percentile-gauge-container">
-          <div
-            className="overall-percentile-gauge"
-            role="progressbar"
-            aria-valuenow={comparison.percentile!}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="종합 활동 백분위 게이지"
-          >
-            <div
-              className="overall-percentile-gauge-fill"
-              style={{ width: `${Math.min(100, Math.max(0, comparison.percentile!))}%` }}
-            />
-          </div>
-          <div className="overall-percentile-scale">
-            <span>0</span>
-            <span>25</span>
-            <span>50 (중간)</span>
-            <span>75</span>
-            <span>100</span>
-          </div>
-        </div>
-      </div>
+      <OverallPercentileHero comparison={comparison} />
     )}
     {available && (comparison.singleActivitySensitivity ?? 0) >= 20 && <p role="note" className="comparison-caution">
       유의: 비교 표본에 따라 작은 활동 차이에도 백분위가 달라질 수 있습니다.

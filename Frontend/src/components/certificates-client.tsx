@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { certificateResult } from "@/lib/certificate-result";
-import { ComparisonSummary } from "./activity-comparison";
+import { ComparisonSummary, OverallPercentileHero } from "./activity-comparison";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -194,7 +194,7 @@ export function CertificatesClient() {
                       </div>
                     </div>
 
-                    <ComparisonSummary comparison={certificateResult(cert).comparison} />
+                    <OverallPercentileHero comparison={certificateResult(cert).comparison} compact />
                     <div className="cert-public-id-bar">
                       <span className="cert-id-tag">Public ID</span>
                       <code className="cert-id-val">{cert.publicId}</code>
