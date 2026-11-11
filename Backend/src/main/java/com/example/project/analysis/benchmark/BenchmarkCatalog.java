@@ -55,14 +55,16 @@ public class BenchmarkCatalog {
         return entries.stream().filter(e -> e.dataset().periodStart().equals(start)
                 && e.dataset().periodEnd().equals(end)).findFirst().orElse(null);
     }
-    public Entry latestCovered(Instant start, Instant end, String language) {
+    public Entry latestForLanguage(String language) {
         if (language == null || language.isBlank()) return null;
         String normalizedLanguage = language.trim();
-        return entries.stream().filter(e -> !e.dataset().periodStart().isBefore(start)
-                        && !e.dataset().periodEnd().isAfter(end)
-                        && e.dataset().repositories().stream().anyMatch(r -> normalizedLanguage.equalsIgnoreCase(r.language())))
+        return entries.stream()
+                .filter(e -> e.dataset().repositories().stream().anyMatch(r -> normalizedLanguage.equalsIgnoreCase(r.language())))
                 .max(Comparator.comparing((Entry e) -> e.dataset().periodEnd())
                         .thenComparing(e -> e.dataset().periodStart(), Comparator.reverseOrder())).orElse(null);
+    }
+    public Entry latestCovered(Instant start, Instant end, String language) {
+        return latestForLanguage(language);
     }
     public static void validate(BenchmarkDataset dataset) {
         if (!"benchmark-v1".equals(dataset.schemaVersion()) || !RepositoryActivityCollector.VERSION.equals(dataset.collectorVersion())

@@ -29,7 +29,7 @@ test("full history sends server-resolved mode, not a fixed number of years or a 
   const state = await setup(page, "2011-04-12T13:45:27Z");
   await page.goto("/repositories/repo/analyze");
   await expect(page.locator('input[type="date"]')).toHaveCount(0);
-  await expect(page.getByRole("status")).toContainText("2011-04-12T13:45:27Z");
+  await expect(page.getByRole("status")).toContainText("2011.04.12");
   await expect(page.getByRole("combobox")).toHaveCount(0);
   await expect(page.getByRole("button", { name: /최근|전체 기간|날짜 직접 지정/ })).toHaveCount(0);
   await page.getByRole("button", { name: "기여 분석 시작하기", exact: true }).click();
@@ -46,5 +46,5 @@ test("legacy rows never substitute their local registration date for GitHub crea
   await expect(page.locator('input[type="date"]')).toHaveCount(0);
   await page.getByRole("button", { name: "기여 분석 시작하기", exact: true }).click();
   await expect.poll(() => state.requests).toEqual([{ allTime: true }]);
-  await expect(page.getByRole("status")).toContainText("2011-04-12T13:45:27Z");
+  await expect(page.getByRole("status")).toContainText("2011.04.12");
 });

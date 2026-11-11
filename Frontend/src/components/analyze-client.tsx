@@ -15,6 +15,17 @@ import {
   type Repository,
 } from "@/lib/api";
 
+function formatPeriodDate(isoString: string): string {
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) {
+    return isoString;
+  }
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}.${month}.${day}`;
+}
+
 export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
   const router = useRouter();
 
@@ -98,27 +109,25 @@ export function AnalyzeClient({ repositoryId }: { repositoryId: string }) {
         <div className="analyze-card-header">
           <h2>GitHub 기여 분석 실행</h2>
           <p className="muted">
-            main 브랜치에서 저장소 생성일부터 현재까지 전체 기간을 자동으로 분석합니다.
+            main 브랜치의 생성일부터 현재까지의 활동을 분석합니다.
           </p>
         </div>
 
         <div className="analysis-info-box">
           <div>
-            <strong>분석 기간 · 전체 기간</strong>
+            <strong>분석 기간</strong>
             <p role="status">{repository?.githubCreatedAt
-              ? `${repository.githubCreatedAt}부터 분석 요청 시점까지`
+              ? `${formatPeriodDate(repository.githubCreatedAt)} ~ 현재 (저장소 생성일 기준)`
               : "분석 시작 시 GitHub에서 실제 저장소 생성 시각을 자동으로 확인합니다."}</p>
-            <p className="muted">백분위는 전체 분석 기간과 일치하는 비교 데이터가 있을 때 제공됩니다.
-              비교 데이터가 부족하면 원시 활동 지표만 표시합니다.</p>
           </div>
         </div>
 
         <form className="form-grid" onSubmit={submit}>
           <div className="analysis-info-box">
             <div>
-              <strong>수집 및 분석 지표</strong>
+              <strong>수집 지표</strong>
               <p>
-                커밋(수정/추가 라인 수), 풀 리퀘스트 생성 및 병합, 코드 리뷰 제출, 활동 일수를 포괄하여 AI 요약을 생성합니다.
+                커밋 이력, PR 생성 및 병합, 코드 리뷰, 활동 일수를 종합 분석합니다.
               </p>
             </div>
           </div>

@@ -24,20 +24,17 @@ class FullHistoryBenchmarkTest {
         assertThat(covered.dataset().periodStart()).isEqualTo(SEPTEMBER_START);
         assertThat(covered.dataset().periodEnd()).isEqualTo(OCTOBER_START);
         assertThat(catalog.latestCovered(SEPTEMBER_START.plusSeconds(1),
-                Instant.parse("2026-10-06T00:00:00Z"), "Java")).isNull();
-        assertThat(catalog.latestCovered(Instant.parse("2026-08-14T01:02:31Z"),
                 Instant.parse("2026-10-06T00:00:00Z"), "Python")).isNull();
-        assertThat(catalog.latestCovered(Instant.parse("2026-01-01T00:00:00Z"),
-                Instant.parse("2026-10-06T00:00:00Z"), "C#").dataset().periodStart())
-                .isEqualTo(Instant.parse("2026-06-01T00:00:00Z"));
+        assertThat(catalog.latestForLanguage("Python")).isNull();
+        assertThat(catalog.latestForLanguage("Java").dataset().periodStart()).isEqualTo(SEPTEMBER_START);
     }
 
     @Test void ranksTheSeparatelyCollectedReferenceWindowAndUsesItsContributorBand() throws Exception {
         var catalog = mock(BenchmarkCatalog.class);
         var dataset = PercentileCalculatorTest.dataset(false);
         var entry = new BenchmarkCatalog.Entry("data-1", dataset, "{}");
-        var fullStart = Instant.parse("2026-07-01T00:00:00Z");
-        var fullEnd = Instant.parse("2026-10-01T00:00:00Z");
+        var fullStart = PercentileCalculatorTest.START;
+        var fullEnd = PercentileCalculatorTest.END;
         when(catalog.latestCovered(fullStart, fullEnd, "C#")).thenReturn(entry);
         var snapshot = mock(RepositorySnapshot.class);
         when(snapshot.getPeriodStart()).thenReturn(fullStart);
@@ -54,7 +51,7 @@ class FullHistoryBenchmarkTest {
                 new ObjectMapper().findAndRegisterModules()).compare(snapshot,
                 new AnalysisMetrics(100, 0, 0, 0, 100, 0, 0, 0));
         assertThat(result.status()).isEqualTo("AVAILABLE");
-        assertThat(result.modelVersion()).isEqualTo("activity-percentile-v2");
+        assertThat(result.modelVersion()).isEqualTo("activity-density-v1");
         assertThat(result.periodStart()).isEqualTo(PercentileCalculatorTest.START);
         assertThat(result.periodEnd()).isEqualTo(PercentileCalculatorTest.END);
         assertThat(result.sizeBand()).isEqualTo("10-49");

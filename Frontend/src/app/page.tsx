@@ -295,13 +295,6 @@ export default function HomePage() {
         </section>
 
         <PublicVerificationForm />
-
-        <footer className="landing-footer">
-          <Link className="brand footer-brand" href="/">
-            <span className="brand-text">Contrib</span>
-          </Link>
-          <p>GitHub 활동 기반의 검증 가능한 Contribution Certificate</p>
-        </footer>
       </div>
     </main>
   );
