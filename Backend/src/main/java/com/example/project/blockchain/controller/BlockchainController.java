@@ -3,6 +3,7 @@ package com.example.project.blockchain.controller;
 import java.util.UUID;
 
 import com.example.project.auth.service.GitHubPrincipal;
+import com.example.project.blockchain.dto.AttestationIntentRequest;
 import com.example.project.blockchain.dto.AttestationIntentResponse;
 import com.example.project.blockchain.dto.AttestationResponse;
 import com.example.project.blockchain.dto.SubmitTransactionRequest;
@@ -31,8 +32,10 @@ public class BlockchainController {
 
     @PostMapping("/certificates/{certificateId}/attestation-intent")
     public AttestationIntentResponse intent(@AuthenticationPrincipal GitHubPrincipal principal,
-            @PathVariable UUID certificateId) {
-        return blockchainService.intent(principal.getUserId(), certificateId);
+            @PathVariable UUID certificateId,
+            @RequestBody(required = false) AttestationIntentRequest request) {
+        String fallbackWalletAddress = request != null ? request.walletAddress() : null;
+        return blockchainService.intent(principal.getUserId(), certificateId, fallbackWalletAddress);
     }
 
     @PostMapping("/certificates/{certificateId}/transactions")

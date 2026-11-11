@@ -279,8 +279,11 @@ export async function deleteCertificate(id: string): Promise<void> {
   }
 }
 
-export async function getAttestationIntent(id: string): Promise<AttestationIntent> {
-  return apiJson(`/api/certificates/${id}/attestation-intent`, { method: "POST" });
+export async function getAttestationIntent(id: string, walletAddress?: string): Promise<AttestationIntent> {
+  return apiJson(`/api/certificates/${id}/attestation-intent`, {
+    method: "POST",
+    ...(walletAddress ? { body: JSON.stringify({ walletAddress }) } : {}),
+  });
 }
 
 export async function submitAttestation(

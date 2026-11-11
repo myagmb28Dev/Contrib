@@ -29,6 +29,7 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
   const router = useRouter();
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [certificateId, setCertificateId] = useState<string | null>(null);
+  const [walletAddress, setWalletAddress] = useState("");
   const [issuing, setIssuing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -67,7 +68,7 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
     setError("");
     setIssuing(true);
     try {
-      const cert = await createCertificate(analysisId, null);
+      const cert = await createCertificate(analysisId, walletAddress.trim() || null);
       setCertificateId(cert.id);
     } catch (reason) {
       if (reason instanceof ApiRequestError && reason.status === 401) {
@@ -182,7 +183,21 @@ export function AnalysisDetailClient({ analysisId }: { analysisId: string }) {
           </p>
         </div>
 
-        <div className="issue-action-row mt" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <div className="issue-action-row mt" style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "flex-start" }}>
+          {!certificateId && (
+            <div style={{ maxWidth: "420px", width: "100%" }}>
+              <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "4px" }}>
+                수신자 지갑 주소 (선택 사항)
+              </label>
+              <input
+                type="text"
+                placeholder="0x... (온체인 등록 시 사용)"
+                value={walletAddress}
+                onChange={(e) => setWalletAddress(e.target.value)}
+                style={{ width: "100%", padding: "8px 12px", fontSize: "0.88rem", borderRadius: "6px", border: "1px solid var(--border)" }}
+              />
+            </div>
+          )}
           {!certificateId ? (
             <button
               className="button primary"

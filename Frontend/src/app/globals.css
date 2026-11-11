@@ -1280,7 +1280,9 @@ a {
 
 .cert-card-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
   gap: 8px;
   padding-top: 14px;
   border-top: 1px solid var(--border);

@@ -26,9 +26,11 @@ function formatPeriodDate(isoString: string): string {
 export function OverallPercentileHero({
   comparison,
   compact = false,
+  showGauge = true,
 }: {
   comparison?: ActivityComparison | null;
   compact?: boolean;
+  showGauge?: boolean;
 }) {
   if (!comparison) {
     return (
@@ -61,28 +63,30 @@ export function OverallPercentileHero({
         <strong className="overall-percentile-number">{percentile.toFixed(1)}</strong>
         <span className="overall-percentile-unit">백분위</span>
       </div>
-      <div className="overall-percentile-gauge-container">
-        <div
-          className="overall-percentile-gauge"
-          role="progressbar"
-          aria-valuenow={percentile}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label="종합 활동 백분위 게이지"
-        >
+      {showGauge && (
+        <div className="overall-percentile-gauge-container">
           <div
-            className="overall-percentile-gauge-fill"
-            style={{ width: `${Math.min(100, Math.max(0, percentile))}%` }}
-          />
+            className="overall-percentile-gauge"
+            role="progressbar"
+            aria-valuenow={percentile}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="종합 활동 백분위 게이지"
+          >
+            <div
+              className="overall-percentile-gauge-fill"
+              style={{ width: `${Math.min(100, Math.max(0, percentile))}%` }}
+            />
+          </div>
+          <div className="overall-percentile-scale">
+            <span>0</span>
+            <span>25</span>
+            <span>50 (중간)</span>
+            <span>75</span>
+            <span>100</span>
+          </div>
         </div>
-        <div className="overall-percentile-scale">
-          <span>0</span>
-          <span>25</span>
-          <span>50 (중간)</span>
-          <span>75</span>
-          <span>100</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

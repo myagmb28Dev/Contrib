@@ -157,18 +157,18 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
     });
   }
 
-  async function connectWallet(intent: AttestationIntent) {
+  async function connectWallet(targetChainId: number = 84532) {
     if (!window.ethereum) throw new Error("MetaMask 등 브라우저 Web3 지갑을 찾을 수 없습니다.");
     const wallet = createWalletClient({ transport: custom(window.ethereum) });
     const [account] = await wallet.requestAddresses();
-    const chainId = `0x${intent.chainId.toString(16)}`;
+    const chainId = `0x${targetChainId.toString(16)}`;
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId }],
       });
     } catch (switchError) {
-      if ((switchError as { code?: number }).code !== 4902 || intent.chainId !== 84532)
+      if ((switchError as { code?: number }).code !== 4902 || targetChainId !== 84532)
         throw switchError;
       await window.ethereum.request({
         method: "wallet_addEthereumChain",
@@ -190,8 +190,8 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
     setWorking(true);
     setError("");
     try {
-      const intent = await getAttestationIntent(certificateId);
-      const { wallet, account } = await connectWallet(intent);
+      const { wallet, account } = await connectWallet(84532);
+      const intent = await getAttestationIntent(certificateId, account);
       const hash = await wallet.writeContract({
         account,
         chain: null,
@@ -200,7 +200,9 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
         functionName: "issue",
         args: intent.arguments as [`0x${string}`, `0x${string}`, `0x${string}`],
       });
-      setAttestation(await submitAttestation(certificateId, hash, account));
+      const newAttestation = await submitAttestation(certificateId, hash, account);
+      setAttestation(newAttestation);
+      setCertificate((prev) => prev ? { ...prev, subjectWalletAddress: account } : prev);
     } catch (reason) {
       if (reason instanceof ApiRequestError && reason.status === 401) {
         router.replace("/");
@@ -221,7 +223,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
     setError("");
     try {
       const intent = await getRevocationIntent(certificateId);
-      const { wallet, account } = await connectWallet(intent);
+      const { wallet, account } = await connectWallet(intent.chainId);
       const hash = await wallet.writeContract({
         account,
         chain: null,
@@ -412,7 +414,7 @@ export function CertificateDetailClient({ certificateId }: { certificateId: stri
           <button
             className="button primary"
             onClick={publish}
-            disabled={working || !certificate.subjectWalletAddress || certificate.status === "REVOKED" || attestation?.status === "CONFIRMED" || attestation?.status === "PENDING"}
+            disabled={working || certificate.status === "REVOKED" || attestation?.status === "CONFIRMED" || attestation?.status === "PENDING"}
           >
             {working ? "지갑 서명 진행 중..." : "Base Sepolia 온체인 발급"}
           </button>

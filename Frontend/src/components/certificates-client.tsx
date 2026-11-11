@@ -194,7 +194,7 @@ export function CertificatesClient() {
                       </div>
                     </div>
 
-                    <OverallPercentileHero comparison={certificateResult(cert).comparison} compact />
+                    <OverallPercentileHero comparison={certificateResult(cert).comparison} compact showGauge={false} />
                     <div className="cert-public-id-bar">
                       <span className="cert-id-tag">Public ID</span>
                       <code className="cert-id-val">{cert.publicId}</code>
@@ -219,14 +219,14 @@ export function CertificatesClient() {
                     </div>
 
                     <div className="cert-meta-grid">
-                      <div>
-                        <span className="meta-label">Subject Wallet</span>
-                        <span className="meta-val monospace">
-                          {cert.subjectWalletAddress
-                            ? `${cert.subjectWalletAddress.slice(0, 8)}...${cert.subjectWalletAddress.slice(-6)}`
-                            : "미설정 (오프체인)"}
-                        </span>
-                      </div>
+                      {cert.subjectWalletAddress && (
+                        <div>
+                          <span className="meta-label">Subject Wallet</span>
+                          <span className="meta-val monospace">
+                            {`${cert.subjectWalletAddress.slice(0, 8)}...${cert.subjectWalletAddress.slice(-6)}`}
+                          </span>
+                        </div>
+                      )}
                       <div>
                         <span className="meta-label">발급 일시</span>
                         <span className="meta-val">

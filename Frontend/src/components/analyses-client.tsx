@@ -152,7 +152,7 @@ export function AnalysesClient() {
                       </strong>
                     </div>
 
-                    <OverallPercentileHero comparison={analysis.activityComparison} compact />
+                    <OverallPercentileHero comparison={analysis.activityComparison} compact showGauge={false} />
                     <div className="analysis-period-box">
                       <span className="period-text">
                         기간: {new Date(analysis.periodStart).toLocaleDateString()} ~{" "}

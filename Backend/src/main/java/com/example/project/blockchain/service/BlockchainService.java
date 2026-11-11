@@ -45,18 +45,28 @@ public class BlockchainService {
         this.rpcClient = rpcClient;
     }
 
-    @Transactional(readOnly = true)
-    public AttestationIntentResponse intent(UUID userId, UUID certificateId) {
+    @Transactional
+    public AttestationIntentResponse intent(UUID userId, UUID certificateId, String fallbackWalletAddress) {
         Certificate certificate = ownedCertificate(userId, certificateId);
         ensureConfigured();
         if (certificate.getSubjectWalletAddress() == null) {
-            throw new IllegalArgumentException("A subject wallet address is required for blockchain attestation");
+            if (fallbackWalletAddress != null && !fallbackWalletAddress.isBlank()) {
+                String normalized = payloadFactory.normalizeAddress(fallbackWalletAddress);
+                certificate.setSubjectWalletAddress(normalized);
+            } else {
+                throw new IllegalArgumentException("A subject wallet address is required for blockchain attestation");
+            }
         }
         String onchainId = onchainId(certificate);
         return new AttestationIntentResponse(certificate.getId(), properties.getChainId(), properties.getNetwork(),
                 properties.getContractAddress().toLowerCase(Locale.ROOT), "issue",
                 List.of(onchainId, certificate.getCertificateHash(), certificate.getSubjectWalletAddress()),
                 onchainId, certificate.getCertificateHash());
+    }
+
+    @Transactional
+    public AttestationIntentResponse intent(UUID userId, UUID certificateId) {
+        return intent(userId, certificateId, null);
     }
 
     @Transactional

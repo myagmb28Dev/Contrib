@@ -84,6 +84,7 @@ public class Certificate extends BaseTimeEntity {
     }
 
     public void setIssuerWalletAddress(String issuerWalletAddress) { this.issuerWalletAddress = issuerWalletAddress; }
+    public void setSubjectWalletAddress(String subjectWalletAddress) { this.subjectWalletAddress = subjectWalletAddress; }
     public void revoke(String reason) {
         this.status = CertificateStatus.REVOKED;
         this.revokedAt = Instant.now();
